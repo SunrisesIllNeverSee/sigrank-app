@@ -252,7 +252,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          — Υ Yield, class tier, and compression ratio instantly.
+          — Υ Yield, class tier, and velocity instantly.
         </p>
       </section>
 

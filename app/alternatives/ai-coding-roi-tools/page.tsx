@@ -41,7 +41,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only tool that measures whether your AI investment is compounding or burning, not just how much you adopted.",
+      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier. The only tool that measures whether your AI investment is compounding or burning, not just how much you adopted.",
     pros: [
       "Measures actual cascade efficiency (Υ Yield) — whether your AI dollars compounded or burned",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
@@ -102,7 +102,7 @@ const TOOLS: Tool[] = [
     ],
     cons: [
       "Measures hours, not AI ROI — blind to the cascade and to token spend",
-      "No AI-specific metrics: no cache-read, yield, or compression ratio",
+      "No AI-specific metrics: no cache-read, yield, or velocity",
       "Cannot tell you whether your AI investment is compounding or burning",
     ],
     pricing: "Free tier; Pro from $9/month",
@@ -158,7 +158,7 @@ const FAQS = [
   {
     question: "Which tool is best for measuring AI coding ROI?",
     answer:
-      "For adoption-rate ROI, GitHub Copilot metrics and Cursor insights are the simplest if you're already in those ecosystems. For time-based ROI, WakaTime. For LLM application cost, Langfuse. But for actual cascade-efficiency ROI — whether your AI dollars compounded or burned — SigRank is the only tool that computes Υ Yield, compression ratio, leverage, and velocity, and ranks you against other operators on cost-adjusted efficiency.",
+      "For adoption-rate ROI, GitHub Copilot metrics and Cursor insights are the simplest if you're already in those ecosystems. For time-based ROI, WakaTime. For LLM application cost, Langfuse. But for actual cascade-efficiency ROI — whether your AI dollars compounded or burned — SigRank is the only tool that computes Υ Yield, leverage, and velocity, and ranks you against other operators on cost-adjusted efficiency.",
   },
   {
     question: "Is acceptance rate a good ROI proxy?",

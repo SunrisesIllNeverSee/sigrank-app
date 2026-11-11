@@ -97,8 +97,8 @@ const RELATED = [
     desc: "How much cached context amplifies your fresh input — the compounding multiplier of the cascade.",
   },
   {
-    href: "/metrics/compression-ratio",
-    title: "Compression Ratio",
+    href: "/metrics/velocity",
+    title: "Velocity",
     desc: "Output over input — whether the model is doing more with your tokens than echoing them back.",
   },
   {

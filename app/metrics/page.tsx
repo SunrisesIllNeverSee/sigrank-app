@@ -1,7 +1,7 @@
 /**
  * app/metrics/page.tsx — Metrics index.
  *
- * Hub page listing all six metric definition pages. Each child page carries
+ * Hub page listing the SigRank metric definition pages. Each child page carries
  * DefinedTerm + FAQPage + BreadcrumbList schema. This index adds an ItemList
  * so AI engines see the full metric set as a structured collection.
  *
@@ -19,7 +19,7 @@ import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Metrics — AI Operator Token Efficiency Definitions",
   description:
-    "The six SigRank metrics: Yield (Υ), Cache Hit Rate, Compression Ratio, Leverage, Velocity, and Signal-to-Noise Ratio. Definitions, formulas, and how to improve each one.",
+    "The token-era SigRank metrics: Yield (Υ), Cache Hit Rate, Leverage, Velocity, and Signal-to-Noise Ratio. Definitions, formulas, and how to improve each one. Compression Ratio is a word-era metric, still shown as a legacy view.",
   path: "/metrics",
 });
 
@@ -38,8 +38,8 @@ const METRICS = [
   },
   {
     href: "/metrics/compression-ratio",
-    title: "Compression Ratio — Output per Input",
-    desc: "output / input — how much you get back per token sent to an AI model. What it means and how to improve it.",
+    title: "Compression Ratio — Word-Era Metric",
+    desc: "A word-era SigRank metric (M.01), still shown as a legacy Compression view. The token-era output-per-fresh-input ratio is Velocity.",
   },
   {
     href: "/metrics/leverage",
@@ -48,7 +48,7 @@ const METRICS = [
   },
   {
     href: "/metrics/velocity",
-    title: "Velocity — Token Production Rate",
+    title: "Velocity — Output per Fresh Input",
     desc: "output / input — output efficiency ratio in AI coding. Why it's a secondary metric and how it interacts with yield.",
   },
   {
@@ -80,7 +80,7 @@ export default function MetricsIndex() {
       <JsonLd
         data={[
           breadcrumb([{ name: "Metrics", path: "/metrics" }]),
-          alternativesItemList(METRICS.map((m) => ({ name: m.title, url: `${SITE_ORIGIN}${m.href}` })), "/metrics", "SigRank Metrics — All Six Definitions"),
+          alternativesItemList(METRICS.map((m) => ({ name: m.title, url: `${SITE_ORIGIN}${m.href}` })), "/metrics", "SigRank Metrics — All Definitions"),
         ]}
       />
       <JsonLd

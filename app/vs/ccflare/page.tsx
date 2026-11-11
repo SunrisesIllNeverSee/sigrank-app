@@ -40,7 +40,7 @@ const COMPARE_ROWS: { feature: string; ccflare: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     ccflare: "No (consumption charts)",
     sigrank: "Yes (derived metrics)",
   },
@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does ccflare not measure that SigRank does?",
     answer:
-      "ccflare visualizes token consumption as charts. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). ccflare tells you what your spending looks like; SigRank tells you whether your cascade is compounding or burning. A chart is a visualization; a score is an evaluation.",
+      "ccflare visualizes token consumption as charts. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccflare tells you what your spending looks like; SigRank tells you whether your cascade is compounding or burning. A chart is a visualization; a score is an evaluation.",
   },
   {
     question: "Can I use both ccflare and SigRank?",
@@ -286,7 +286,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

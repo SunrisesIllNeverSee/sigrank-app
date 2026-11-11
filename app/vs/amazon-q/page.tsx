@@ -45,7 +45,7 @@ const COMPARE_ROWS: {
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     amazonQ: "No",
     sigrank: "Yes",
   },

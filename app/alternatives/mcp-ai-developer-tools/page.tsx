@@ -40,7 +40,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank MCP",
     measures:
-      "Operator-level token-cascade efficiency exposed via MCP — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only MCP server that lets AI agents read their own token metrics and cascade efficiency.",
+      "Operator-level token-cascade efficiency exposed via MCP — Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier. The only MCP server that lets AI agents read their own token metrics and cascade efficiency.",
     pros: [
       "The only MCP server that gives AI agents self-awareness of their own cascade efficiency",
       "Agents can read their Υ Yield, cache hit rate, and class tier in real time and adjust behavior",
@@ -152,7 +152,7 @@ const FAQS = [
   {
     question: "How does SigRank's MCP server work?",
     answer:
-      "SigRank's MCP server exposes your operator-level token metrics to AI agents via the Model Context Protocol. An agent can query its Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier in real time. This means the agent can see whether its own cascade is efficient and adjust its context strategy — reuse cache, compress inputs, or reduce token waste — without leaving the conversation.",
+      "SigRank's MCP server exposes your operator-level token metrics to AI agents via the Model Context Protocol. An agent can query its Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier in real time. This means the agent can see whether its own cascade is efficient and adjust its context strategy — reuse cache, compress inputs, or reduce token waste — without leaving the conversation.",
   },
   {
     question: "Which MCP tools are best for AI coding workflows?",

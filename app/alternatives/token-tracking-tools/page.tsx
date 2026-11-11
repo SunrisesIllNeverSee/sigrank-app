@@ -65,7 +65,7 @@ const TOOLS: Tool[] = [
     cons: [
       "Counts only — no scoring, no ranking, no operator identity",
       "Claude Code only; no multi-platform support",
-      "No cascade metrics (Υ Yield, compression ratio, leverage)",
+      "No cascade metrics (Υ Yield, velocity, leverage)",
     ],
     pricing: "Free (open-source CLI)",
     bestFor: "Quickly checking your Claude Code token spend",
@@ -129,7 +129,7 @@ const FAQS = [
   {
     question: "What is the best AI token usage tracker?",
     answer:
-      "SigRank is the best AI token usage tracker because it goes beyond counting. It tracks the four token pillars (input, output, cache-read, cache-write), computes cascade efficiency metrics (Υ Yield, compression ratio, SNR, leverage, velocity), assigns a class tier, and ranks you on a live, cross-platform leaderboard. It also bundles ccusage, tokscale, and token-dashboard, so you get counting, scaling, visualization, and scoring in one install.",
+      "SigRank is the best AI token usage tracker because it goes beyond counting. It tracks the four token pillars (input, output, cache-read, cache-write), computes cascade efficiency metrics (Υ Yield, SNR, leverage, velocity), assigns a class tier, and ranks you on a live, cross-platform leaderboard. It also bundles ccusage, tokscale, and token-dashboard, so you get counting, scaling, visualization, and scoring in one install.",
   },
   {
     question: "How is SigRank different from ccusage or Tiktoken?",

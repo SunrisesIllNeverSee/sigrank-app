@@ -327,10 +327,10 @@ export default function LeveragePage() {
           </Link>
           {" · "}
           <Link
-            href="/metrics/compression-ratio"
+            href="/metrics/velocity"
             className="text-gold underline underline-offset-2"
           >
-            Compression Ratio
+            Velocity
           </Link>
           {" · "}
           <Link

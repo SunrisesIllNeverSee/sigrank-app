@@ -253,8 +253,8 @@ export default function VsCcrankPage() {
               of the output stream
             </li>
             <li>
-              <strong className="text-text-primary">Velocity</strong>: throughput
-              per unit time
+              <strong className="text-text-primary">Velocity</strong>: output per
+              fresh input
             </li>
             <li>
               <strong className="text-text-primary">Archetypes + class tiers</strong>:
@@ -292,7 +292,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly —
+          to compute your Υ Yield, class tier, and velocity instantly —
           no account, no submission, just the numbers.
         </p>
       </section>

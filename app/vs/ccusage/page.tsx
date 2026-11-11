@@ -42,7 +42,7 @@ const COMPARE_ROWS: { feature: string; ccusage: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     ccusage: "Partial (raw counts)",
     sigrank: "Yes (derived metrics)",
   },
@@ -93,17 +93,17 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does SigRank replace ccusage?",
     answer:
-      "No — it wraps it. The SigRank CLI calls ccusage under the hood to parse your Claude Code token telemetry locally, then computes the four-pillar cascade metrics (Υ Yield, compression ratio, SNR, Leverage, Velocity), signs a snapshot with ed25519, and publishes it to the leaderboard. You can still run `ccusage` standalone anytime; SigRank just adds the scoring and ranking layer ccusage was never built to provide.",
+      "No — it wraps it. The SigRank CLI calls ccusage under the hood to parse your Claude Code token telemetry locally, then computes the four-pillar cascade metrics (Υ Yield, SNR, Leverage, Velocity), signs a snapshot with ed25519, and publishes it to the leaderboard. You can still run `ccusage` standalone anytime; SigRank just adds the scoring and ranking layer ccusage was never built to provide.",
   },
   {
     question: "What does ccusage not measure that SigRank does?",
     answer:
-      "ccusage reports raw token counts per session — input, output, cache creation, and cache read. SigRank derives the cascade architecture from those counts: Υ Yield = cache_read × output / input² (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). ccusage tells you what you spent; SigRank tells you how efficiently you drove.",
+      "ccusage reports raw token counts per session — input, output, cache creation, and cache read. SigRank derives the cascade architecture from those counts: Υ Yield = cache_read × output / input² (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccusage tells you what you spent; SigRank tells you how efficiently you drove.",
   },
   {
     question: "Can I use SigRank with my existing ccusage output?",
     answer:
-      "Yes. The SigRank score calculator at /score accepts pasted ccusage JSON — paste your `ccusage --json` output and it computes your Υ Yield, class tier, and compression ratio instantly, no account required. To publish to the leaderboard, run `npx sigrank enroll` then `npx sigrank submit`; the CLI handles the ccusage read, scoring, signing, and submission in one flow.",
+      "Yes. The SigRank score calculator at /score accepts pasted ccusage JSON — paste your `ccusage --json` output and it computes your Υ Yield, class tier, and velocity instantly, no account required. To publish to the leaderboard, run `npx sigrank enroll` then `npx sigrank submit`; the CLI handles the ccusage read, scoring, signing, and submission in one flow.",
   },
   {
     question: "Does SigRank only work with Claude Code like ccusage?",

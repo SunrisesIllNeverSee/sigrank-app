@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 /**
  * CascadeComparator — client-side side-by-side comparison of two token cascades.
  *
- * Two sets of four token pillars (A vs B) → yield, compression ratio, cache hit
+ * Two sets of four token pillars (A vs B) → yield, velocity, cache hit
  * rate, and leverage for each, with the winner flagged per metric.
  */
 
@@ -60,7 +60,7 @@ const ROWS: {
 }[] = [
   { label: "Υ Yield", key: "yield_", higher: true, fmt: (n) => fmt(n, 2) },
   {
-    label: "Compression ratio",
+    label: "Velocity",
     key: "compression",
     higher: true,
     fmt: (n) => n.toFixed(2),

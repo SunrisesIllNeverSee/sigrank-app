@@ -81,7 +81,7 @@ export default function AboutPage() {
           {
             question: "What makes someone good at using AI?",
             answer:
-              "Strong operators show high cache hit rates (reusing context), a high compression ratio (more output per input), and high leverage (cached context amplification). SigRank measures this objectively from token telemetry, not from time spent or subjective quality.",
+              "Strong operators show high cache hit rates (reusing context), a high velocity (more output per input), and high leverage (cached context amplification). SigRank measures this objectively from token telemetry, not from time spent or subjective quality.",
           },
           {
             question: "Is there a user-based AI leaderboard?",
@@ -203,7 +203,7 @@ export default function AboutPage() {
             </summary>
             <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
               Strong operators show high cache hit rates (reusing context), a
-              high compression ratio (more output per input), and high leverage
+              high velocity (more output per input), and high leverage
               (cached context amplification). SigRank measures this objectively
               from token telemetry, not from time spent or subjective quality.
             </p>

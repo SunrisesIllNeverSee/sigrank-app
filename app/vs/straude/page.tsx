@@ -216,7 +216,7 @@ export default function VsStraudePage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           SigRank&apos;s metric stack reads the shape Straude&apos;s log
           records: Υ Yield for the compounding question, Leverage for how much
-          cache amplifies input, Velocity for throughput, SNR for signal
+          cache amplifies input, Velocity for output per fresh input, SNR for signal
           density — plus the archetype that describes your operating pattern
           and the class tier that calibrates it to scale. In fitness terms:
           Straude is the activity feed, SigRank is the power meter and the
@@ -246,7 +246,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          for an instant Υ Yield, class tier, and compression ratio.
+          for an instant Υ Yield, class tier, and velocity.
         </p>
       </section>
 

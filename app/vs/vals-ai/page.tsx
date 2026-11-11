@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does VALS AI not see that SigRank does?",
     answer:
-      "VALS sees system-level behavior - model outputs, accuracy, safety, robustness. It does not see the token cascade: how much input an operator sends, how much context they reuse from cache, how much output they produce per token of input. SigRank reads exactly those four pillars (input, output, cache-read, cache-write) and derives the cascade architecture - Yield, compression ratio, SNR, Leverage, and Velocity. That cascade is where operator efficiency lives, and it is invisible to a system-level evaluator.",
+      "VALS sees system-level behavior - model outputs, accuracy, safety, robustness. It does not see the token cascade: how much input an operator sends, how much context they reuse from cache, how much output they produce per token of input. SigRank reads exactly those four pillars (input, output, cache-read, cache-write) and derives the cascade architecture - Yield, SNR, Leverage, and Velocity. That cascade is where operator efficiency lives, and it is invisible to a system-level evaluator.",
   },
   {
     question: "Is the SigRank leaderboard the product?",

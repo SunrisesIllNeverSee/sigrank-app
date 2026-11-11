@@ -9,7 +9,7 @@ import { CascadeComparator } from "./CascadeComparator";
 export const metadata: Metadata = withOG({
   title: "Cascade Comparator — Compare Two AI Token Cascades",
   description:
-    "Free AI metrics comparison tool. Enter two sets of token pillars and compare yield, compression ratio, cache hit rate, and leverage side by side.",
+    "Free AI metrics comparison tool. Enter two sets of token pillars and compare yield, velocity, cache hit rate, and leverage side by side.",
   path: "/tools/cascade-comparator",
 });
 
@@ -17,7 +17,7 @@ const FAQS = [
   {
     question: "What does the Cascade Comparator do?",
     answer:
-      "It takes two sets of four token pillars (input, output, cache-read, cache-write) — call them A and B — and computes yield, compression ratio, cache hit rate, and leverage for each, flagging which cascade has the edge on every metric.",
+      "It takes two sets of four token pillars (input, output, cache-read, cache-write) — call them A and B — and computes yield, velocity, cache hit rate, and leverage for each, flagging which cascade has the edge on every metric.",
   },
   {
     question: "How is this different from the /compare page?",
@@ -27,7 +27,7 @@ const FAQS = [
   {
     question: "Which metrics matter most when comparing cascades?",
     answer:
-      "Υ Yield is the headline — it captures cache reuse and output density in one number. Cache hit rate shows how well context is reused, and leverage shows how much cached context amplifies fresh input. Compression ratio rounds out the picture of output-per-input.",
+      "Υ Yield is the headline — it captures cache reuse and output density in one number. Cache hit rate shows how well context is reused, and leverage shows how much cached context amplifies fresh input. Velocity rounds out the picture of output-per-input.",
   },
   {
     question: "Can I compare cascades from different AI platforms?",
@@ -52,13 +52,13 @@ export default function CascadeComparatorPage() {
             name: "SigRank Cascade Comparator",
             url: "https://signalaf.com/tools/cascade-comparator",
             description:
-              "Compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, compression ratio, cache hit rate, and leverage for each, with the winning cascade flagged per metric.",
+              "Compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, velocity, cache hit rate, and leverage for each, with the winning cascade flagged per metric.",
             applicationCategory: "CalculatorApplication",
             operatingSystem: "Web",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Side-by-side yield comparison",
-              "Compression ratio comparison",
+              "Velocity comparison",
               "Cache hit rate comparison",
               "Leverage comparison",
             ],

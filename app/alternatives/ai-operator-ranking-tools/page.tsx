@@ -40,7 +40,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only tool that ranks the operator driving the AI, not the model itself.",
+      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier. The only tool that ranks the operator driving the AI, not the model itself.",
     pros: [
       "Ranks operators, not models — the only leaderboard measuring the person driving the AI",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
@@ -162,7 +162,7 @@ const FAQS = [
   {
     question: "Can I rank myself as an AI operator?",
     answer:
-      "Yes. Install the SigRank CLI (npm install -g sigrank), enroll, and submit a verified snapshot of your token telemetry. Your cascade-efficiency score (Υ Yield, compression ratio, leverage, velocity) is computed on-device and submitted with an ed25519 signature. You appear on the live leaderboard with 7d/30d/90d/all-time windows and a class tier from IGNITER to ARCH+.",
+      "Yes. Install the SigRank CLI (npm install -g sigrank), enroll, and submit a verified snapshot of your token telemetry. Your cascade-efficiency score (Υ Yield, leverage, velocity) is computed on-device and submitted with an ed25519 signature. You appear on the live leaderboard with 7d/30d/90d/all-time windows and a class tier from IGNITER to ARCH+.",
   },
   {
     question: "Are AI operator ranking tools free?",

@@ -43,7 +43,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency for supported telemetry sources — Υ Yield (cache_read × output / input²), compression ratio, SNR, leverage, velocity, and class tier. No dedicated Cursor log adapter is currently registered; Cursor's native metrics or separately supplied counts are distinct from signed SigRank submissions.",
+      "Operator-level token-cascade efficiency for supported telemetry sources — Υ Yield (cache_read × output / input²), SNR, leverage, velocity, and class tier. No dedicated Cursor log adapter is currently registered; Cursor's native metrics or separately supplied counts are distinct from signed SigRank submissions.",
     pros: [
       "Platform-neutral metrics for supported local adapters, plus a separate manual scoring path",
       "Scores supported or supplied token pillars with Υ Yield; no automatic Cursor ingestion",
@@ -106,7 +106,7 @@ const TOOLS: Tool[] = [
     ],
     cons: [
       "Measures hours, not token efficiency — blind to the cascade",
-      "No AI-specific metrics: no cache-read, yield, or compression ratio",
+      "No AI-specific metrics: no cache-read, yield, or velocity",
       "Cannot tell you whether your Cursor AI usage is compounding or burning",
     ],
     pricing: "Free tier; Pro from $9/month",

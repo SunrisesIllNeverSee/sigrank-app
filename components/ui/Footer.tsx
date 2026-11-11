@@ -37,7 +37,7 @@ const FOOTER_COLUMNS: {
       { href: "/metrics/signal-to-noise-ratio", label: "Signal-to-Noise Ratio" },
       { href: "/metrics/efficiency", label: "10xDEV" },
       { href: "/metrics/cache-hit-rate", label: "Cache Hit Rate" },
-      { href: "/metrics/compression-ratio", label: "Compression Ratio" },
+      { href: "/metrics/compression-ratio", label: "Compression Ratio (word era)" },
     ],
   },
   {

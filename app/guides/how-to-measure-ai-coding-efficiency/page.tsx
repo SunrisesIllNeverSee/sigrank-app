@@ -320,7 +320,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
                 /score
               </Link>
               . Paste your ccusage JSON to see yield, class tier, and
-              compression ratio instantly — no install required.
+              velocity instantly — no install required.
             </p>
           </li>
         </ul>
@@ -394,8 +394,8 @@ export default function HowToMeasureAICodingEfficiencyPage() {
               >
                 /score
               </Link>{" "}
-              calculator. You&rsquo;ll see yield, class tier, and compression
-              ratio instantly.
+              calculator. You&rsquo;ll see yield, class tier, and velocity
+              instantly.
             </p>
           </li>
           <li className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5">

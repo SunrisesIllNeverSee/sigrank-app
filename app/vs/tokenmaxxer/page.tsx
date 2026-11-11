@@ -41,7 +41,7 @@ const COMPARE_ROWS: { feature: string; tokenmaxxer: string; sigrank: string }[] 
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     tokenmaxxer: "No (raw counts + badges)",
     sigrank: "Yes (derived metrics)",
   },
@@ -101,7 +101,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does tokenmaxxer not measure that SigRank does?",
     answer:
-      "tokenmaxxer reports total tokens burned, streaks, and badges. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). tokenmaxxer tells you how much you burned and how many days in a row; SigRank tells you whether your cascade is compounding or burning.",
+      "tokenmaxxer reports total tokens burned, streaks, and badges. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). tokenmaxxer tells you how much you burned and how many days in a row; SigRank tells you whether your cascade is compounding or burning.",
   },
   {
     question: "Can I use both tokenmaxxer and SigRank?",
@@ -289,7 +289,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

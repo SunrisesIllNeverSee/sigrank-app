@@ -1078,7 +1078,7 @@ export function scoreCalculator() {
     name: "SigRank SignalAF Score Calculator",
     url: `${SITE_ORIGIN}/score`,
     description:
-      "Paste your ccusage JSON to see your Υ Yield, class tier, and compression ratio instantly. No account needed — just run the numbers.",
+      "Paste your ccusage JSON to see your Υ Yield, class tier, and velocity instantly. No account needed — just run the numbers.",
     applicationCategory: "CalculatorApplication",
     operatingSystem: "Web",
     offers: {
@@ -1090,7 +1090,7 @@ export function scoreCalculator() {
     featureList: [
       "Yield (Υ) calculation from token cascade",
       "Class tier classification (IGNITER to ARCH+)",
-      "Compression ratio analysis",
+      "Velocity analysis",
       "No account required",
     ],
   };
@@ -1165,7 +1165,7 @@ export function scoreHowTo() {
     "@type": "HowTo",
     name: "Score your AI token cascade",
     description:
-      "Paste your ccusage JSON output to instantly see your Υ Yield, class tier, and compression ratio. No account needed.",
+      "Paste your ccusage JSON output to instantly see your Υ Yield, class tier, and velocity. No account needed.",
     totalTime: "PT1M",
     step: [
       {
@@ -1184,7 +1184,7 @@ export function scoreHowTo() {
         "@type": "HowToStep",
         position: 3,
         name: "See your yield and class",
-        text: "The calculator computes your Υ Yield = (cache_read × output) / input², your class tier (IGNITER to ARCH+), and your compression ratio instantly.",
+        text: "The calculator computes your Υ Yield = (cache_read × output) / input², your class tier (IGNITER to ARCH+), and your velocity instantly.",
       },
     ],
   };

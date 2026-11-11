@@ -40,7 +40,7 @@ const COMPARE_ROWS: { feature: string; ccstatusline: string; sigrank: string }[]
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     ccstatusline: "No (single count)",
     sigrank: "Yes (derived metrics)",
   },
@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does ccstatusline not measure that SigRank does?",
     answer:
-      "ccstatusline shows a token count in your status bar. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). ccstatusline tells you a number; SigRank tells you whether your cascade is compounding or burning. A widget is a display; a score is an evaluation.",
+      "ccstatusline shows a token count in your status bar. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccstatusline tells you a number; SigRank tells you whether your cascade is compounding or burning. A widget is a display; a score is an evaluation.",
   },
   {
     question: "Can I use both ccstatusline and SigRank?",
@@ -288,7 +288,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

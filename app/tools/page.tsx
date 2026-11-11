@@ -28,12 +28,12 @@ const TOOLS = [
   {
     href: "/tools/yield-calculator",
     title: "Yield (Υ) Calculator — Token Cascade Efficiency",
-    desc: "Enter the four token pillars (input, output, cache-read, cache-write) to compute the Υ Yield score, compression ratio, cache hit rate, and class tier.",
+    desc: "Enter the four token pillars (input, output, cache-read, cache-write) to compute the Υ Yield score, velocity, cache hit rate, and class tier.",
   },
   {
     href: "/tools/cascade-comparator",
     title: "Cascade Comparator — Compare Two AI Token Cascades",
-    desc: "Compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, compression ratio, cache hit rate, and leverage for each.",
+    desc: "Compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, velocity, cache hit rate, and leverage for each.",
   },
   {
     href: "/tools/operator-class-checker",
@@ -61,12 +61,12 @@ export default function ToolsIndex() {
           {
             question: "What is the Yield (Υ) Calculator?",
             answer:
-              "The Yield Calculator is a free tool that computes your Υ = (cache_read × output) / input² score from four token pillars (input, output, cache-read, cache-write). It also shows your compression ratio, cache hit rate, and class tier. No account needed — visit signalaf.com/tools/yield-calculator.",
+              "The Yield Calculator is a free tool that computes your Υ = (cache_read × output) / input² score from four token pillars (input, output, cache-read, cache-write). It also shows your velocity, cache hit rate, and class tier. No account needed — visit signalaf.com/tools/yield-calculator.",
           },
           {
             question: "What is the Cascade Comparator?",
             answer:
-              "The Cascade Comparator lets you compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, compression ratio, cache hit rate, and leverage for each operator. Useful for benchmarking yourself against top operators or comparing two time windows.",
+              "The Cascade Comparator lets you compare two AI token cascades side by side. Enter two sets of four token pillars to see yield, velocity, cache hit rate, and leverage for each operator. Useful for benchmarking yourself against top operators or comparing two time windows.",
           },
           {
             question: "What is the Operator Class Checker?",
