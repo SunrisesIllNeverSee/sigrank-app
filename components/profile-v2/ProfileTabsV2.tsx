@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useProfileWorkspace } from "./ProfileWorkspace";
 import { useProfileAuth } from "@/components/profile/ProfileAuthGate";
@@ -86,9 +85,14 @@ export function ProfileTabsV2({
   badges,
   initial = "overview",
 }: ProfileTabsV2Props) {
-  const searchParams = useSearchParams();
-  const urlTab = searchParams.get("tab") as TabKey | null;
-  const [localTab, setTab] = useState<TabKey>(urlTab && TABS.some((t) => t.key === urlTab) ? urlTab : initial);
+  // ?tab= is read after mount, not via useSearchParams: on this ISR page that
+  // hook bails the profile body out of server rendering, so crawlers and
+  // non-JS AI agents got only the Suspense fallback ("Loading cascade data…").
+  const [localTab, setTab] = useState<TabKey>(initial);
+  useEffect(() => {
+    const urlTab = new URLSearchParams(window.location.search).get("tab") as TabKey | null;
+    if (urlTab && TABS.some((t) => t.key === urlTab)) setTab(urlTab);
+  }, []);
   const workspace = useProfileWorkspace();
   const { isOwner } = useProfileAuth();
   const tab = workspace?.section ?? localTab;
