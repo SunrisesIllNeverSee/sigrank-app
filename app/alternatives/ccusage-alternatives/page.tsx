@@ -56,7 +56,7 @@ const ALTS: Alt[] = [
   },
   {
     name: "Token Dashboard (tokendash)",
-    what: "A token-visualization tool that turns raw token counts into charts and breakdowns. Bundled with SigRank alongside ccusage and tokscale.",
+    what: "A token-visualization tool that turns raw token counts into charts and breakdowns. A separate tool; the SigRank npm package does not list it as a dependency.",
     pros: [
       "Clean visual dashboards for input, output, cache-read, and cache-write",
       "Spot cache-heavy vs input-heavy session patterns at a glance",

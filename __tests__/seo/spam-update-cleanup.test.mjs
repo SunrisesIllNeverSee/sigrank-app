@@ -129,10 +129,13 @@ const BLOG_NOINDEX = [
   "/blog/how-to-answer-best-ai-user",
 ].sort();
 
-test("googlebot noindex covers every /vs/[x] page and not the /vs hub", () => {
+const KEEP_VS = ["/vs/ccusage", "/vs/langfuse"];
+
+test("googlebot noindex covers every /vs/[x] page except the two rebuilt ones, and not the /vs hub", () => {
   const vs = childRoutes("vs");
   assert.ok(vs.length > 40);
-  for (const p of vs) assert.equal(isGoogleOnlyNoindex(p), true, p);
+  for (const k of KEEP_VS) assert.ok(vs.includes(k), `${k} should exist`);
+  for (const p of vs) assert.equal(isGoogleOnlyNoindex(p), !KEEP_VS.includes(p), p);
   assert.equal(isGoogleOnlyNoindex("/vs"), false);
 });
 
@@ -176,7 +179,10 @@ test("googlebot noindex never applies to core pages, /user profiles or utility p
 });
 
 test("googleOnlyRobots keeps the generic robots indexable and noindexes googlebot only", () => {
-  assert.deepEqual(googleOnlyRobots("/vs/ccusage"), {
+  // The two rebuilt /vs pages are Google-indexable: no googlebot override at all.
+  assert.equal(googleOnlyRobots("/vs/ccusage"), undefined);
+  assert.equal(googleOnlyRobots("/vs/langfuse"), undefined);
+  assert.deepEqual(googleOnlyRobots("/vs/cursor"), {
     index: true,
     follow: true,
     googleBot: { index: false, follow: true },
@@ -212,6 +218,7 @@ test("noindex-for-Google pages stay in the sitemap/llms manifest classes unchang
   // Established comparisons and kept pages remain promoted (sitemap + llms.txt).
   for (const p of [
     "/vs/ccusage",
+    "/vs/langfuse",
     "/alternatives/ccusage-alternatives",
     "/alternatives/token-tracking-tools",
     "/guides/how-to-measure-ai-coding-efficiency",

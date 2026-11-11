@@ -1,12 +1,12 @@
 /**
- * app/vs/ccusage/page.tsx — "SigRank vs ccusage" SEO comparison page.
+ * app/vs/ccusage/page.tsx - "SigRank vs ccusage" comparison page.
  *
- * Angle: ccusage reads token usage from Claude Code logs. SigRank bundles ccusage
- * AND adds cascade scoring, leaderboards, operator profiles, MCP integration.
- * ccusage is the sensor; SigRank is the instrument panel.
+ * Rebuilt 2026-11-11 as a standalone page, not template text: competitor facts
+ * come from its primary sources (cited on the page with an as-of date); field
+ * facts come from the public SigRank analyst MCP, fetched the same day.
+ * Metric names follow lib/identity/canon-ids.ts (token-era board).
  *
- * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage), WaveHero,
- * and a styled comparison table matching the repo's table conventions.
+ * RSC only, no client JS.
  */
 
 import type { Metadata } from "next";
@@ -17,98 +17,100 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs ccusage \u2014 Sensor to Instrument Panel",
+  title: "SigRank vs ccusage — Spend Ledger vs Efficiency Ranking",
   description:
-    "ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring, leaderboards, operator profiles, and MCP integration.",
+    "ccusage reports what your coding agents cost from local logs. SigRank ranks how efficiently you drive them. When to use each, and how to run both.",
   path: "/vs/ccusage",
 });
 
-// Comparison rows — feature-by-feature, ccusage vs SigRank.
-const COMPARE_ROWS: { feature: string; ccusage: string; sigrank: string }[] = [
+const COMPARE_ROWS: { feature: string; other: string; sigrank: string }[] = [
   {
-    feature: "Reads Claude Code token logs",
-    ccusage: "Yes",
-    sigrank: "Yes (bundles ccusage)",
+    feature: "Main question answered",
+    other: "What did I spend, and on what?",
+    sigrank: "How does my reuse pattern compare with other operators?",
   },
   {
-    feature:
-      "Token pillar breakdown (input / output / cache-read / cache-write)",
-    ccusage: "Yes",
-    sigrank: "Yes",
+    feature: "Data read",
+    other: "Local usage data from 19 listed agent CLIs",
+    sigrank:
+      "Local usage via the SigRank CLI (lists ccusage as a dependency); four token pillars",
   },
   {
-    feature: "Cascade efficiency score (Υ = cache_read × output / input²)",
-    ccusage: "No",
-    sigrank: "Yes",
+    feature: "Cost in dollars",
+    other: "Yes, per model (pricing data; --offline uses a cache)",
+    sigrank: "Cost per 1M tokens appears on the board; not a billing ledger",
   },
   {
-    feature: "SNR + Leverage + Velocity",
-    ccusage: "Partial (raw counts)",
-    sigrank: "Yes (derived metrics)",
+    feature: "Time views",
+    other: "daily, weekly, monthly, session, 5-hour blocks",
+    sigrank: "7d / 30d / 90d / all-time board windows",
   },
   {
-    feature: "Class tier (IGNITER to ARCH+)",
-    ccusage: "No",
-    sigrank: "Yes",
-  },
-  { feature: "Global operator leaderboard", ccusage: "No", sigrank: "Yes" },
-  {
-    feature: "Operator profiles + head-to-head compare",
-    ccusage: "No",
-    sigrank: "Yes",
+    feature: "Efficiency metrics",
+    other: "Raw counts and cost",
+    sigrank: "Υ Yield, SNR, Leverage, Velocity, 10xDEV, Scale V",
   },
   {
-    feature: "MCP server for AI-agent integration",
-    ccusage: "No",
-    sigrank: "Yes",
+    feature: "Public ranking and profiles",
+    other: "No",
+    sigrank: "Yes, after enroll and submit",
   },
   {
-    feature: "ed25519-signed snapshot submission",
-    ccusage: "No",
-    sigrank: "Yes",
+    feature: "Account required",
+    other: "No",
+    sigrank: "Only to enroll and submit; the calculator needs none",
   },
   {
-    feature: "Platform-neutral (Cursor, Copilot, Gemini, 15+)",
-    ccusage: "Claude Code only",
-    sigrank: "Yes",
-  },
-  {
-    feature: "Bundled tools (tokscale, token-dashboard)",
-    ccusage: "No",
-    sigrank: "Yes",
-  },
-  {
-    feature: "Privacy-preserving (token counts only)",
-    ccusage: "Yes",
-    sigrank: "Yes",
+    feature: "Licence",
+    other: "MIT",
+    sigrank: "See the repository LICENSE",
   },
 ];
 
 const FAQS: { question: string; answer: string }[] = [
   {
-    question: "Is SigRank a ccusage alternative or a ccusage upgrade?",
-    answer:
-      "Both. SigRank bundles ccusage as its local log reader, so you keep every number ccusage gives you — then layers cascade scoring (Υ Yield), a global leaderboard, operator profiles, class tiers, and MCP integration on top. ccusage is the sensor that reads the logs; SigRank is the instrument panel that turns those readings into a ranked, comparable signal. If you already run ccusage, `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` is the upgrade path.",
-  },
-  {
     question: "Does SigRank replace ccusage?",
     answer:
-      "No — it wraps it. The SigRank CLI calls ccusage under the hood to parse your Claude Code token telemetry locally, then computes the four-pillar cascade metrics (Υ Yield, SNR, Leverage, Velocity), signs a snapshot with ed25519, and publishes it to the leaderboard. You can still run `ccusage` standalone anytime; SigRank just adds the scoring and ranking layer ccusage was never built to provide.",
+      "No. They answer different questions. ccusage is a cost and token ledger across many agent CLIs; SigRank compares reuse-to-fresh-input patterns across operators. Keep ccusage for spend.",
   },
   {
-    question: "What does ccusage not measure that SigRank does?",
+    question: "Which ccusage numbers can I use in SigRank?",
     answer:
-      "ccusage reports raw token counts per session — input, output, cache creation, and cache read. SigRank derives the cascade architecture from those counts: Υ Yield = cache_read × output / input² (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccusage tells you what you spent; SigRank tells you how efficiently you drove.",
+      "The four token pillars: input, output, cache creation and cache read. Run ccusage with --json, copy those counts into the score calculator at /score, and you get a Yield preview without an account.",
   },
   {
-    question: "Can I use SigRank with my existing ccusage output?",
+    question: "Is a high Yield the same as a low ccusage bill?",
     answer:
-      "Yes. The SigRank score calculator at /score accepts pasted ccusage JSON — paste your `ccusage --json` output and it computes your Υ Yield, class tier, and velocity instantly, no account required. To publish to the leaderboard, run `npx sigrank enroll` then `npx sigrank submit`; the CLI handles the ccusage read, scoring, signing, and submission in one flow.",
+      "No. Yield is high when cached context is reused heavily relative to fresh input. That often, but not always, lines up with lower cost; ccusage is the tool to check the actual bill.",
   },
   {
-    question: "Does SigRank only work with Claude Code like ccusage?",
+    question: "How should I read a rank on a small board?",
     answer:
-      "No. ccusage is Claude Code-specific — it reads the Claude Code JSONL logs. SigRank is platform-neutral: it works across Claude Code, Cursor, GitHub Copilot, ChatGPT, Gemini, and 15+ other platforms. ccusage remains the reader for Claude Code logs; SigRank adds readers (tokscale, token-dashboard) and a unified scoring layer so your efficiency is comparable no matter which tool you drove.",
+      "As an early signal. The public board is small and changes as people enroll, so the spread of Yield across operators and your own trend over time tell you more than a single position.",
+  },
+  {
+    question: "If SigRank depends on ccusage, why run ccusage separately?",
+    answer:
+      "Because ccusage is the better tool for spend: per-model dollar costs, daily and monthly reports, and 5-hour block views. SigRank reports efficiency patterns, not a bill.",
+  },
+];
+
+const SOURCES: { label: string; href: string }[] = [
+  {
+    label: "ccusage README (github.com/ryoppippi/ccusage)",
+    href: "https://github.com/ryoppippi/ccusage",
+  },
+  {
+    label: "ccusage on npm",
+    href: "https://www.npmjs.com/package/ccusage",
+  },
+  {
+    label: "SigRank CLI and MCP (sigrank-mcp)",
+    href: "https://github.com/SunrisesIllNeverSee/sigrank-mcp",
+  },
+  {
+    label: "sigrank on npm (declared dependencies)",
+    href: "https://www.npmjs.com/package/sigrank",
   },
 ];
 
@@ -123,8 +125,9 @@ export default function VsCcusagePage() {
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs ccusage — Sensor to Instrument Panel",
-            description: "ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring, leaderboards, operator profiles, and MCP integration.",
+            title: "SigRank vs ccusage — Spend Ledger vs Efficiency Ranking",
+            description:
+              "ccusage reports what your coding agents cost from local logs. SigRank ranks how efficiently you drive them. When to use each, and how to run both.",
             path: "/vs/ccusage",
           }),
         ]}
@@ -132,52 +135,208 @@ export default function VsCcusagePage() {
 
       <WaveHero
         eyebrow="◈ SigRank vs ccusage"
-        title="From Token Sensor to Instrument Panel"
+        title="ccusage Reports Spend. SigRank Ranks Efficiency."
         subtitle={
           <>
-            ccusage reads your Claude Code token logs. SigRank{" "}
-            <span className="text-gold">bundles ccusage</span> and adds cascade
-            scoring, leaderboards, operator profiles, and MCP integration. The
-            sensor stays — the instrument panel is what was missing.
+            ccusage reads local agent logs and tells you what you spent. SigRank
+            takes the same four token counts and asks how you compare with other
+            operators. Different questions; here is when each is the right tool.
           </>
         }
       />
 
-      {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version: ccusage
+          What ccusage is, as of 2026-11-11
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          ccusage is a CLI that parses Claude Code&apos;s local JSONL logs and
-          prints your token usage — input, output, cache creation, cache read.
-          It does exactly one thing well: it <em>reads the sensor</em>. SigRank
-          takes that same reading and turns it into an{" "}
-          <strong className="text-text-primary">instrument panel</strong>: a
-          cascade-efficiency score (Υ Yield), a class tier, a global
-          leaderboard, operator profiles, head-to-head comparisons, and an MCP
-          server your AI agents can query. You don&apos;t throw away ccusage —
-          you graduate from it.
+          ccusage is an MIT-licensed command-line tool that reads the usage data
+          coding-agent CLIs leave on your machine and turns it into cost and
+          token reports. Its README lists 19 supported sources, including Claude
+          Code, Codex, OpenCode, Amp, Cline, GitHub Copilot CLI, Gemini CLI and
+          Goose. Reports are{" "}
+          <span className="font-mono text-text-primary">daily</span>,{" "}
+          <span className="font-mono text-text-primary">weekly</span>,{" "}
+          <span className="font-mono text-text-primary">monthly</span> and{" "}
+          <span className="font-mono text-text-primary">session</span>, plus{" "}
+          <span className="font-mono text-text-primary">blocks</span> (Claude
+          Code 5-hour billing windows) and a beta{" "}
+          <span className="font-mono text-text-primary">statusline</span> hook
+          for Claude Code. You run it with{" "}
+          <span className="font-mono text-text-primary">
+            npx ccusage@latest
+          </span>{" "}
+          (or bunx / pnpm dlx), add{" "}
+          <span className="font-mono text-text-primary">--json</span> for
+          machine-readable output, and it reports cache-creation and cache-read
+          tokens separately. The npm package ccusage was at version 20.0.49,
+          published 2026-11-10.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The analogy: ccusage is the oxygen sensor in the exhaust. SigRank is
-          the dashboard that turns that reading into a lap time, a ranking, and
-          a pit strategy. Both matter. Only one tells you whether you&apos;re
-          winning.
+          Where ccusage is the better choice: it is free, needs no account,
+          covers far more agent CLIs than most trackers, gives per-model dollar
+          costs, and its blocks and statusline views help you watch a live
+          5-hour window. If your question is “what did I spend, on which model,
+          on which day?”, ccusage answers it directly and SigRank does not try
+          to.
         </p>
       </section>
 
-      {/* Comparison table */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Feature comparison
+          Two different questions
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          ccusage is a ledger: how many tokens went in and out, and what that
+          cost. SigRank asks a different question about the same four counts:
+          relative to other operators, how much output and reuse did you get per
+          unit of fresh input? It turns the counts into canon metrics and
+          publishes them on a public board so you can see where you sit.
+        </p>
+        <ul className="flex list-disc flex-col gap-1.5 pl-5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>
+            <strong className="text-text-primary">Υ Yield</strong> is the
+            headline: (cache_read × output) / input². It is large when cached
+            context is reused heavily and output is high relative to fresh
+            input.
+          </li>
+          <li>
+            <strong className="text-text-primary">Leverage</strong> is cache
+            reuse per fresh input;{" "}
+            <strong className="text-text-primary">Velocity</strong> is output
+            per fresh input (a ratio, not a time rate);{" "}
+            <strong className="text-text-primary">SNR</strong> is the output
+            share of fresh traffic.
+          </li>
+          <li>
+            <strong className="text-text-primary">10xDEV</strong> and{" "}
+            <strong className="text-text-primary">Scale V</strong> (log10 of
+            total tokens) round out the token-era board.
+          </li>
+        </ul>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          None of these says whether the work was good. They describe
+          token-processing patterns, nothing more. The{" "}
+          <a
+            href="/guides/how-to-measure-ai-coding-efficiency"
+            className="text-gold underline underline-offset-2"
+          >
+            measurement guide
+          </a>{" "}
+          walks through reading them, and the{" "}
+          <a
+            href="/tools/yield-calculator"
+            className="text-gold underline underline-offset-2"
+          >
+            Yield calculator
+          </a>{" "}
+          lets you try numbers by hand.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Use ccusage when, use SigRank when
+        </h2>
+        <ul className="flex list-disc flex-col gap-1.5 pl-5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>
+            Use <strong className="text-text-primary">ccusage</strong> when you
+            need dollars, a per-day or per-session breakdown, a 5-hour block
+            view, or coverage of an agent CLI SigRank does not read.
+          </li>
+          <li>
+            Use <strong className="text-text-primary">SigRank</strong> when you
+            want to know whether your reuse-to-fresh-input pattern is high or
+            low compared with other operators, track it over 7d / 30d / 90d
+            windows, or publish a signed snapshot others can look at.
+          </li>
+          <li>
+            Use <strong className="text-text-primary">both</strong> when you are
+            tuning a workflow. A concrete loop: run{" "}
+            <span className="font-mono text-text-primary">
+              npx ccusage@latest daily
+            </span>{" "}
+            for the spend, then{" "}
+            <span className="font-mono text-text-primary">
+              npx sigrank submit --dry-run
+            </span>{" "}
+            to see the Yield, Leverage and Velocity of the same usage before you
+            change prompts or caching habits, and again after. ccusage tells you
+            what the change cost; SigRank tells you whether the pattern behind
+            it moved.
+          </li>
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Adding SigRank if you already run ccusage
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          You do not need to change how you use ccusage. The SigRank CLI is its
+          own npm package (sigrank 1.0.49 as of 2026-11-11), and it lists
+          ccusage and tokscale among its dependencies, so the log-reading layer
+          is shared rather than replaced:
+        </p>
+        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
+            {`npx sigrank                  # inspect local usage in the terminal
+npx sigrank enroll           # bind this device with a connect code from Settings
+npx sigrank submit --dry-run # inspect the payload; nothing is sent
+npx sigrank submit           # publish a signed snapshot`}
+          </pre>
+        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Prefer not to install anything? The{" "}
+          <a href="/score" className="text-gold underline underline-offset-2">
+            score calculator
+          </a>{" "}
+          takes four token counts (input, output, cache creation, cache read),
+          which you can copy from{" "}
+          <span className="font-mono text-text-primary">ccusage --json</span>{" "}
+          output, and returns a preview without an account. Ranked submissions
+          do not need prompt text, responses or source code.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          What the live board looks like
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Fetched from the public SigRank analyst MCP on 2026-11-11. As of
+          2026-11-11 the 30-day public board had{" "}
+          <strong className="text-text-primary">7 public operators</strong>, so
+          the field is small and a rank means little yet; the spread of Yield
+          across operators says more than your position. The current count is on
+          the{" "}
+          <a
+            href="/board/all"
+            className="text-gold underline underline-offset-2"
+          >
+            live board
+          </a>{" "}
+          and moves as people enroll; definitions are on the{" "}
+          <a
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
+            methodology
+          </a>{" "}
+          page.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Side-by-side
         </h2>
         <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
           <table className="w-full border-collapse font-sans text-sm">
             <thead>
               <tr className="border-b border-bg-border bg-bg-elevated">
                 <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
-                  Feature
+                  Question
                 </th>
                 <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
                   ccusage
@@ -194,9 +353,7 @@ export default function VsCcusagePage() {
                   className="border-b border-bg-border-subtle last:border-0"
                 >
                   <td className="px-4 py-2.5 text-text-primary">{r.feature}</td>
-                  <td className="px-4 py-2.5 text-text-secondary">
-                    {r.ccusage}
-                  </td>
+                  <td className="px-4 py-2.5 text-text-secondary">{r.other}</td>
                   <td className="px-4 py-2.5 font-medium text-gold">
                     {r.sigrank}
                   </td>
@@ -207,88 +364,6 @@ export default function VsCcusagePage() {
         </div>
       </section>
 
-      {/* Why the cascade matters */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-mono text-base font-bold text-text-primary">
-          Why raw token counts aren&apos;t enough
-        </h2>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          ccusage answers <em>&quot;how many tokens did I burn?&quot;</em>{" "}
-          That&apos;s necessary but not sufficient. Two operators can spend the
-          same 50K input tokens and get wildly different outcomes. One reuses
-          cached context efficiently and produces 30K output tokens; the other
-          re-sends the same context every turn and produces 3K. Same spend,
-          ten-fold difference in signal.
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank&apos;s headline metric —{" "}
-          <span className="font-mono text-gold">
-            Υ = cache_read × output / input²
-          </span>{" "}
-          — measures exactly that gap. It rewards the operator who compounds
-          cached context into output and penalizes the one who burns fresh input
-          without leverage. ccusage gives you the four integers; SigRank tells
-          you whether the cascade they describe is{" "}
-          <em>compounding or burning</em>.
-        </p>
-        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
-          <p className="font-mono text-xs uppercase tracking-wide text-text-muted">
-            The four token pillars (both tools read these)
-          </p>
-          <ul className="mt-3 flex flex-col gap-1.5 font-sans text-sm text-text-secondary">
-            <li>
-              <strong className="text-text-primary">Input</strong> — tokens you
-              send to the model
-            </li>
-            <li>
-              <strong className="text-text-primary">Output</strong> — tokens the
-              model generates back
-            </li>
-            <li>
-              <strong className="text-text-primary">Cache-read</strong> — cached
-              tokens reused from prior context
-            </li>
-            <li>
-              <strong className="text-text-primary">Cache-write</strong> — new
-              tokens written to cache for future reuse
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      {/* The upgrade path */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-mono text-base font-bold text-text-primary">
-          The ccusage upgrade path
-        </h2>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          If you already run ccusage, you&apos;re one command away from the full
-          instrument panel:
-        </p>
-        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
-          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
-            {`npm install -g sigrank
-sigrank enroll      # link this device (connect code from Settings)
-sigrank submit --dry-run  # inspect payload; nothing sent
-sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
-          </pre>
-        </div>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Prefer to inspect before you submit? Run{" "}
-          <span className="font-mono text-text-primary">
-            npx sigrank submit --dry-run
-          </span>{" "}
-          to see your scored payload locally, or paste your{" "}
-          <span className="font-mono text-text-primary">ccusage --json</span>{" "}
-          output into the{" "}
-          <a href="/score" className="text-gold underline underline-offset-2">
-            /score calculator
-          </a>{" "}
-          — no account, no submission, just the numbers.
-        </p>
-      </section>
-
-      {/* FAQ */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
           Frequently asked questions
@@ -305,15 +380,14 @@ sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
         </dl>
       </section>
 
-      {/* CTA */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-6">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Ready to see your cascade?
+          Ready to see your pattern?
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Keep your ccusage reads. Add the scoring, the leaderboard, and the
-          operator profile that turns those reads into a rank. Install SigRank
-          and submit your first signed snapshot in under a minute.
+          Keep ccusage for the bill. Paste your four token counts into the
+          calculator for a no-account preview, or enroll and submit a signed
+          snapshot to appear on the board.
         </p>
         <div className="flex flex-wrap gap-3">
           <a
@@ -328,10 +402,39 @@ sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
           >
             See the leaderboard
           </Link>
+          <Link
+            href="/hall"
+            className="rounded-lg border border-bg-border bg-bg-elevated px-4 py-2 font-mono text-xs uppercase tracking-wide text-text-primary transition-colors hover:border-gold"
+          >
+            Hall of operators
+          </Link>
         </div>
       </section>
 
-      {/* ── Cross-links ── */}
+      <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-6">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Sources and as-of date
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Competitor facts were read from the sources below on 2026-11-11 (UTC);
+          check them for anything newer. Field numbers come from the public
+          SigRank analyst MCP on the same date.
+        </p>
+        <ul className="flex list-disc flex-col gap-1 pl-5 font-sans text-sm text-text-secondary">
+          {SOURCES.map((s) => (
+            <li key={s.href}>
+              <a
+                href={s.href}
+                rel="noopener noreferrer"
+                className="text-gold underline underline-offset-2"
+              >
+                {s.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
@@ -347,6 +450,20 @@ sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
             className="text-gold underline underline-offset-2"
           >
             Yield Calculator
+          </Link>
+          {" · "}
+          <Link
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
+            Methodology
+          </Link>
+          {" · "}
+          <Link
+            href="/guides/how-to-measure-ai-coding-efficiency"
+            className="text-gold underline underline-offset-2"
+          >
+            How to measure AI coding efficiency
           </Link>
           {" · "}
           <Link
