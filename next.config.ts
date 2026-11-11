@@ -193,14 +193,13 @@ const nextConfig: NextConfig = {
         destination: "/standard/open-vs-proprietary",
         permanent: true,
       },
-      // The full seeded leaderboard (all operators including unclaimed seed
-      // data) moved to sigeconomy.com/all-time. Redirect so old bookmarks +
-      // search indexes find the seeded board.
+      // The seeded leaderboard used to live at sigeconomy.com/all-time. That
+      // domain is retired (owner, 2026-11-11), so old bookmarks and search
+      // indexes go to the all-time board here.
       {
         source: "/board/seeded",
-        destination: "https://sigeconomy.com/all-time",
+        destination: "/board/all",
         permanent: true,
-        basePath: false,
       },
       // NS-02.04 named category pages — redirect to nearest existing equivalents
       {

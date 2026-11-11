@@ -126,8 +126,7 @@ export default async function BoardWindowPage({
   const isAllTime = win.slug === "all";
 
   // All windows query the DB directly; ISR (revalidate=3600) bounds egress to
-  // 1 query/hour. Only claimed/live operators are shown — the full seeded
-  // board (including unclaimed seed operators) lives on sigeconomy.com/all-time.
+  // 1 query/hour. Only claimed/live operators are shown.
   //
   // ONE ranking scope, two projections. getLiveBoardInitialState issues the
   // SAME getLeaderboard call (identical param literal → identical memo key),
@@ -352,21 +351,6 @@ export default async function BoardWindowPage({
           four token pillars and publishes a signed record. No prompt content
           leaves your machine — only the four counts.
         </p>
-        {win.slug === "all" && (
-          <p className="mt-4 border-t border-bg-border-subtle pt-4 font-sans text-xs leading-relaxed text-text-muted">
-            This board shows claimed operators with verified submissions. The
-            full seeded archive (all operators including the historical seed
-            corpus) is at{" "}
-            <a
-              href="https://sigeconomy.com/all-time"
-              className="text-gold underline underline-offset-2 hover:text-text-primary"
-              rel="noopener"
-            >
-              sigeconomy.com/all-time
-            </a>
-            .
-          </p>
-        )}
       </section>
           </>
         }

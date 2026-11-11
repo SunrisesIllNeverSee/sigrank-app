@@ -16,7 +16,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Conservation", href: "/wiki/ct/conservation" },
   { label: "Semantic Entropy", href: "/wiki/ct/semantic-entropy" },
   { label: "Architecture (mos2es.com)", href: "https://mos2es.com/architecture" },
-  { label: "System Testing (mos2es.org)", href: "https://mos2es.org/system-testing" },
+  { label: "System Testing (mos2es.com)", href: "https://mos2es.com/research" },
 ];
 
 export default function CompressionTestPage() {

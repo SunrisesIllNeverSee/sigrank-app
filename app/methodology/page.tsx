@@ -45,8 +45,7 @@ function fmtYield(y: number): string {
 export default async function MethodologyPage() {
   // Live all_time board query (ISR revalidate=86400, so this runs once/day).
   // Fetches ALL snapshots (no window_type filter) so operators who only
-  // submitted 7d/30d/90d also appear. Only claimed/live operators — the
-  // full seeded board is on sigeconomy.com/all-time.
+  // submitted 7d/30d/90d also appear. Only claimed/live operators.
   const rows = await getLeaderboard({
     window: "all_time",
     windowFilter: false,

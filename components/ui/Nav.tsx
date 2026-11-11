@@ -22,7 +22,7 @@ const LINKS: { href: string; label: string }[] = [
   { href: "/hall", label: "Hall" },
   { href: "/wiki", label: "Wiki" },
   { href: "/blog", label: "Blog" },
-  { href: "https://mos2es.org/baseline-assessment", label: "Enterprise" },
+  { href: "https://mos2es.com/products", label: "Enterprise" },
 ];
 
 // `exchange_search` flag: site-wide search entry, before the external

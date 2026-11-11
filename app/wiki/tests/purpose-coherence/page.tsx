@@ -16,7 +16,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Alignment vs Governance", href: "/wiki/governance/alignment-vs-governance" },
   { label: "Commitment", href: "/wiki/ct/commitment" },
   { label: "Architecture (mos2es.com)", href: "https://mos2es.com/architecture" },
-  { label: "System Testing (mos2es.org)", href: "https://mos2es.org/system-testing" },
+  { label: "System Testing (mos2es.com)", href: "https://mos2es.com/research" },
 ];
 
 export default function PurposeCoherenceTestPage() {

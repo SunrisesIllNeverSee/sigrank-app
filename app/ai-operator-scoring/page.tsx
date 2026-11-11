@@ -240,10 +240,6 @@ export default function AIOperatorScoringPage() {
                 <td className="py-2">The operator and AI system measured together. Telemetry captures the dyad&apos;s behavior, not the operator in isolation.</td>
               </tr>
               <tr className="border-b border-bg-border/50">
-                <td className="py-2 pr-4 font-semibold text-text-primary">SigArena</td>
-                <td className="py-2">The public leaderboard surface (sigeconomy.com). Displays rankings.</td>
-              </tr>
-              <tr className="border-b border-bg-border/50">
                 <td className="py-2 pr-4 font-semibold text-text-primary">SignalAF</td>
                 <td className="py-2">The public distribution and platform brand (signalaf.com). Hosts scoring, methodology, and enrollment.</td>
               </tr>
@@ -307,12 +303,12 @@ export default function AIOperatorScoringPage() {
           >
             Measure &amp; rank your cascade →
           </Link>
-          <a
-            href="https://sigeconomy.com/ai-user-leaderboard"
+          <Link
+            href="/board/all"
             className="inline-flex items-center gap-2 rounded-lg border border-bg-border bg-bg-surface px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-bg-border-subtle"
           >
             View the public leaderboard →
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -329,7 +325,7 @@ export default function AIOperatorScoringPage() {
           telemetry.
         </p>
         <a
-          href="https://mos2es.org/baseline-assessment"
+          href="https://mos2es.com/products"
           className="mt-4 inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
         >
           Explore the baseline assessment →
@@ -354,10 +350,10 @@ export default function AIOperatorScoringPage() {
             <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">TTEOP protocol</h3>
             <p className="mt-1 font-sans text-xs text-text-secondary">The open telemetry protocol (tteop-spec repo).</p>
           </a>
-          <a href="https://sigeconomy.com/ai-user-leaderboard" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
+          <Link href="/board/all" className="group rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-bg-border-subtle">
             <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">AI User Leaderboard</h3>
-            <p className="mt-1 font-sans text-xs text-text-secondary">The public leaderboard on SigArena (sigeconomy.com).</p>
-          </a>
+            <p className="mt-1 font-sans text-xs text-text-secondary">The public leaderboard on signalaf.com.</p>
+          </Link>
         </div>
       </section>
 

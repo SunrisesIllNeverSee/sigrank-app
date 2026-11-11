@@ -222,7 +222,6 @@ export function organization() {
       "https://doi.org/10.5281/zenodo.21900519",
       "https://signomy.xyz",
       "https://mos2es.com",
-      "https://sigeconomy.com",
     ],
   };
 }

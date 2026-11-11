@@ -52,7 +52,7 @@ signalaf.com is one workspace: a rail of sections on the left edge, a sidebar on
 - [Field](${u("/fieldhub")}): the research hub — [Field Analysis](${u("/field")}) of the operator field and the [State of the Index](${u("/research")}) dataset (DOI 10.5281/zenodo.21900519).
 - [Articles](${u("/articles")}), [Blog](${u("/blog")}) and [Wiki](${u("/wiki")}): original analyses, guides, and metric definitions.
 
-**Enterprise:** private team baselines through MO§ES™ — https://mos2es.org/baseline-assessment
+**Enterprise:** private team baselines through MO§ES™ — https://mos2es.com/products
 
 Comparisons here are comparisons of operating shape from four token counts. Yield (Υ = cache_read × output / input²) does not measure correctness, code quality, effort, productivity or intelligence.`;
 }

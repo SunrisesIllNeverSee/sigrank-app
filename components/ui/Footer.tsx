@@ -166,7 +166,7 @@ const FOOTER_COLUMNS: {
     heading: "Ecosystem",
     links: [
       {
-        href: "https://mos2es.org",
+        href: "https://mos2es.com/products",
         label: "MO§ES™ Enterprise →",
       },
       {
@@ -178,11 +178,7 @@ const FOOTER_COLUMNS: {
         label: "Signomy City-State →",
       },
       {
-        href: "https://sigeconomy.com",
-        label: "SigEconomy Leaderboard →",
-      },
-      {
-        href: "https://mos2es.xyz",
+        href: "https://aquaidp.xyz",
         label: "AQUA Application Hub →",
       },
     ],

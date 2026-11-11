@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const CLAIMS: Record<string, string> = {
   'signalaf.com': 'glama_claim_c6dKAWMpwWQQ_FrPVwTkZr6bFLSwbBc6',
-  'sigeconomy.com': 'glama_claim_wbGrlkXVi5ckXCWgB3e1dxb0QmHLwvJ5',
 }
 
 export async function GET(req: NextRequest) {
