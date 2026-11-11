@@ -456,3 +456,104 @@ describe("Tool catalog integrity", () => {
     expect(PROMPTS.length).toBe(5);
   });
 });
+
+// ── Regression: null display_name must not break the declared outputSchema ──
+// PostHog 2026-10-01: get_leaderboard failed output validation because entries
+// with a null display_name violated `display_name: string`. Unnamed operators
+// now fall back to their codename (the website shows the codename for them).
+
+describe("null display_name regression", () => {
+  it("get_leaderboard coalesces null display_name to codename (string)", async () => {
+    const { getLeaderboard } = await import("@/lib/board");
+    const nameless = { ...mockRow, operator: { ...mockOperator, codename: "signal-nameless", display_name: null } };
+    vi.mocked(getLeaderboard).mockResolvedValueOnce([nameless] as never);
+    const result = await callTool("get_leaderboard", {}, {} as never);
+    const data = JSON.parse(result.content[0].text as string);
+    expect(data.entries).toHaveLength(1);
+    expect(typeof data.entries[0].display_name).toBe("string");
+    expect(data.entries[0].display_name).toBe("signal-nameless");
+  });
+
+  it("get_operator coalesces blank display_name to codename", async () => {
+    const { getOperator } = await import("@/lib/board");
+    const nameless = { ...mockRow, operator: { ...mockOperator, codename: "signal-nameless", display_name: "   " } };
+    vi.mocked(getOperator).mockResolvedValueOnce(nameless as never);
+    const result = await callTool("get_operator", { codename: "signal-nameless" }, {} as never);
+    const data = JSON.parse(result.content[0].text as string);
+    expect(data.display_name).toBe("signal-nameless");
+  });
+});
+
+// ── Self-correcting errors for rank_paste / benchmark_me ────────────────────
+
+describe("pillar argument errors are self-correcting", () => {
+  it("rank_paste names missing fields and shows an example", async () => {
+    const result = await callTool("rank_paste", { input: 100 }, {} as never);
+    expect(result.isError).toBe(true);
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("non-negative finite numbers");
+    expect(msg).toContain("Missing: output, cache_read, cache_write");
+    expect(msg).toContain('"cache_write"');
+  });
+
+  it("rank_paste names fields sent as strings", async () => {
+    const result = await callTool(
+      "rank_paste",
+      { input: "100", output: 1, cache_read: 1, cache_write: 1 },
+      {} as never,
+    );
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("input is a string");
+  });
+
+  it("benchmark_me gives the same guidance and mentions codename", async () => {
+    const result = await callTool("benchmark_me", { input: 100 }, {} as never);
+    expect(result.isError).toBe(true);
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("Missing: output, cache_read, cache_write");
+    expect(msg).toContain("codename");
+  });
+
+  it("negative numbers get a number message, not a string message", async () => {
+    const result = await callTool("rank_paste", { input: -5, output: 1, cache_read: 1, cache_write: 1 }, {} as never);
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("input must be a non-negative number");
+    expect(msg).not.toContain("not a string");
+  });
+
+  it("string values get the string message", async () => {
+    const result = await callTool("rank_paste", { input: "5", output: 1, cache_read: 1, cache_write: 1 }, {} as never);
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("input is a string: send a JSON number, not a string.");
+  });
+
+  it("benchmark_me builds the codename alternative into the message (no dangling suffix)", async () => {
+    const result = await callTool("benchmark_me", { input: 1 }, {} as never);
+    const msg = JSON.parse(result.content[0].text as string).message as string;
+    expect(msg).toContain("either a codename or the four fields");
+    expect(msg.trim().endsWith("}.")).toBe(true);
+    expect(msg).not.toContain("Or provide a codename instead");
+  });
+
+  it("generic callers get no location advice", async () => {
+    const { pillarErrorMessage } = await import("@/lib/mcp/tools");
+    expect(pillarErrorMessage({ input: 1 })).not.toContain("top level");
+  });
+
+  it("display_name that sanitizes to empty falls back to codename", async () => {
+    const { getLeaderboard } = await import("@/lib/board");
+    const zw = { ...mockRow, operator: { ...mockOperator, codename: "signal-zw", display_name: "\u200b\u0007 " } };
+    vi.mocked(getLeaderboard).mockResolvedValueOnce([zw] as never);
+    const result = await callTool("get_leaderboard", {}, {} as never);
+    expect(JSON.parse(result.content[0].text as string).entries[0].display_name).toBe("signal-zw");
+  });
+
+  it("descriptions state the required shape with an example", async () => {
+    const { TOOLS } = await import("@/lib/mcp/tools");
+    for (const name of ["rank_paste", "benchmark_me"]) {
+      const t = TOOLS.find((x) => x.name === name)!;
+      expect(t.description).toContain("cache_write");
+      expect(t.description).toMatch(/Example|e\.g\./);
+    }
+  });
+});
