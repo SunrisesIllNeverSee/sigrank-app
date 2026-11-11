@@ -22,7 +22,7 @@ const FOOTER_COLUMNS: {
       { href: "/blog/sigrank-dashboards", label: "Interactive Dashboards" },
       { href: "/blog/the-tool-is-the-person", label: "The Tool Is the Person" },
       { href: "/blog/token-cascade-vs-raw-token-consumption", label: "Token Yield vs Token Count" },
-      { href: "/blog/why-yield-beats-tokenmaxxing", label: "Why Yield Beats Tokenmaxxing" },
+      { href: "/blog/why-yield-beats-tokenmaxxing", label: "Tokenmaxxing, Measured" },
       { href: "/blog/how-sigrank-measures-operator-efficiency", label: "How SigRank Measures" },
       { href: "/blog/ai-power-user-benchmarking", label: "AI Power User Benchmarking" },
     ],

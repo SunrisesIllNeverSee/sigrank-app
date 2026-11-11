@@ -18,9 +18,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage, alternativesItemList } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "cc usage Alternatives: Token Tracking & Analysis Tools",
+  title: "ccusage Alternatives: Token Tracking & Analysis Tools",
   description:
-    "The 5 best cc usage alternatives in 2026. Compare SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale on scoring, leaderboards, and MCP integration.",
+    "The 5 best ccusage alternatives in 2026. Compare SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale on scoring, leaderboards, and MCP integration.",
   path: "/alternatives/ccusage-alternatives",
 });
 
@@ -170,7 +170,7 @@ export default function CcusageAlternativesPage() {
 
       <WaveHero
         eyebrow="◈ Alternatives"
-        title="cc usage Alternatives for Token Tracking & Analysis"
+        title="ccusage Alternatives for Token Tracking & Analysis"
         subtitle={
           <>
             ccusage is great for reading token usage. These five alternatives
@@ -186,7 +186,7 @@ export default function CcusageAlternativesPage() {
       {/* Intro */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          What cc usage does well — and where it stops
+          What ccusage does well — and where it stops
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-text-primary">ccusage</strong> (often

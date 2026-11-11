@@ -169,6 +169,8 @@ export interface LiveBoardWorkspaceProps {
   stageFooter?: ReactNode;
   /** Newest blog/article post for Wire / Notes (server-resolved, no extra request). */
   newestPost?: { slug: string; title: string } | null;
+  /** Page H1 override ({a}<em>{b}</em>) so the homepage and /board/all differ. */
+  heading?: { a: string; b: string };
 }
 
 /** Field-hydration lifecycle reported by the mount (live-board-mount.tsx). */
@@ -628,6 +630,7 @@ export function LiveBoardWorkspace({
   fieldStatus,
   stageFooter,
   newestPost,
+  heading,
 }: LiveBoardWorkspaceProps) {
   /* ---------- theme switch (LB-20) — ?theme= > lbw-theme localStorage >
      "green"; state lives on .lbw-root's data-theme (the site's own
@@ -1873,8 +1876,8 @@ export function LiveBoardWorkspace({
               <div className="stitle">
                 <div className="stitle-main">
                   <h1 className="pagetitle">
-                    {COPY.heroTitleA}
-                    <em>{COPY.heroTitleB}</em>
+                    {heading?.a ?? COPY.heroTitleA}
+                    <em>{heading?.b ?? COPY.heroTitleB}</em>
                   </h1>
                 </div>
                 {/* owner 2026-10-21: site-wide search at the right end of the title

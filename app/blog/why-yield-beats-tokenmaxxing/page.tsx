@@ -20,7 +20,7 @@ import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Why Yield Beats Tokenmaxxing",
+  title: "Tokenmaxxing: Why Burning More Tokens Won't Make You Better",
   description:
     "Tokenmaxxing is the practice of maximizing raw token count. Yield (Υ) proves it wrong — efficiency, not volume, defines a top AI operator.",
   path: "/blog/why-yield-beats-tokenmaxxing",
@@ -33,7 +33,7 @@ function articleJsonLd() {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "@id": url,
-    headline: "Why Yield Beats Tokenmaxxing",
+    headline: "Tokenmaxxing, Measured",
     description:
       "Tokenmaxxing is the practice of maximizing raw token count. Yield (Υ) proves it wrong — efficiency, not volume, defines a top AI operator.",
     url,
@@ -81,7 +81,7 @@ export default function WhyYieldBeatsTokenmaxxingPage() {
           breadcrumb([
             { name: "Blog", path: "/blog" },
             {
-              name: "Why Yield Beats Tokenmaxxing",
+              name: "Tokenmaxxing, Measured",
               path: "/blog/why-yield-beats-tokenmaxxing",
             },
           ]),
@@ -91,7 +91,7 @@ export default function WhyYieldBeatsTokenmaxxingPage() {
 
       <WaveHero
         eyebrow="◈ Blog · AI Efficiency"
-        title="Why Yield Beats Tokenmaxxing"
+        title="Tokenmaxxing, Measured"
         subtitle={
           <>
             <span className="text-gold">Tokenmaxxing</span> is the practice of
@@ -112,6 +112,15 @@ export default function WhyYieldBeatsTokenmaxxingPage() {
 
       {/* ── Intro ── */}
       <section className="flex flex-col gap-4">
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The short version, from the measured field: the operator with the
+          most tokens (<strong className="text-text-primary">487B</strong>, a
+          third of it fresh input) has a Yield of{" "}
+          <strong className="text-text-primary">0.02</strong>. An operator with{" "}
+          <strong className="text-text-primary">253M</strong> tokens, almost
+          all cache reuse, has a Yield of{" "}
+          <strong className="text-gold">1,825</strong>. Volume is not Yield.
+        </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           There&apos;s a trap that catches almost everyone who starts tracking
           their AI usage. You see the token counter climb — 500K, 1M, 2M — and

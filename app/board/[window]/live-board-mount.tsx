@@ -74,6 +74,8 @@ interface LiveBoardMountProps {
   stageFooter?: ReactNode;
   /** Newest blog/article post for Wire / Notes (resolved in the page's server component). */
   newestPost?: { slug: string; title: string } | null;
+  /** Page H1 override ({a}<em>{b}</em>); default is the global board title. */
+  heading?: { a: string; b: string };
 }
 
 /** Append only rows whose codename isn't already loaded (StrictMode-safe). */
@@ -92,6 +94,7 @@ export function LiveBoardMount({
   legacy,
   stageFooter,
   newestPost,
+  heading,
 }: LiveBoardMountProps) {
   /* ---------- ?v=legacy review flag (post-mount; keeps the page static) -- */
   const [legacyOn, setLegacyOn] = useState(false);
@@ -183,6 +186,7 @@ export function LiveBoardMount({
       fieldStatus={fieldStatus}
       stageFooter={stageFooter}
       newestPost={newestPost}
+      heading={heading}
     />
   );
 }

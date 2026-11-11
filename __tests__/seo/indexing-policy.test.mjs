@@ -469,7 +469,7 @@ test("llms.txt advertises topic pages only through the sitemap manifest", async 
 });
 
 test("board Dataset JSON-LD never stamps render time as dateModified", async () => {
-  const board = await source("app/board/[window]/page.tsx");
+  const board = await source("app/board/[window]/board-window.tsx");
   assert.doesNotMatch(board, /sigrankDataset\(\{\s*updated:\s*new Date\(/);
   assert.match(board, /sigrankDataset\(\{\s*updated:\s*SIGRANK_DATASET_PUBLISHED\s*\}\)/);
 });
