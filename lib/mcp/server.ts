@@ -22,7 +22,7 @@ import {
   type ReadResourceCallback,
   type PromptCallback,
 } from "@modelcontextprotocol/server";
-import { instrument } from "@posthog/mcp";
+import { instrumentMcp } from "@/lib/mcp/analytics";
 import { posthogMcp } from "@/lib/mcp/posthog";
 import { TOOLS, NAME_BEARING_TOOLS, callTool } from "@/lib/mcp/tools";
 import { UNTRUSTED_TEXT_NOTICE } from "@/lib/mcp/untrusted";
@@ -68,26 +68,10 @@ export function createSigrankServer(req?: NextRequest): McpServer {
     },
   );
 
-  if (posthogMcp) {
-    // Disable exception autocapture for MCP tool errors. Tool handlers return
-    // isError: true for legitimate user errors (invalid_arguments,
-    // operator_not_found) — these are expected application-level errors, not
-    // bugs. Without this flag, @posthog/mcp captures every isError response
-    // as a $exception event, polluting PostHog error tracking with user errors.
-    // Tool errors are still captured as $mcp_tool_call events with isError: true
-    // in the properties, which is the correct way to track them as data.
-    //
-    // context / captureModel / enableConversationId are off: in @posthog/mcp
-    // 0.25 each one injects an extra parameter (context, llm_model,
-    // conversation_id) into every tool's input schema, and context and
-    // llm_model are marked required. The published tool schemas stay as written.
-    instrument(server, posthogMcp, {
-      enableExceptionAutocapture: false,
-      enableConversationId: false,
-      captureModel: false,
-      context: false,
-    });
-  }
+  // PostHog MCP analytics with the shared SigRank options (lib/mcp/analytics):
+  // no exception autocapture for expected isError results, no parameters
+  // injected into tool schemas, and surface/traffic labels on every event.
+  instrumentMcp(server, posthogMcp);
 
   // ── Register all 16 SigRank tools ──────────────────────────────────────
   // Each tool's handler delegates to the existing callTool dispatcher,

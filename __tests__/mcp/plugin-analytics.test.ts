@@ -21,7 +21,7 @@ vi.mock("next/server", async importOriginal => ({ ...(await importOriginal<typeo
 
 import { NextRequest } from "next/server";
 import { POST as pluginPost } from "@/app/api/plugins/sigrank/mcp/route";
-import { analystSurface, analystTraffic } from "@/lib/mcp/plugin/analytics";
+import { mcpSurface, mcpTraffic } from "@/lib/mcp/analytics";
 import contracts from "@/lib/mcp/plugin/contracts.json";
 
 const URL_ = "https://analyst.signalaf.com/api/plugins/sigrank/mcp";
@@ -71,13 +71,44 @@ describe("Analyst connector MCP analytics", () => {
 
 describe("surface and traffic labels", () => {
   it("reads the calling app from client name or User-Agent", () => {
-    expect(analystSurface("", "openai-mcp/1.0.0")).toBe("chatgpt");
-    expect(analystSurface("claude-ai", "")).toBe("claude");
-    expect(analystSurface("codex-mcp-client", "")).toBe("codex");
-    expect(analystSurface("cursor", "node")).toBe("other");
-    expect(analystSurface("", "")).toBe("unknown");
-    expect(analystTraffic("sentinel-probe", "")).toBe("probe");
-    expect(analystTraffic("", "mcp-registry-call-probe")).toBe("probe");
-    expect(analystTraffic("claude-ai", "Claude-User")).toBe("client");
+    expect(mcpSurface("", "openai-mcp/1.0.0")).toBe("chatgpt");
+    expect(mcpSurface("claude-ai", "Claude-User/1.0 (Anthropic MCP client)")).toBe("claude");
+    expect(mcpSurface("claude-code", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)")).toBe("claude");
+    expect(mcpSurface("codex-mcp-client", "codex-mcp-client/0.159.2")).toBe("codex");
+    expect(mcpSurface("codexguild-catalog-review", "node")).toBe("other");
+    expect(mcpSurface("cursor", "node")).toBe("other");
+    expect(mcpSurface("", "")).toBe("unknown");
+  });
+
+  it("tags the monitors and indexers seen in production as probes", () => {
+    const bots: [string, string][] = [
+      ["fixter-monitoring", "Java-http-client/25.0.3"],
+      ["glimind-probe", "SentinelOracle/0.1"],
+      ["rokmcp-probe", "rokmcp-collector/0.2"],
+      ["glama", "node"],
+      ["talaria-catalog", "Talaria"],
+      ["agent-collector", "agent-collector/0.1 (+health check)"],
+      ["taifoon-harvester", "TaifoonHarvester/1.0.0"],
+      ["AgentsJunction health checker", "node"],
+      ["mcpbeat", "mcpbeat/0.1 (liveness check)"],
+      ["mcpindex-trust", ""],
+      ["mcplantern-check", "mcplantern-check/0.2"],
+      ["mcp.market-uptime", "mcp.market uptime check"],
+      ["SealKeeper", "SealKeeperBot/1.0"],
+      ["mcpwatch", "MCPWatch/0.1.0"],
+      ["exp116-census", "Python-urllib/3.12"],
+      ["atpp-scan", "atpp-scan/1.0"],
+      ["posthog-mcp-registry-probe", "python-requests/2.33.0"],
+      ["codexguild-catalog-review", "node"],
+    ];
+    for (const [name, ua] of bots) expect(mcpTraffic(name, ua), name).toBe("probe");
+  });
+
+  it("leaves real AI apps as client traffic", () => {
+    expect(mcpTraffic("claude-ai", "Claude-User/1.0 (Anthropic MCP client)")).toBe("client");
+    expect(mcpTraffic("claude-code", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")).toBe("client");
+    expect(mcpTraffic("codex-mcp-client", "codex-mcp-client/0.159.2")).toBe("client");
+    expect(mcpTraffic("openai-mcp", "openai-mcp/1.0.0")).toBe("client");
+    expect(mcpTraffic("cursor-vscode", "node")).toBe("client");
   });
 });
