@@ -113,6 +113,8 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/vs/braintrust": "SUPPORTED",
   "/vs/langchain": "SUPPORTED",
   "/vs/langfuse": "SUPPORTED",
+  "/vs/viberank": "SUPPORTED", // rebuilt as unique content (2026-11)
+  "/vs/ccgather": "SUPPORTED", // rebuilt as unique content (2026-11)
   "/vs/clawdboard": "SUPPORTED",
   "/vs/costhawk": "SUPPORTED",
   "/vs/mytokentracker": "SUPPORTED",
@@ -192,7 +194,6 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/ai-model-safety-evaluation-benchmark-continuous-testing": "HOLD",
 
   // ── HOLD — late competitor comparison batches (2026-08-27 + 09-26) ──────
-  "/vs/viberank": "HOLD",
   "/vs/tokenmaxxer": "HOLD",
   "/vs/whoburnedmore": "HOLD",
   "/vs/aiusage": "HOLD",
@@ -209,7 +210,6 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/vs/lineman": "HOLD",
   "/vs/codeburn": "HOLD",
   "/vs/claudecount": "HOLD",
-  "/vs/ccgather": "HOLD",
   "/vs/clauderank": "HOLD",
   "/vs/ccrank": "HOLD",
   "/vs/tokenmaxxing": "HOLD",
@@ -350,6 +350,8 @@ export const GOOGLE_INDEX_KEEP_GUIDES: ReadonlySet<string> = new Set([
 export const GOOGLE_INDEX_KEEP_VS: ReadonlySet<string> = new Set([
   "/vs/ccusage",
   "/vs/langfuse",
+  "/vs/viberank",
+  "/vs/ccgather",
 ]);
 
 /** Blog posts hidden from Google: the "best X" listicles plus the AI-answer post. */
