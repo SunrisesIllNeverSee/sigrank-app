@@ -299,8 +299,8 @@ A: An 8-tier qualification system: ARCH+, ARCH, POWER, BASE, SEEKER, REFINER, BE
 
 - npm package: https://www.npmjs.com/package/sigrank
 - MCP server + CLI source: https://github.com/SunrisesIllNeverSee/sigrank-mcp
-- Install: \`npm install -g sigrank\` then \`sigrank enroll\` then \`sigrank submit\`
-- Or: \`npx sigrank\` to see your cascade, \`npx sigrank submit\` to publish
+- Install: \`npm install -g sigrank\`, or run it with \`npx sigrank\` to see your cascade locally (publishes nothing)
+- To publish: create a connect code at ${SITE_ORIGIN}/settings, then \`sigrank enroll\`, \`sigrank submit --dry-run\` to inspect, and \`sigrank submit\`
 
 ## Academic foundation
 

@@ -94,12 +94,14 @@ The portable v0.1 draft core contains four telemetry primitives (input, output, 
 
 To get an operator on the leaderboard:
 
-1. Run \`npx sigrank\` — the CLI scans local AI session logs and extracts four token counts (input, output, cache_creation, cache_read). No prompt content is read.
-2. Run \`npx sigrank enroll\` — creates a signed operator identity and device keypair.
-3. Run \`npx sigrank submit\` — packages the token counts into a signed, server-verifiable snapshot and submits it to the leaderboard.
-4. Your Yield (Υ) score is computed server-side and you appear on the board at ${SITE_ORIGIN}/board/all.
+1. Sign in at ${SITE_ORIGIN} and create a connect code in Settings.
+2. Run \`npx sigrank enroll\` with that connect code — binds this device's signing key to the operator account. The private key stays on the device.
+3. Run \`npx sigrank submit --dry-run\` to inspect the signed payload without sending it, then \`npx sigrank submit\` to publish.
+4. The server verifies and re-scores the submission; your Yield (Υ) and rank appear on the board at ${SITE_ORIGIN}/board/all.
 
-No account required. No web login required. The CLI handles identity, signing, and submission. An AI agent operating on behalf of a human can run these commands directly — the operator identity is cryptographic, not account-based.
+A signed submission carries the four token pillars (input, output, cache_write, cache_read) plus account and device identifiers, a signature, platform and version information, and report metadata. Prompt and response text, source code, repository contents and local file paths are not sent. Running \`npx sigrank\` alone only opens a local dashboard and publishes nothing.
+
+An AI agent operating on behalf of a human can run these commands once the human has created the connect code and approved publishing.
 
 ## Contribution Exchange
 
