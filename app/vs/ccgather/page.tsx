@@ -67,6 +67,11 @@ const COMPARE_ROWS: { feature: string; ccgather: string; sigrank: string }[] = [
     ccgather: "“Token usage is NOT a measure of skill” (its README)",
     sigrank: "Totals are context; Yield is the ranking measure",
   },
+  {
+    feature: "Bundled tools (ccusage, tokscale, token-dashboard)",
+    ccgather: "No",
+    sigrank: "Yes",
+  },
 ];
 
 const FAQS: { question: string; answer: string }[] = [

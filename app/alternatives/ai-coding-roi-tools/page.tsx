@@ -405,7 +405,7 @@ export default function AICodingROIToolsPage() {
           operator.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          SigRank lists ccusage and tokscale as npm dependencies, so you get
+          SigRank bundles ccusage, tokscale, and token-dashboard, so you get
           cost tracking <em>and</em> cascade-efficiency ROI in one install:{" "}
           <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-xs text-gold">
             npm install -g sigrank
