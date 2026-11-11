@@ -35,7 +35,7 @@ const COMPARE_ROWS: { feature: string; claudecount: string; sigrank: string }[] 
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     claudecount: "No (raw counts)",
     sigrank: "Yes (derived metrics)",
   },
@@ -91,7 +91,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does claudecount not measure that SigRank does?",
     answer:
-      "claudecount reports raw token counts per session. SigRank reads the same four pillars and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). claudecount tells you what you spent; SigRank tells you whether the cascade it describes is compounding or burning.",
+      "claudecount reports raw token counts per session. SigRank reads the same four pillars and derives the cascade architecture: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). claudecount tells you what you spent; SigRank tells you whether the cascade it describes is compounding or burning.",
   },
   {
     question: "Can I use both claudecount and SigRank?",
@@ -278,7 +278,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

@@ -98,7 +98,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
             {
               question: "What should I measure to benchmark my workflow?",
               answer:
-                "Measure the four token pillars (input, output, cache-read, cache-write) plus the derived metrics: Υ Yield, compression ratio, cache hit rate, leverage, and signal-to-noise ratio. These together describe the full architecture of your token cascade.",
+                "Measure the four token pillars (input, output, cache-read, cache-write) plus the derived metrics: Υ Yield, velocity, cache hit rate, leverage, and signal-to-noise ratio. These together describe the full architecture of your token cascade.",
             },
             {
               question: "How do I establish a baseline?",
@@ -246,7 +246,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
           </div>
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
             <p className="font-mono text-sm font-bold text-gold">
-              Compression Ratio
+              Velocity
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">
@@ -559,7 +559,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               The four token pillars (input, output, cache-read, cache-write)
-              plus yield, compression ratio, cache hit rate, leverage, and SNR.
+              plus yield, velocity, cache hit rate, leverage, and SNR.
               Together they describe the full cascade architecture.
             </dd>
           </div>

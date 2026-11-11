@@ -41,7 +41,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only platform that benchmarks the operator driving the AI, not the model on coding tasks.",
+      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier. The only platform that benchmarks the operator driving the AI, not the model on coding tasks.",
     pros: [
       "Benchmarks operators, not models — a different unit of measurement entirely",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",

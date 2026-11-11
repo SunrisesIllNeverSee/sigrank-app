@@ -41,7 +41,7 @@ const COMPARE_ROWS: { feature: string; whoburnedmore: string; sigrank: string }[
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     whoburnedmore: "No (raw counts)",
     sigrank: "Yes (derived metrics)",
   },
@@ -96,7 +96,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does whoburnedmore not measure that SigRank does?",
     answer:
-      "whoburnedmore reports total tokens burned and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). whoburnedmore tells you who burned the most; SigRank tells you who got the most signal per token spent.",
+      "whoburnedmore reports total tokens burned and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). whoburnedmore tells you who burned the most; SigRank tells you who got the most signal per token spent.",
   },
   {
     question: "Can I use both whoburnedmore and SigRank?",
@@ -283,7 +283,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

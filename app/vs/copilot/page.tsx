@@ -40,7 +40,7 @@ const COMPARE_ROWS: { feature: string; copilot: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     copilot: "No",
     sigrank: "Yes",
   },
@@ -87,7 +87,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does GitHub Copilot track token usage?",
     answer:
-      "Copilot exposes limited usage signals — mostly subscription-tier scoped (how many completions or chat messages you used against your quota). It does not expose the four-pillar token cascade (input, output, cache-read, cache-write) needed to compute cascade efficiency. SigRank reads that telemetry locally — including from Copilot sessions where available — and derives Υ Yield, compression ratio, SNR, Leverage, and Velocity. Copilot tells you how many times you asked; SigRank tells you how efficiently you asked.",
+      "Copilot exposes limited usage signals — mostly subscription-tier scoped (how many completions or chat messages you used against your quota). It does not expose the four-pillar token cascade (input, output, cache-read, cache-write) needed to compute cascade efficiency. SigRank reads that telemetry locally — including from Copilot sessions where available — and derives Υ Yield, SNR, Leverage, and Velocity. Copilot tells you how many times you asked; SigRank tells you how efficiently you asked.",
   },
   {
     question: "How does SigRank measure Copilot efficiency specifically?",

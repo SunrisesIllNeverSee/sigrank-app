@@ -57,7 +57,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 5,
       name: "Apply what you learned",
-      text: "Identify the workflow difference that drives the yield gap. If the other operator has higher cache hit rate, focus on context stability. If higher compression ratio, focus on prompt structure.",
+      text: "Identify the workflow difference that drives the yield gap. If the other operator has higher cache hit rate, focus on context stability. If higher velocity, focus on prompt structure.",
     },
   ],
 };
@@ -83,12 +83,12 @@ export default function HowToCompareAIOperatorsPage() {
             {
               question: "What is the SigRank compare tool?",
               answer:
-                "The SigRank compare tool (/compare) renders a side-by-side cascade comparison of two or more operators. It shows yield, cache hit rate, leverage, compression ratio, class tier, and the four-pillar ratios so you can see not just who is more efficient but why.",
+                "The SigRank compare tool (/compare) renders a side-by-side cascade comparison of two or more operators. It shows yield, cache hit rate, leverage, velocity, class tier, and the four-pillar ratios so you can see not just who is more efficient but why.",
             },
             {
               question: "What metrics should I compare?",
               answer:
-                "Compare yield (overall efficiency), cache hit rate (context reuse quality), leverage (cache amplification of input), compression ratio (output per input), and class tier (performance band). Each metric reveals a different aspect of the operator workflow.",
+                "Compare yield (overall efficiency), cache hit rate (context reuse quality), leverage (cache amplification of input), velocity (output per fresh input), and class tier (performance band). Each metric reveals a different aspect of the operator workflow.",
             },
             {
               question: "How do I read a comparison?",
@@ -161,7 +161,7 @@ export default function HowToCompareAIOperatorsPage() {
           </Link>{" "}
           renders a side-by-side cascade comparison of two or more operators.
           You enter codenames from the leaderboard and get a full breakdown:
-          yield, cache hit rate, leverage, compression ratio, class tier, and
+          yield, cache hit rate, leverage, velocity, class tier, and
           the four-pillar ratios. It shows you not just <em>who</em> is more
           efficient but <em>why</em>.
         </p>
@@ -209,7 +209,7 @@ export default function HowToCompareAIOperatorsPage() {
           </div>
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
             <p className="font-mono text-sm font-bold text-gold">
-              Compression Ratio
+              Velocity
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               output / input. How much signal each operator gets per fresh input
@@ -319,7 +319,7 @@ export default function HowToCompareAIOperatorsPage() {
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Apply the workflow change that addresses the gap. If their cache
               hit rate is higher, focus on context stability. If their
-              compression ratio is higher, focus on prompt structure. Re-measure
+              velocity is higher, focus on prompt structure. Re-measure
               after a week.
             </p>
           </li>
@@ -359,7 +359,7 @@ export default function HowToCompareAIOperatorsPage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               The /compare tool renders a side-by-side cascade comparison of
-              operators — yield, cache hit rate, leverage, compression ratio,
+              operators — yield, cache hit rate, leverage, velocity,
               class tier, and four-pillar ratios. Platform-neutral: compare
               across Claude, Cursor, Copilot, and more.
             </dd>
@@ -370,7 +370,7 @@ export default function HowToCompareAIOperatorsPage() {
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               Yield (overall efficiency), cache hit rate (context reuse),
-              leverage (cache amplification), compression ratio (output per
+              leverage (cache amplification), velocity (output per
               input), and class tier (performance band). Each reveals a
               different aspect of the workflow.
             </dd>

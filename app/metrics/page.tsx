@@ -19,7 +19,7 @@ import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Metrics — AI Operator Token Efficiency Definitions",
   description:
-    "The six SigRank metrics: Yield (Υ), Cache Hit Rate, Compression Ratio, Leverage, Velocity, and Signal-to-Noise Ratio. Definitions, formulas, and how to improve each one.",
+    "The live token-era SigRank metrics: Yield (Υ), Cache Hit Rate, Leverage, Velocity, and Signal-to-Noise Ratio. Definitions, formulas, and how to improve each one. Compression Ratio is a word-era metric.",
   path: "/metrics",
 });
 

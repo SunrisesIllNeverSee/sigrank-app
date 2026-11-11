@@ -146,7 +146,7 @@ export function YieldCalculator() {
         </div>
         <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs text-text-secondary">
           <span>
-            Compression:{" "}
+            Velocity:{" "}
             <span className="text-text-primary">
               {result.compression.toFixed(2)}
             </span>

@@ -93,7 +93,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does CostHawk not measure that SigRank does?",
     answer:
-      "CostHawk reports total token consumption. SigRank derives the cascade architecture from token counts: Yield (cache_read times output divided by input squared), compression ratio, SNR, Leverage, and Velocity. CostHawk sees the total. SigRank sees the structure. Two operators can consume the same total tokens with wildly different efficiency. One reuses cache and produces high output. The other burns fresh input and produces little. CostHawk ranks them the same. SigRank ranks them 10x apart.",
+      "CostHawk reports total token consumption. SigRank derives the cascade architecture from token counts: Yield (cache_read times output divided by input squared), SNR, Leverage, and Velocity. CostHawk sees the total. SigRank sees the structure. Two operators can consume the same total tokens with wildly different efficiency. One reuses cache and produces high output. The other burns fresh input and produces little. CostHawk ranks them the same. SigRank ranks them 10x apart.",
   },
   {
     question: "Can I use both CostHawk and SigRank?",

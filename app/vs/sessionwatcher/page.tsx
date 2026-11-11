@@ -40,7 +40,7 @@ const COMPARE_ROWS: { feature: string; sessionwatcher: string; sigrank: string }
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     sessionwatcher: "No (session-level counts)",
     sigrank: "Yes (derived metrics)",
   },
@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does sessionwatcher not measure that SigRank does?",
     answer:
-      "sessionwatcher reports per-session token usage. SigRank derives the cascade architecture across an operator's entire body of work: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). sessionwatcher tells you what happened in one session; SigRank tells you whether the operator's cascade is compounding or burning across all of them.",
+      "sessionwatcher reports per-session token usage. SigRank derives the cascade architecture across an operator's entire body of work: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). sessionwatcher tells you what happened in one session; SigRank tells you whether the operator's cascade is compounding or burning across all of them.",
   },
   {
     question: "Can I use both sessionwatcher and SigRank?",
@@ -289,7 +289,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

@@ -52,11 +52,6 @@ const RELATED = [
     desc: "The headline metric: cache_read × output / input². Measures the architecture of your token cascade.",
   },
   {
-    href: "/metrics/compression-ratio",
-    title: "Compression Ratio",
-    desc: "Output divided by input — how much you get back per token you put in.",
-  },
-  {
     href: "/metrics/signal-to-noise-ratio",
     title: "Signal-to-Noise Ratio (SNR)",
     desc: "Signal tokens over total tokens — the density of useful output in your cascade.",
@@ -84,7 +79,7 @@ const RELATED = [
   {
     href: "/tools/yield-calculator",
     title: "Yield Calculator",
-    desc: "Paste your token stats and see your Υ Yield, class tier, and compression ratio instantly.",
+    desc: "Paste your token stats and see your Υ Yield, class tier, and velocity instantly.",
   },
   {
     href: "/token-cascade",

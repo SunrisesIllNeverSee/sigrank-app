@@ -41,7 +41,7 @@ const COMPARE_ROWS: { feature: string; notchpilot: string; sigrank: string }[] =
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     notchpilot: "No",
     sigrank: "Yes (derived metrics)",
   },
@@ -92,7 +92,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does notch-pilot not measure that SigRank does?",
     answer:
-      "notch-pilot doesn't measure anything about the operator — it's a tool, not a measurement system. SigRank reads the four token pillars (input, output, cache-read, cache-write) from your AI coding sessions and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). notch-pilot writes code; SigRank scores the writing.",
+      "notch-pilot doesn't measure anything about the operator — it's a tool, not a measurement system. SigRank reads the four token pillars (input, output, cache-read, cache-write) from your AI coding sessions and derives the cascade architecture: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). notch-pilot writes code; SigRank scores the writing.",
   },
   {
     question: "Can I use both notch-pilot and SigRank?",
@@ -278,7 +278,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

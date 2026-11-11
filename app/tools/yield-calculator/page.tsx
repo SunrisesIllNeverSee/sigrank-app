@@ -9,7 +9,7 @@ import { YieldCalculator } from "./YieldCalculator";
 export const metadata: Metadata = withOG({
   title: "Yield (Υ) Calculator — Token Cascade Efficiency",
   description:
-    "Free yield calculator for AI token cascades. Enter your four token pillars to compute \u03A5 Yield, compression ratio, cache hit rate, and yield interpretation instantly.",
+    "Free yield calculator for AI token cascades. Enter your four token pillars to compute \u03A5 Yield, velocity, cache hit rate, and yield interpretation instantly.",
   path: "/tools/yield-calculator",
 });
 
@@ -57,13 +57,13 @@ export default function YieldCalculatorPage() {
             name: "SigRank Yield (Υ) Calculator",
             url: "https://signalaf.com/tools/yield-calculator",
             description:
-              "Enter the four token pillars (input, output, cache-read, cache-write) to compute the Υ Yield token-cascade efficiency score, compression ratio, cache hit rate, and yield interpretation.",
+              "Enter the four token pillars (input, output, cache-read, cache-write) to compute the Υ Yield token-cascade efficiency score, velocity, cache hit rate, and yield interpretation.",
             applicationCategory: "CalculatorApplication",
             operatingSystem: "Web",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             featureList: [
               "Υ Yield calculation",
-              "Compression ratio",
+              "Velocity",
               "Cache hit rate",
               "Yield interpretation",
             ],

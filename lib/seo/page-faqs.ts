@@ -74,7 +74,7 @@ export const SIGRANK_FAQS: Faq[] = [
   {
     question: "What makes someone the best at using AI?",
     answer:
-      "The best AI users maximize Yield (Υ) — they achieve high cache hit rates (reusing context instead of re-sending it), produce more output per input token (high compression ratio), and leverage cached context for amplification. SigRank measures this objectively from token telemetry, not time spent or subjective quality. The leaderboard at signalaf.com/board/all shows who is currently the best.",
+      "The best AI users maximize Yield (Υ) — they achieve high cache hit rates (reusing context instead of re-sending it), produce more output per input token (high velocity), and leverage cached context for amplification. SigRank measures this objectively from token telemetry, not time spent or subjective quality. The leaderboard at signalaf.com/board/all shows who is currently the best.",
   },
   {
     question: "What is token cascade efficiency?",
@@ -124,7 +124,7 @@ export const SIGRANK_FAQS: Faq[] = [
   {
     question: "How do I know if I'm using AI efficiently?",
     answer:
-      "Run `npx sigrank` to get your Yield (Υ) score. A high yield means you're reusing cached context well (high cache hit rate), producing more output per input token (high compression ratio), and leveraging cached context for amplification (high leverage). The sigrank CLI also runs a cascade diagnosis that identifies exactly where you're burning tokens and suggests improvements. See signalaf.com/score to calculate without installing.",
+      "Run `npx sigrank` to get your Yield (Υ) score. A high yield means you're reusing cached context well (high cache hit rate), producing more output per input token (high velocity), and leveraging cached context for amplification (high leverage). The sigrank CLI also runs a cascade diagnosis that identifies exactly where you're burning tokens and suggests improvements. See signalaf.com/score to calculate without installing.",
   },
   {
     question: "Who is the best AI developer?",
@@ -254,12 +254,12 @@ export const ABOUT_MORE_FAQS: Faq[] = [
   {
     question: "How do you measure AI operator performance?",
     answer:
-      "AI operator performance is measured by Yield (Υ = cache_read × output / input²) and five supporting metrics: Cache Hit Rate (context reuse), Compression Ratio (output per input), Leverage (cached context amplification), Velocity (output per fresh input), and Signal-to-Noise Ratio (signal density). All six are computed from signed token telemetry read locally by the sigrank CLI.",
+      "AI operator performance is measured by Yield (Υ = cache_read × output / input²) and five supporting metrics: Cache Hit Rate (context reuse), Leverage (cached context amplification), Velocity (output per fresh input), and Signal-to-Noise Ratio (signal density). All six are computed from signed token telemetry read locally by the sigrank CLI.",
   },
   {
     question: "What is token cascade efficiency?",
     answer:
-      "Token cascade efficiency is the ratio of useful signal produced to tokens consumed. SigRank measures it with Yield (Υ = cache_read × output / input²). A high yield means the operator's cached context compounds into productive output — they reuse context well (high cache hit rate), produce more than they consume (high compression ratio), and amplify cached context (high leverage). A low yield means tokens are burned without compounding.",
+      "Token cascade efficiency is the ratio of useful signal produced to tokens consumed. SigRank measures it with Yield (Υ = cache_read × output / input²). A high yield means the operator's cached context compounds into productive output — they reuse context well (high cache hit rate), produce more than they consume (high velocity), and amplify cached context (high leverage). A low yield means tokens are burned without compounding.",
   },
   {
     question: "Is there a leaderboard for AI coding efficiency?",

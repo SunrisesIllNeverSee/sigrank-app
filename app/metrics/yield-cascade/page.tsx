@@ -139,10 +139,10 @@ export default function YieldCascadePage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Yield is the single number that captures the full cascade. Other
-          metrics isolate one dimension — compression ratio measures output per
+          metrics isolate one dimension — velocity measures output per fresh
           input, cache hit rate measures context reuse, leverage measures cached
           amplification. Yield blends all of them. An operator can have a high
-          compression ratio but low yield (if they never reuse cache). An
+          velocity but low yield (if they never reuse cache). An
           operator can have a high cache hit rate but low yield (if they produce
           little output). Yield is the only metric that rewards getting{" "}
           <em>all three</em> dimensions right simultaneously.
@@ -394,10 +394,10 @@ export default function YieldCascadePage() {
         <p className="font-sans text-sm text-text-muted">
           Related metrics:{" "}
           <Link
-            href="/metrics/compression-ratio"
+            href="/metrics/velocity"
             className="text-gold underline underline-offset-2"
           >
-            Compression Ratio
+            Velocity
           </Link>
           {" · "}
           <Link

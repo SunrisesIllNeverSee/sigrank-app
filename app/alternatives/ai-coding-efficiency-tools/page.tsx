@@ -41,7 +41,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only tool that scores whether your AI usage is compounding or burning.",
+      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier. The only tool that scores whether your AI usage is compounding or burning.",
     pros: [
       "Scores the operator, not the model — the only tool that ranks the operator driving the AI",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
@@ -136,7 +136,7 @@ const TOOLS: Tool[] = [
     ],
     cons: [
       "Measures hours, not token efficiency — blind to the cascade",
-      "No AI-specific metrics: no cache-read, yield, or compression ratio",
+      "No AI-specific metrics: no cache-read, yield, or velocity",
       "Cannot tell you whether your AI usage is compounding or burning",
     ],
     pricing: "Free tier; Pro from $9/month",
@@ -176,7 +176,7 @@ const FAQS = [
     question:
       "Which AI coding efficiency tool is best for measuring operator performance?",
     answer:
-      "SigRank is the only tool that scores operator-level token-cascade efficiency and ranks you against other operators on a live leaderboard. Cursor and Copilot report acceptance rates (a weak proxy). WakaTime reports hours. ccusage reports raw token counts. Only SigRank computes Υ Yield, compression ratio, SNR, leverage, and velocity — and assigns a class tier from IGNITER to ARCH+ based on your cascade architecture.",
+      "SigRank is the only tool that scores operator-level token-cascade efficiency and ranks you against other operators on a live leaderboard. Cursor and Copilot report acceptance rates (a weak proxy). WakaTime reports hours. ccusage reports raw token counts. Only SigRank computes Υ Yield, SNR, leverage, and velocity — and assigns a class tier from IGNITER to ARCH+ based on your cascade architecture.",
   },
   {
     question: "Is acceptance rate a good measure of AI coding efficiency?",

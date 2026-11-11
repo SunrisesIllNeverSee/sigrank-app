@@ -67,7 +67,7 @@ const COMPARE_ROWS: { feature: string; codeburn: string; sigrank: string }[] = [
     sigrank: "Yes (\u03A5 = cache_read \u00D7 output / input\u00B2)",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     codeburn: "No (cost and waste metrics, not cascade architecture)",
     sigrank: "Yes (derived cascade metrics)",
   },
@@ -122,7 +122,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does SigRank do that CodeBurn doesn\u2019t?",
     answer:
-      "SigRank scores and ranks operators. The headline metric, Υ Yield = cache_read × output / input², measures cascade architecture — whether signal is compounding or burning. SigRank derives compression ratio, SNR, Leverage, Velocity, and 10xDEV from the same four token pillars. It assigns class tiers (IGNITER to ARCH+), publishes ed25519-signed snapshots to a public leaderboard, and supports head-to-head operator comparisons. CodeBurn optimizes your local setup; SigRank measures where you stand against the field. If you want to improve your spending efficiency, CodeBurn is the tool. If you want to know whether your cascade architecture is competitive, SigRank is the tool.",
+      "SigRank scores and ranks operators. The headline metric, Υ Yield = cache_read × output / input², measures cascade architecture — whether signal is compounding or burning. SigRank derives SNR, Leverage, Velocity, and 10xDEV from the same four token pillars. It assigns class tiers (IGNITER to ARCH+), publishes ed25519-signed snapshots to a public leaderboard, and supports head-to-head operator comparisons. CodeBurn optimizes your local setup; SigRank measures where you stand against the field. If you want to improve your spending efficiency, CodeBurn is the tool. If you want to know whether your cascade architecture is competitive, SigRank is the tool.",
   },
   {
     question: "Can I use both CodeBurn and SigRank?",
@@ -182,7 +182,7 @@ export default function VsCodeburnPage() {
           <strong className="text-text-primary"> is your cascade compounding
           or burning?</strong> The headline metric, Υ Yield = cache_read ×
           output / input², measures the architecture of your token cascade.
-          SigRank derives compression ratio, SNR, Leverage, Velocity, and
+          SigRank derives SNR, Leverage, Velocity, and
           10xDEV, assigns class tiers, and publishes ed25519-signed snapshots
           to a public leaderboard. CodeBurn optimizes your setup; SigRank
           scores your skill. Both matter. They are not substitutes.

@@ -7,7 +7,7 @@ const METRICS = [
   ["Leverage", "/metrics/leverage"],
   ["Velocity", "/metrics/velocity"],
   ["Cache Hit Rate", "/metrics/cache-hit-rate"],
-  ["Compression Ratio", "/metrics/compression-ratio"],
+  ["Compression Ratio (word era)", "/metrics/compression-ratio"],
   ["Signal-to-Noise", "/metrics/signal-to-noise-ratio"],
   ["Efficiency", "/metrics/efficiency"],
 ] as const;

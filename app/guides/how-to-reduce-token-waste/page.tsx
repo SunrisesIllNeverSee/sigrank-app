@@ -214,7 +214,7 @@ export default function HowToReduceTokenWastePage() {
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               You&rsquo;re sending a lot but getting little back. Your
-              compression ratio (output / input) will be low. Fix: structure
+              velocity (output / input) will be low. Fix: structure
               inputs to be minimal.
             </p>
           </li>
@@ -348,7 +348,7 @@ export default function HowToReduceTokenWastePage() {
             drop — fewer fresh tokens, more cache reuse.
           </li>
           <li className="font-sans text-sm leading-relaxed text-text-secondary">
-            <strong className="text-text-primary">Compression ratio</strong>{" "}
+            <strong className="text-text-primary">Velocity</strong>{" "}
             should rise — more output per input token.
           </li>
         </ul>

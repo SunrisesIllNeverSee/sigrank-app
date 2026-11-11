@@ -44,11 +44,6 @@ const COMPARE_ROWS: { feature: string; wakatime: string; sigrank: string }[] = [
     wakatime: "No",
     sigrank: "Yes (cache hit rate, Leverage)",
   },
-  {
-    feature: "Compression ratio (output per input)",
-    wakatime: "No",
-    sigrank: "Yes",
-  },
   { feature: "Signal-to-noise ratio", wakatime: "No", sigrank: "Yes" },
   {
     feature: "Velocity (output per fresh input)",
@@ -97,7 +92,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does WakaTime not see that SigRank does?",
     answer:
-      "WakaTime sees editor activity — file opens, keystrokes, language, project. It does not see the token cascade: how much input you sent, how much output came back, how much context you reused from cache versus re-paid for. SigRank reads exactly those four pillars (input, output, cache-read, cache-write) and derives the cascade architecture — Υ Yield, compression ratio, SNR, Leverage, and Velocity. That cascade is where AI coding efficiency lives, and it is invisible to a time tracker.",
+      "WakaTime sees editor activity — file opens, keystrokes, language, project. It does not see the token cascade: how much input you sent, how much output came back, how much context you reused from cache versus re-paid for. SigRank reads exactly those four pillars (input, output, cache-read, cache-write) and derives the cascade architecture — Υ Yield, SNR, Leverage, and Velocity. That cascade is where AI coding efficiency lives, and it is invisible to a time tracker.",
   },
   {
     question: "Does SigRank track time at all?",

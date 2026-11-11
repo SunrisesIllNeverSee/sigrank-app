@@ -300,7 +300,7 @@ export default function BestAiCodingTools2026Page() {
           <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
             <strong className="text-text-primary">Strengths:</strong> The only
             tool that scores the <em>operator</em>, not the model. It computes
-            yield (Υ), cache hit rate, leverage, compression ratio, and SNR from
+            yield (Υ), cache hit rate, leverage, velocity, and SNR from
             four token integers read locally, and it is platform-neutral,
             working across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+
             platforms. It is privacy-preserving, reading token counts only and

@@ -42,7 +42,7 @@ const COMPARE_ROWS: { feature: string; tokenrank: string; sigrank: string }[] = 
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     tokenrank: "Partial (raw counts)",
     sigrank: "Yes (derived metrics)",
   },
@@ -97,7 +97,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does TokenRank not measure that SigRank does?",
     answer:
-      "TokenRank reports aggregate token activity and ranks by that total. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). TokenRank rewards the operator who burns the most; SigRank rewards the one who compounds the most. Burning to rank is a volume game; building to rank is a skill game.",
+      "TokenRank reports aggregate token activity and ranks by that total. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). TokenRank rewards the operator who burns the most; SigRank rewards the one who compounds the most. Burning to rank is a volume game; building to rank is a skill game.",
   },
   {
     question: "Can I use both TokenRank and SigRank?",
@@ -292,7 +292,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

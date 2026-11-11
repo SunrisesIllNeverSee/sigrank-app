@@ -320,7 +320,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
                 /score
               </Link>
               . Paste your ccusage JSON to see yield, class tier, and
-              compression ratio instantly — no install required.
+              velocity instantly — no install required.
             </p>
           </li>
         </ul>

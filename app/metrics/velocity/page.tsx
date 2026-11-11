@@ -4,7 +4,7 @@
  * Defines velocity per canon (lib/identity/canon-ids.ts Y.04): T.01 / T.02 —
  * output per fresh input. It is NOT a time rate. Explains why it's a secondary
  * metric (high velocity without yield = wasteful volume), how it interacts with
- * yield, and when velocity matters (throughput-oriented tasks).
+ * yield, and when velocity matters (output-heavy tasks).
  *
  * JSON-LD: breadcrumb + definedTerm + faqPage.
  */
@@ -47,7 +47,7 @@ export default function VelocityPage() {
           ]),
           definedTerm(
             "Velocity — Output per Fresh Input",
-            "Velocity = output / input. The ratio of output tokens to fresh input tokens — how much the model generates per token of fresh context provided. A secondary metric: high velocity without yield is wasteful volume. Velocity matters most for throughput-oriented tasks where raw output volume per input is the goal.",
+            "Velocity = output / input. The ratio of output tokens to fresh input tokens — how much the model generates per token of fresh context provided. A secondary metric: high velocity without yield is wasteful volume. Velocity matters most for output-heavy tasks where raw output volume per input is the goal.",
             "/metrics/velocity",
           ),
           faqPage([
@@ -69,7 +69,7 @@ export default function VelocityPage() {
             {
               question: "When does velocity matter?",
               answer:
-                "Velocity matters most for throughput-oriented tasks: bulk code generation, large refactors, test suite generation, documentation writing. In these cases, raw output volume per fresh input is the goal, and velocity is the relevant metric. For precision tasks — debugging, architecture decisions, security review — yield matters more than velocity. Use velocity as a diagnostic, not a target.",
+                "Velocity matters most for output-heavy tasks: bulk code generation, large refactors, test suite generation, documentation writing. In these cases, raw output volume per fresh input is the goal, and velocity is the relevant metric. For precision tasks — debugging, architecture decisions, security review — yield matters more than velocity. Use velocity as a diagnostic, not a target.",
             },
           ]),
         ]}
@@ -115,8 +115,8 @@ export default function VelocityPage() {
           how much output you produce per token of fresh input. It is the
           AI-coding analog of code-to-comment ratio, but measured in output
           tokens versus input tokens. Unlike lines of code, output tokens are a
-          direct measure of the model&rsquo;s productive work, not your typing
-          speed.
+          direct measure of the model&rsquo;s productive work, not how much you
+          typed.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Velocity is influenced by several factors: how specific your prompts
@@ -181,9 +181,9 @@ export default function VelocityPage() {
             High yield, low velocity
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
-            Efficient but deliberate. Long thinking time between turns, careful
+            Efficient but deliberate. Careful
             prompt composition, deep review of output. Each turn is high-value —
-            the cascade compounds — but throughput is modest. This is the
+            the cascade compounds — but output per fresh input is modest. This is the
             signature of precision work: debugging, architecture, security
             review.
           </p>
@@ -222,7 +222,7 @@ export default function VelocityPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Velocity matters most for{" "}
           <strong className="text-text-primary">
-            throughput-oriented tasks
+            output-heavy tasks
           </strong>{" "}
           where output volume per fresh input is the goal:
         </p>
@@ -251,7 +251,7 @@ export default function VelocityPage() {
           debugging a subtle race condition, making an architecture decision,
           reviewing a security-critical change — yield matters more than
           velocity. These tasks reward careful, efficient cascades over raw
-          throughput. Use velocity as a diagnostic to understand your working
+          output volume. Use velocity as a diagnostic to understand your working
           style, not as a target to maximize at the expense of yield.
         </p>
       </section>
@@ -343,7 +343,7 @@ export default function VelocityPage() {
               When does velocity matter?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Velocity matters most for throughput-oriented tasks: bulk code
+              Velocity matters most for output-heavy tasks: bulk code
               generation, large refactors, test suite generation, documentation
               writing. For precision tasks — debugging, architecture, security
               review — yield matters more. Use velocity as a diagnostic, not a
@@ -368,7 +368,7 @@ export default function VelocityPage() {
             href="/metrics/compression-ratio"
             className="text-gold underline underline-offset-2"
           >
-            Compression Ratio
+            Compression Ratio (word era)
           </Link>
           {" · "}
           <Link

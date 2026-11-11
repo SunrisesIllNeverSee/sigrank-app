@@ -16,7 +16,7 @@ import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
-import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
+import { breadcrumb, definedTerm } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
   title: "Compression Ratio — Word-Era Metric",
@@ -54,23 +54,6 @@ export default function CompressionRatioPage() {
             DEFINITION,
             "/metrics/compression-ratio",
           ),
-          faqPage([
-            {
-              question: "What is Compression Ratio in SigRank?",
-              answer:
-                "Compression Ratio (ticker COMP) is a word-era SigRank metric. It is retained as background for the planned evolution to word-based ranking and is not part of the live token-era board.",
-            },
-            {
-              question: "Which metric measures output per fresh input on the live board?",
-              answer:
-                "Velocity. On the live token-era board, Velocity = output / input — output tokens per fresh input token. It is a secondary metric; Yield (Υ) is the headline.",
-            },
-            {
-              question: "How does this relate to Yield?",
-              answer:
-                "Yield (Υ) = (cache_read / input) × (output / input) — leverage × velocity. The output-per-fresh-input term inside Yield is Velocity.",
-            },
-          ]),
         ]}
       />
 
@@ -82,27 +65,46 @@ export default function CompressionRatioPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
           <p className="font-sans text-sm leading-relaxed text-text-secondary">
             Compression Ratio (ticker{" "}
-            <strong className="text-text-primary">COMP</strong>) is a{" "}
+            <strong className="text-text-primary">COMP</strong>, canonical id
+            M.01) is a{" "}
             <strong className="text-text-primary">word-era</strong> SigRank
             metric. It is retained as background for the planned evolution to
             word-based ranking and is not part of the live token-era board.
           </p>
         </div>
+      </section>
+
+      {/* ── What it was ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          What it was in the word era
+        </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The live SigRank board ranks on the token cascade: Yield, SNR,
-          Leverage, Velocity, and the other token-era metrics, all derived from
-          the four raw token pillars.
+          Compression Ratio was the first of SigRank&rsquo;s original Core 5
+          metrics, alongside Prompt Complexity and the others. It was a bounded
+          0 to 1 score rather than a count: the SigRank badge criteria for
+          structural badges such as Compression Forge are written as thresholds
+          on that 0 to 1 scale (for example, a Compression score of 0.85 or
+          higher). It described how tightly an operator&rsquo;s work was
+          structured, not how many tokens moved through the cascade.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Those definitions are kept in the canon registry as background. They
+          are not shown on the live board, and this site does not publish a
+          token formula for Compression Ratio.
         </p>
       </section>
 
-      {/* ── Where output per input lives now ── */}
+      {/* ── Why the token board uses Velocity ── */}
       <section className="flex flex-col gap-3">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Output per fresh input on the live board: Velocity
+          Why the live board uses Velocity instead
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          If you are looking for the ratio of output tokens to fresh input
-          tokens, that metric is{" "}
+          The live SigRank board ranks on the token cascade. Every token-era
+          metric is derived from four raw token pillars: input, output,
+          cache-read and cache-write. Within that set, the ratio of output
+          tokens to fresh input tokens is{" "}
           <Link
             href="/metrics/velocity"
             className="text-gold underline underline-offset-2"
@@ -110,55 +112,28 @@ export default function CompressionRatioPage() {
             Velocity
           </Link>
           : <span className="font-mono text-text-primary">Velocity = output / input</span>
-          . Velocity is a secondary metric; Yield is the headline.
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Velocity is one of the two terms of{" "}
+          . It is a secondary metric, and it is one of the two terms of{" "}
           <Link
             href="/metrics/yield-cascade"
             className="text-gold underline underline-offset-2"
           >
             Yield (Υ)
           </Link>
-          : Υ = (cache_read / input) × (output / input), which is leverage ×
-          velocity.
+          , the headline: Υ = (cache_read / input) × (output / input), which is
+          leverage × velocity.
         </p>
-      </section>
-
-      {/* ── FAQ ── */}
-      <section className="flex flex-col gap-3">
-        <h2 className="font-mono text-base font-bold text-text-primary">FAQ</h2>
-        <dl className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <dt className="font-semibold text-text-primary">
-              What is Compression Ratio in SigRank?
-            </dt>
-            <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Compression Ratio (COMP) is a word-era SigRank metric, retained as
-              background and not part of the live token-era board.
-            </dd>
-          </div>
-          <div className="flex flex-col gap-1">
-            <dt className="font-semibold text-text-primary">
-              Which metric measures output per fresh input on the live board?
-            </dt>
-            <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Velocity. On the live token-era board, Velocity = output / input —
-              output tokens per fresh input token. It is a secondary metric;
-              Yield (Υ) is the headline.
-            </dd>
-          </div>
-          <div className="flex flex-col gap-1">
-            <dt className="font-semibold text-text-primary">
-              How does this relate to Yield?
-            </dt>
-            <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Yield (Υ) = (cache_read / input) × (output / input) — leverage ×
-              velocity. The output-per-fresh-input term inside Yield is
-              Velocity.
-            </dd>
-          </div>
-        </dl>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          If you were looking for an output-per-input number for your own
+          sessions, use Velocity. For how the board is built and what each
+          metric means, see the{" "}
+          <Link
+            href="/methodology"
+            className="text-gold underline underline-offset-2"
+          >
+            methodology
+          </Link>
+          .
+        </p>
       </section>
 
       {/* ── Cross-links ── */}

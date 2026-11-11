@@ -39,7 +39,7 @@ const COMPARE_ROWS: { feature: string; ccgather: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     ccgather: "No (usage stats)",
     sigrank: "Yes (derived metrics)",
   },
@@ -89,7 +89,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does ccgather not measure that SigRank does?",
     answer:
-      "ccgather reports Claude Code usage stats and ranks by them. SigRank reads the same four token pillars and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccgather tells you who used Claude Code the most; SigRank tells you who is the most efficient operator across every platform.",
+      "ccgather reports Claude Code usage stats and ranks by them. SigRank reads the same four token pillars and derives the cascade architecture: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccgather tells you who used Claude Code the most; SigRank tells you who is the most efficient operator across every platform.",
   },
   {
     question: "Can I use both ccgather and SigRank?",
@@ -275,7 +275,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

@@ -40,7 +40,7 @@ const COMPARE_ROWS: { feature: string; omnara: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     omnara: "No (agent metrics)",
     sigrank: "Yes (derived metrics)",
   },
@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does omnara not measure that SigRank does?",
     answer:
-      "omnara monitors AI agent behavior and infrastructure. SigRank derives the cascade architecture from the operator's token telemetry: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). omnara tells you what your agents are doing; SigRank tells you whether the operator behind them is compounding or burning.",
+      "omnara monitors AI agent behavior and infrastructure. SigRank derives the cascade architecture from the operator's token telemetry: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). omnara tells you what your agents are doing; SigRank tells you whether the operator behind them is compounding or burning.",
   },
   {
     question: "Can I use both omnara and SigRank?",
@@ -287,7 +287,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

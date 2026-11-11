@@ -92,7 +92,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does Token Tracker not measure that SigRank does?",
     answer:
-      "Token Tracker reports raw token counts and cost per tool. SigRank derives the cascade architecture from those counts: Yield (cache_read times output divided by input squared), compression ratio, SNR, Leverage, and Velocity. Token Tracker tells you how much you spent across its supported tools. SigRank tells you whether your token cascade is compounding signal or burning tokens. The same 50K input tokens can produce 30K output with high cache reuse or 3K output with zero reuse. Token Tracker sees the same number either way. SigRank sees the 10x difference.",
+      "Token Tracker reports raw token counts and cost per tool. SigRank derives the cascade architecture from those counts: Yield (cache_read times output divided by input squared), SNR, Leverage, and Velocity. Token Tracker tells you how much you spent across its supported tools. SigRank tells you whether your token cascade is compounding signal or burning tokens. The same 50K input tokens can produce 30K output with high cache reuse or 3K output with zero reuse. Token Tracker sees the same number either way. SigRank sees the 10x difference.",
   },
   {
     question: "Can I use both Token Tracker and SigRank?",

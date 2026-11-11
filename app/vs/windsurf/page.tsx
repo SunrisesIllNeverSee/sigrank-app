@@ -42,7 +42,7 @@ const COMPARE_ROWS: { feature: string; windsurf: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     windsurf: "No",
     sigrank: "Yes",
   },

@@ -35,7 +35,7 @@ const COMPARE_ROWS: { feature: string; lineman: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     lineman: "No (spend only)",
     sigrank: "Yes (derived metrics)",
   },
@@ -91,7 +91,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does lineman not measure that SigRank does?",
     answer:
-      "lineman reports dollars spent on Claude Code. SigRank reads the same token telemetry and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). lineman tells you what you paid; SigRank tells you whether the cascade it funded is compounding or burning.",
+      "lineman reports dollars spent on Claude Code. SigRank reads the same token telemetry and derives the cascade architecture: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). lineman tells you what you paid; SigRank tells you whether the cascade it funded is compounding or burning.",
   },
   {
     question: "Can I use both lineman and SigRank?",
@@ -275,7 +275,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

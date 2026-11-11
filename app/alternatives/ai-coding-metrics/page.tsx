@@ -37,7 +37,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier.",
+      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier.",
     pros: [
       "Scores the operator, not the model — the only tool that ranks the operator driving the AI",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
@@ -81,7 +81,7 @@ const TOOLS: Tool[] = [
     ],
     cons: [
       "Measures hours, not token efficiency — blind to the cascade",
-      "No AI-specific metrics: no cache-read, yield, or compression ratio",
+      "No AI-specific metrics: no cache-read, yield, or velocity",
       "Cannot tell you whether your AI usage is compounding or burning",
     ],
     pricing: "Free tier; Pro from $9/month",
@@ -166,7 +166,7 @@ const FAQS = [
   {
     question: "How is SigRank different from ccusage?",
     answer:
-      "ccusage reads Claude Code logs and reports raw token counts — it is a measurement tool. SigRank bundles ccusage and adds scoring (Υ Yield, compression ratio, SNR, leverage, velocity), operator identity, ed25519-signed submissions, a live leaderboard with class tiers, and multi-platform support across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms. ccusage tells you what you spent; SigRank tells you how efficiently you spent it and where you rank.",
+      "ccusage reads Claude Code logs and reports raw token counts — it is a measurement tool. SigRank bundles ccusage and adds scoring (Υ Yield, SNR, leverage, velocity), operator identity, ed25519-signed submissions, a live leaderboard with class tiers, and multi-platform support across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms. ccusage tells you what you spent; SigRank tells you how efficiently you spent it and where you rank.",
   },
   {
     question:

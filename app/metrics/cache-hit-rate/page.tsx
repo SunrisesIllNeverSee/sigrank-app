@@ -177,8 +177,8 @@ export default function CacheHitRatePage() {
           </li>
         </ul>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          No other metric has this many downstream effects. Compression ratio
-          only affects yield through one term. Velocity is secondary. Cache hit
+          No other metric has this many downstream effects. Velocity
+          only affects yield through one term, and it is secondary. Cache hit
           rate is the multiplier that amplifies everything else — which is why
           it&rsquo;s the first metric to optimize when improving your cascade.
         </p>

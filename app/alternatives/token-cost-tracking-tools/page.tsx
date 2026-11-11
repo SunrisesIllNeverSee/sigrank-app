@@ -41,7 +41,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. The only tool that scores whether your token spend was efficient, not just how much it cost.",
+      "Operator-level token-cascade efficiency — Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier. The only tool that scores whether your token spend was efficient, not just how much it cost.",
     pros: [
       "Scores spend efficiency, not just spend volume — tells you if your dollars compounded or burned",
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
@@ -158,7 +158,7 @@ const FAQS = [
   {
     question: "Which tool is best for tracking AI token costs?",
     answer:
-      "For raw cost tracking, ccusage and Claude Code /cost are the simplest for Claude Code users; aider /usage for aider users; Langfuse for teams monitoring LLM application spend. But for cost tracking that also scores efficiency, SigRank is the only tool that computes Υ Yield, compression ratio, leverage, and velocity — and ranks you against other operators on cost-adjusted cascade efficiency.",
+      "For raw cost tracking, ccusage and Claude Code /cost are the simplest for Claude Code users; aider /usage for aider users; Langfuse for teams monitoring LLM application spend. But for cost tracking that also scores efficiency, SigRank is the only tool that computes Υ Yield, leverage, and velocity — and ranks you against other operators on cost-adjusted cascade efficiency.",
   },
   {
     question: "Do these tools show cost per session?",

@@ -42,7 +42,7 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency for Claude Code and 15+ other platforms — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. Bundles ccusage so you keep the raw counts and gain scoring.",
+      "Operator-level token-cascade efficiency for Claude Code and 15+ other platforms — Υ Yield (cache_read × output / input²), SNR, cache hit rate, leverage, velocity, and class tier. Bundles ccusage so you keep the raw counts and gain scoring.",
     pros: [
       "Bundles ccusage — reads the same Claude Code logs and adds scoring on top",
       "Scores the operator with Υ Yield — tells you if your context is compounding or burning",
@@ -165,7 +165,7 @@ const FAQS = [
   {
     question: "How is SigRank different from ccusage for Claude Code?",
     answer:
-      "ccusage reads Claude Code logs and reports raw token counts — it is a measurement tool. SigRank bundles ccusage and adds scoring (Υ Yield, compression ratio, SNR, leverage, velocity), operator identity, ed25519-signed submissions, a live leaderboard with class tiers, and multi-platform support across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms. ccusage tells you what you spent; SigRank tells you how efficiently you spent it and where you rank.",
+      "ccusage reads Claude Code logs and reports raw token counts — it is a measurement tool. SigRank bundles ccusage and adds scoring (Υ Yield, SNR, leverage, velocity), operator identity, ed25519-signed submissions, a live leaderboard with class tiers, and multi-platform support across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms. ccusage tells you what you spent; SigRank tells you how efficiently you spent it and where you rank.",
   },
   {
     question: "Can I see Claude Code token usage without installing anything?",

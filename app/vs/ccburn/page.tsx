@@ -40,7 +40,7 @@ const COMPARE_ROWS: { feature: string; ccburn: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     ccburn: "No (burn rate only)",
     sigrank: "Yes (derived metrics)",
   },
@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does ccburn not measure that SigRank does?",
     answer:
-      "ccburn reports tokens burned per unit time. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccburn tells you how fast you are burning; SigRank tells you whether your cascade is compounding or burning. Burn rate is a speedometer; yield is a lap time.",
+      "ccburn reports tokens burned per unit time. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccburn tells you how fast you are burning; SigRank tells you whether your cascade is compounding or burning. Burn rate is a speedometer; yield is a lap time.",
   },
   {
     question: "Can I use both ccburn and SigRank?",
@@ -287,7 +287,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

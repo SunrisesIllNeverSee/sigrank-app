@@ -46,7 +46,7 @@ const COMPARE_ROWS: { feature: string; langfuse: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     langfuse: "No",
     sigrank: "Yes",
   },

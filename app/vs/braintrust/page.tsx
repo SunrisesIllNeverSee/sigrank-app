@@ -45,7 +45,7 @@ const COMPARE_ROWS: { feature: string; braintrust: string; sigrank: string }[] =
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     braintrust: "No",
     sigrank: "Yes",
   },
@@ -87,7 +87,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does Braintrust measure AI operator skill?",
     answer:
-      "Braintrust surfaces talent through marketplace profiles, ratings, and project history — the same signals a freelance platform uses for any skill. It does not measure how efficiently an operator drives AI tools. It cannot tell you whether a candidate compounds cached context into output or burns fresh input every turn. SigRank measures exactly that: the Υ Yield (cache_read × output / input²), compression ratio, SNR, Leverage, and Velocity that define token-cascade efficiency. Braintrust tells you who claims to be good with AI; SigRank measures whether they are.",
+      "Braintrust surfaces talent through marketplace profiles, ratings, and project history — the same signals a freelance platform uses for any skill. It does not measure how efficiently an operator drives AI tools. It cannot tell you whether a candidate compounds cached context into output or burns fresh input every turn. SigRank measures exactly that: the Υ Yield (cache_read × output / input²), SNR, Leverage, and Velocity that define token-cascade efficiency. Braintrust tells you who claims to be good with AI; SigRank measures whether they are.",
   },
   {
     question: "Why does measuring AI skill matter for hiring?",

@@ -41,7 +41,7 @@ const COMPARE_ROWS: { feature: string; aiusage: string; sigrank: string }[] = [
     sigrank: "Yes",
   },
   {
-    feature: "Compression ratio + SNR + Leverage + Velocity",
+    feature: "SNR + Leverage + Velocity",
     aiusage: "No (raw counts)",
     sigrank: "Yes (derived metrics)",
   },
@@ -96,7 +96,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does aiusage not measure that SigRank does?",
     answer:
-      "aiusage reports API call counts and token usage per provider. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). aiusage tells you how many calls you made; SigRank tells you whether your cascade is compounding or burning. Call count is volume; yield is efficiency.",
+      "aiusage reports API call counts and token usage per provider. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). aiusage tells you how many calls you made; SigRank tells you whether your cascade is compounding or burning. Call count is volume; yield is efficiency.",
   },
   {
     question: "Why is counting API calls not the same as scoring operators?",
@@ -289,7 +289,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           <Link href="/score" className="text-gold underline underline-offset-2">
             /score calculator
           </Link>{" "}
-          to compute your Υ Yield, class tier, and compression ratio instantly,
+          to compute your Υ Yield, class tier, and velocity instantly,
           no account, no submission, just the numbers.
         </p>
       </section>

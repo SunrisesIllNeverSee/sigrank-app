@@ -32,7 +32,7 @@ const FAQS = [
   {
     question: "How do I raise my operator class?",
     answer:
-      "The fastest gains come from prompt caching (raising cache_read and cache hit rate) and from denser output per fresh input (raising compression ratio). Yield rewards both at once. Typing more input without caching or denser output rarely moves the tier.",
+      "The fastest gains come from prompt caching (raising cache_read and cache hit rate) and from denser output per fresh input (raising velocity). Yield rewards both at once. Typing more input without caching or denser output rarely moves the tier.",
   },
   {
     question: "Is the class tier the same as a rank?",

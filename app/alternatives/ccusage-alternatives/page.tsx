@@ -40,7 +40,7 @@ const ALTS: Alt[] = [
     what: "A full operator-scoring platform that bundles ccusage and adds yield scoring, a live leaderboard, class tiers, multi-platform support, and MCP integration. Token counts only, ed25519-signed, privacy-preserving.",
     pros: [
       "Bundles ccusage — you keep the raw token counts and get scoring on top",
-      "Scores the operator with Υ Yield (cache_read × output / input²), compression ratio, SNR, leverage, and velocity",
+      "Scores the operator with Υ Yield (cache_read × output / input²), SNR, leverage, and velocity",
       "Live leaderboard with 7d/30d/90d/all-time windows and head-to-head comparison",
       "Platform-neutral: Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
       "MCP server mode for AI-agent integration — your agent can read its own metrics",
