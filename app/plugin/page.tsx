@@ -9,6 +9,7 @@ export const metadata: Metadata = withOG({
 });
 
 const ANALYST_MCP_URL = "https://analyst.signalaf.com/api/plugins/sigrank/mcp";
+const CHATGPT_PLUGIN_URL = "https://chatgpt.com/plugins/plugin_asdk_app_6ac9daab15288191aaeb6847cb6264ee";
 
 const ADMIN_TOOLS = [
   { name: "get_leaderboard", summary: "Reads the public board for 7d, 30d, 90d or all time.", access: "Read-only" },
@@ -50,24 +51,51 @@ export default function PluginPage() {
         </p>
       </section>
 
-      <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
-        <h2 className="font-mono text-xl font-bold text-text-primary">Use it in Claude</h2>
-        <p>
-          In Claude Code, add the plugin from its GitHub marketplace:
-        </p>
-        <pre className="overflow-x-auto rounded border border-border-base bg-surface p-3 font-mono text-xs text-text-primary">
-          /plugin install signalaf-analyst --marketplace SunrisesIllNeverSee/signalaf-analyst-claude
-        </pre>
-        <p>
-          It works the same in Claude chat and Cowork. The plugin connects to the same public,
-          sign-in-free Analyst server as ChatGPT and Codex, so results match across hosts.
-        </p>
-        <a
-          className="text-gold underline underline-offset-4"
-          href="https://github.com/SunrisesIllNeverSee/signalaf-analyst-claude"
-        >
-          View the Claude plugin on GitHub
-        </a>
+      <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary" aria-labelledby="plugin-install-heading">
+        <h2 id="plugin-install-heading" className="font-mono text-xl font-bold text-text-primary">
+          Use SigRank in your AI client
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <article className="min-w-0 rounded border border-border-base bg-surface p-5">
+            <h3 className="font-mono text-lg font-semibold text-text-primary">ChatGPT &amp; Codex</h3>
+            <p className="mt-3">
+              Find SigRank | SignalAF Analyst in the ChatGPT Plugin Directory to explore the
+              public leaderboard, operator profiles and field comparisons.
+            </p>
+            <a
+              className="mt-4 inline-flex min-h-11 items-center justify-center rounded border border-gold px-4 py-2 text-center font-mono text-xs font-semibold text-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+              href={CHATGPT_PLUGIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open in ChatGPT
+            </a>
+            <p className="mt-3 text-xs">
+              This Analyst plugin also supports Codex. It reads public results; it does not
+              submit your telemetry.
+            </p>
+          </article>
+
+          <article className="min-w-0 rounded border border-border-base bg-surface p-5">
+            <h3 className="font-mono text-lg font-semibold text-text-primary">Claude</h3>
+            <p className="mt-3">
+              In Claude Code, add the plugin from its GitHub marketplace:
+            </p>
+            <pre className="mt-3 overflow-x-auto rounded border border-border-base bg-surface p-3 font-mono text-xs text-text-primary">
+              /plugin install signalaf-analyst --marketplace SunrisesIllNeverSee/signalaf-analyst-claude
+            </pre>
+            <p className="mt-3">
+              It works the same in Claude chat and Cowork. The plugin connects to the same public,
+              sign-in-free Analyst server as ChatGPT and Codex, so results match across hosts.
+            </p>
+            <a
+              className="mt-3 inline-block text-gold underline underline-offset-4"
+              href="https://github.com/SunrisesIllNeverSee/signalaf-analyst-claude"
+            >
+              View the Claude plugin on GitHub
+            </a>
+          </article>
+        </div>
       </section>
 
       <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
