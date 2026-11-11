@@ -3,7 +3,7 @@ export type BetaReport = {
   steps: string[];
   expected: string;
   actual: string;
-  surface: "ChatGPT" | "Codex" | "Website" | "Other";
+  surface: "ChatGPT" | "Claude" | "Codex" | "Website" | "Other";
   pluginVersion: string | null;
   window: "7d" | "30d" | "90d" | "all" | null;
   toolName: string | null;
@@ -41,8 +41,8 @@ export function prepareBetaReport(args: Record<string, unknown>): BetaReport {
   if (!Array.isArray(rawSteps) || rawSteps.length < 1 || rawSteps.length > 5)
     throw new Error("steps must contain 1–5 short actions.");
   const surface = args.surface;
-  if (surface !== "ChatGPT" && surface !== "Codex" && surface !== "Website" && surface !== "Other")
-    throw new Error("surface must be ChatGPT, Codex, Website, or Other.");
+  if (surface !== "ChatGPT" && surface !== "Claude" && surface !== "Codex" && surface !== "Website" && surface !== "Other")
+    throw new Error("surface must be ChatGPT, Claude, Codex, Website, or Other.");
   const window = args.window;
   if (window !== undefined && window !== null && window !== "7d" && window !== "30d" && window !== "90d" && window !== "all")
     throw new Error("window must be 7d, 30d, 90d, or all.");

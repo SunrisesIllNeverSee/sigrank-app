@@ -5320,6 +5320,7 @@
             "type": "string",
             "enum": [
               "ChatGPT",
+              "Claude",
               "Codex",
               "Website",
               "Other"

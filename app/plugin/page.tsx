@@ -83,11 +83,27 @@ export default function PluginPage() {
         </Link>
       </section>
 
+      <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
+        <h2 className="font-mono text-xl font-bold text-text-primary">Get on the board</h2>
+        <p>
+          This connector reads public board records; it does not measure you. To appear on the board, use the SigRank CLI
+          (<span className="font-mono">npx sigrank</span>): create a connect code in{" "}
+          <Link className="text-gold underline underline-offset-4" href="/settings">Settings</Link>,
+          run <span className="font-mono">sigrank enroll</span>, then{" "}
+          <span className="font-mono">sigrank submit</span>. It reads your AI session logs on your
+          device and submits the four token totals with signed account and device metadata, never
+          prompt or response text, code or file paths. Run{" "}
+          <span className="font-mono">sigrank submit --dry-run</span> to see exactly what would be sent.
+        </p>
+      </section>
+
       <section id="it-admins" className="mt-10 scroll-mt-20 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
         <h2 className="font-mono text-xl font-bold text-text-primary">For IT admins</h2>
         <p>
           <strong className="text-text-primary">Authentication: none.</strong> The connector is public
-          and read-only for analysis. There are no accounts, API keys, OAuth or SSO settings to configure.
+          and needs no accounts, API keys, OAuth or SSO. Four tools are read-only;{" "}
+          <span className="font-mono">report_beta_bug</span> sends one email to hello@signalaf.com,
+          only when the user explicitly asks.
         </p>
         <p>
           <strong className="text-text-primary">Server URL</strong> (Streamable HTTP):
