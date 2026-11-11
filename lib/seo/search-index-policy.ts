@@ -106,12 +106,12 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
 
   // ── Established comparisons (major-tool intent; 3 sentinel-backed) ──────
   "/vs/ccusage": "SUPPORTED",
-  "/vs/cursor": "SUPPORTED",
+  "/vs/cursor": "SUPPORTED", // stays: SEARCH-RECOVERY sentinel page
   "/vs/lmsys-arena": "SUPPORTED",
   "/vs/vals-ai": "SUPPORTED",
-  "/vs/copilot": "SUPPORTED",
-  "/vs/braintrust": "SUPPORTED",
-  "/vs/langchain": "SUPPORTED",
+  "/vs/copilot": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/braintrust": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/langchain": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
   "/vs/langfuse": "SUPPORTED",
   "/vs/viberank": "SUPPORTED", // rebuilt as unique content (2026-11)
   "/vs/ccgather": "SUPPORTED", // rebuilt as unique content (2026-11)
@@ -122,15 +122,15 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/vs/tokentracker": "SUPPORTED",
   "/vs/tokscale": "SUPPORTED",
   "/vs/wakatime": "SUPPORTED",
-  "/vs/aider": "SUPPORTED",
-  "/vs/cline": "SUPPORTED",
-  "/vs/continue": "SUPPORTED",
-  "/vs/roo-code": "SUPPORTED",
-  "/vs/windsurf": "SUPPORTED",
-  "/vs/zed": "SUPPORTED",
-  "/vs/tabnine": "SUPPORTED",
-  "/vs/amazon-q": "SUPPORTED",
-  "/vs/sourcegraph-cody": "SUPPORTED",
+  "/vs/aider": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/cline": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/continue": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/roo-code": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/windsurf": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/zed": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/tabnine": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/amazon-q": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
+  "/vs/sourcegraph-cody": "HOLD", // editor/IDE or LLM-ops tool, not a competitor (2026-11-11)
   "/vs/swe-bench": "SUPPORTED",
   "/vs/chatbot-arena": "SUPPORTED",
   "/vs/ai-productivity-dashboards": "SUPPORTED",
@@ -371,8 +371,27 @@ function isChildOf(path: string, hub: string): boolean {
   return rest.length > 0 && !rest.includes("/");
 }
 
+/** Root /ai-* model-evaluation pages: off-topic (SigRank ranks users, not
+ *  models), so Google is told not to index them. They stay HOLD (no sitemap). */
+export const GOOGLE_NOINDEX_EXACT: ReadonlySet<string> = new Set([
+  "/ai-evaluation",
+  "/ai-evaluation-tools",
+  "/ai-evaluation-frameworks",
+  "/ai-agent-evaluation",
+  "/ai-evaluator",
+  "/ai-evaluation-platform",
+  "/ai-evaluation-news",
+  "/ai-compliance-standards",
+  "/ai-model-evaluation",
+  "/ai-model-safety-evaluation-benchmark-continuous-testing",
+  "/best-ai-evaluation-tools-for-production",
+  "/evaluating-ai",
+  "/confirmation-hacking-ai-evaluation",
+]);
+
 /** Should Google (only) be told not to index this page? */
 export function isGoogleOnlyNoindex(path: string): boolean {
+  if (GOOGLE_NOINDEX_EXACT.has(path)) return true;
   if (isChildOf(path, "/vs")) return !GOOGLE_INDEX_KEEP_VS.has(path);
   if (isChildOf(path, "/alternatives")) return !GOOGLE_INDEX_KEEP_ALTERNATIVES.has(path);
   if (isChildOf(path, "/guides")) return !GOOGLE_INDEX_KEEP_GUIDES.has(path);

@@ -15,7 +15,7 @@ const freeFeatures = [
   ["REST API", "/developers", "Public reads, OpenAPI spec, rate-limited"],
   ["MCP server", "/mcp", "Streamable HTTP + CLI, 3 tools, no auth required"],
   ["CLI tool", "/developers", "npx sigrank — local scanner and MCP server"],
-  ["Field analysis", "/field", "1,498 operator field distribution and statistics"],
+  ["Field analysis", "/field", "Distribution of the July 2026 field: 1,498 operators after outliers are set aside"],
 ];
 
 const earlyTiers = [
