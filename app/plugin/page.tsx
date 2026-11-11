@@ -90,10 +90,7 @@ export default function PluginPage() {
           (<span className="font-mono">npx sigrank</span>): create a connect code in{" "}
           <Link className="text-gold underline underline-offset-4" href="/settings">Settings</Link>,
           run <span className="font-mono">sigrank enroll</span>, then{" "}
-          <span className="font-mono">sigrank submit</span>. It reads your AI session logs on your
-          device and submits the four token totals with signed account and device metadata, never
-          prompt or response text, code or file paths. Run{" "}
-          <span className="font-mono">sigrank submit --dry-run</span> to see exactly what would be sent.
+          <span className="font-mono">sigrank submit</span>. The CLI is separate from this plugin.
         </p>
       </section>
 
