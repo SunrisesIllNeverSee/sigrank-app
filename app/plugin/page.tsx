@@ -86,7 +86,7 @@ export default function PluginPage() {
       <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
         <h2 className="font-mono text-xl font-bold text-text-primary">Get on the board</h2>
         <p>
-          This connector only reads public records. To appear on the board, use the SigRank CLI
+          This connector reads public board records; it does not measure you. To appear on the board, use the SigRank CLI
           (<span className="font-mono">npx sigrank</span>): create a connect code in{" "}
           <Link className="text-gold underline underline-offset-4" href="/settings">Settings</Link>,
           run <span className="font-mono">sigrank enroll</span>, then{" "}
