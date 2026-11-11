@@ -130,13 +130,13 @@ const BLOG_NOINDEX = [
   "/blog/how-to-answer-best-ai-user",
 ].sort();
 
-const KEEP_VS = ["/vs/ccusage", "/vs/langfuse", "/vs/viberank", "/vs/ccgather"];
+const KEEP_VS = [...GOOGLE_INDEX_KEEP_VS];
 
 test("googlebot noindex covers every /vs/[x] page except the rebuilt ones, and not the /vs hub", () => {
   const vs = childRoutes("vs");
   assert.ok(vs.length > 40);
   for (const k of KEEP_VS) assert.ok(vs.includes(k), `${k} should exist`);
-  for (const p of vs) assert.equal(isGoogleOnlyNoindex(p), !KEEP_VS.includes(p), p);
+  for (const p of vs) assert.equal(isGoogleOnlyNoindex(p), !GOOGLE_INDEX_KEEP_VS.has(p), p);
   assert.equal(isGoogleOnlyNoindex("/vs"), false);
 });
 
@@ -196,6 +196,16 @@ test("googlebot noindex never applies to core pages, /user profiles or utility p
   for (const p of core) assert.equal(isGoogleOnlyNoindex(p), false, p);
   assert.equal(googleOnlyRobots("/user/the-field"), undefined);
   assert.equal(googleOnlyRobots(undefined), undefined);
+});
+
+test("rebuilt /vs pages emit no googlebot noindex while a sample /vs page still does", () => {
+  assert.ok(GOOGLE_INDEX_KEEP_VS.has("/vs/clawdboard") && GOOGLE_INDEX_KEEP_VS.has("/vs/tokscale"));
+  assert.equal(GOOGLE_INDEX_KEEP_VS.has("/vs/cursor"), false);
+  for (const p of GOOGLE_INDEX_KEEP_VS) {
+    assert.equal(googleOnlyRobots(p), undefined, p);
+    assert.equal(isSitemapPromoted(p), true, p);
+  }
+  assert.equal(googleOnlyRobots("/vs/cursor").googleBot.index, false);
 });
 
 test("googleOnlyRobots keeps the generic robots indexable and noindexes googlebot only", () => {

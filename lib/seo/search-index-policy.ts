@@ -332,7 +332,9 @@ export function routesInClass(cls: RouteClass): string[] {
 // 'noindex'" for them; that is expected, not a bug.
 //
 // Hubs (/vs, /alternatives, /guides, /blog) and the pages listed in the
-// KEEP sets stay fully indexable. /user/* profiles are governed by
+// KEEP sets stay fully indexable. GOOGLE_INDEX_KEEP_VS lists /vs/<x> pages
+// that were rebuilt with unique, sourced content; add a page there only after
+// that rebuild, and keep it sitemap-promoted (see the policy tests). /user/* profiles are governed by
 // lib/seo/indexing-policy.ts and never match here.
 
 /** /alternatives/<x> pages that stay Google-indexable. */
@@ -352,6 +354,8 @@ export const GOOGLE_INDEX_KEEP_VS: ReadonlySet<string> = new Set([
   "/vs/langfuse",
   "/vs/viberank",
   "/vs/ccgather",
+  "/vs/clawdboard",
+  "/vs/tokscale",
 ]);
 
 /** Blog posts hidden from Google: the "best X" listicles plus the AI-answer post. */

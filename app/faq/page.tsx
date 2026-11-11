@@ -70,7 +70,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "How is SigRank different from token-count leaderboards?",
     answer:
-      "Token-count leaderboards (clawdboard, CCgather, TrustMRT) rank by how many tokens you burned or dollars you spent — they measure the tool, not the person. SigRank ranks by yield (Υ = cache_read × output / input²), which measures how efficiently you use the tool. It's the difference between ranking hammers by how many nails they hit and ranking carpenters by what they built.",
+      "Token and cost leaderboards (clawdboard and Tokscale among them) rank by tokens used or estimated dollars. SigRank ranks by Yield (Leverage × Velocity), which measures how much output you get per fresh input token once cached context is counted.",
   },
   {
     question: "What are ccusage alternatives?",
