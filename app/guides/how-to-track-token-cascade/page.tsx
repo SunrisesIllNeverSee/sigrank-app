@@ -44,7 +44,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 3,
       name: "Read your token cascade",
-      text: "Run `sigrank me` to read local session logs and count the four pillars across 7d, 30d, 90d, and all-time windows. The cascade is computed on-device.",
+      text: "Run `npx sigrank` to read local session logs and count the four pillars across 7d, 30d, 90d, and all-time windows. The cascade is computed on-device.",
     },
     {
       "@type": "HowToStep",
@@ -81,7 +81,7 @@ export default function HowToTrackTokenCascadePage() {
             {
               question: "How do I track my token cascade automatically?",
               answer:
-                "Install the sigrank CLI (npm: sigrank), which bundles ccusage for local log parsing. Run `sigrank me` to read your session logs on-device and count the four pillars across multiple time windows. Run `sigrank submit` to publish signed snapshots to the leaderboard.",
+                "Install the sigrank CLI (npm: sigrank), which bundles ccusage for local log parsing. Run `npx sigrank` to read your session logs on-device and count the four pillars across multiple time windows. Run `sigrank submit` to publish signed snapshots to the leaderboard.",
             },
             {
               question: "Does sigrank read my prompt content?",
@@ -307,7 +307,7 @@ export default function HowToTrackTokenCascadePage() {
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank me
+                npx sigrank
               </code>
               . Reads local session logs and counts the four pillars across 7d,
               30d, 90d, and all-time windows. You see the full cascade on-device
@@ -365,7 +365,7 @@ export default function HowToTrackTokenCascadePage() {
               How do I track my cascade automatically?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Install the sigrank CLI and run `sigrank me`. It reads your local
+              Install the sigrank CLI and run `npx sigrank`. It reads your local
               session logs on-device and counts the four pillars across multiple
               time windows. Run `sigrank submit` to publish signed snapshots.
             </dd>

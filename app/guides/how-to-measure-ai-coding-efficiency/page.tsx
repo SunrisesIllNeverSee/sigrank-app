@@ -45,7 +45,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 3,
       name: "Read your token cascade locally",
-      text: "Run `sigrank me` (or `ccusage --json`) to read your local session logs and count the four token pillars: input, output, cache-read, cache-write.",
+      text: "Run `npx sigrank` (or `ccusage --json`) to read your local session logs and count the four token pillars: input, output, cache-read, cache-write.",
     },
     {
       "@type": "HowToStep",
@@ -370,7 +370,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Run{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank me
+                npx sigrank
               </code>{" "}
               (or{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">

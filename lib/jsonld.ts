@@ -1172,7 +1172,7 @@ export function scoreHowTo() {
         "@type": "HowToStep",
         position: 1,
         name: "Get your token stats",
-        text: "Run `ccusage --json` or `npx sigrank me` to get your token cascade numbers (input, output, cache write, cache read).",
+        text: "Run `ccusage --json` or `npx sigrank` to get your token cascade numbers (input, output, cache write, cache read).",
       },
       {
         "@type": "HowToStep",

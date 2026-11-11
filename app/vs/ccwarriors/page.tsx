@@ -232,7 +232,7 @@ export default function VsCcwarriorsPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>

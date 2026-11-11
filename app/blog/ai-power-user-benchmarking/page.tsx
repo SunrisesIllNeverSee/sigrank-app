@@ -63,7 +63,7 @@ const faqs = [
   {
     question: "How do I benchmark my AI usage against others?",
     answer:
-      "Install sigrank (npm i -g sigrank), run `sigrank me` or paste your ccusage JSON at /score, then compare your Υ Yield, class tier, and rank against other operators on the /board/all leaderboard.",
+      "Install sigrank (npm i -g sigrank), run `npx sigrank` or paste your ccusage JSON at /score, then compare your Υ Yield, class tier, and rank against other operators on the /board/all leaderboard.",
   },
   {
     question: "What separates a power user from a regular AI user?",
@@ -250,12 +250,15 @@ export default function AiPowerUserBenchmarkingPage() {
 npm i -g sigrank
 
 # 2. Record your cascade
-sigrank me
+sigrank
 
-# 3. Submit your signed snapshot
+# 3. Link this device (connect code from signalaf.com Settings)
+sigrank enroll
+
+# 4. Submit your signed snapshot
 sigrank submit
 
-# 4. Check the leaderboard
+# 5. Check the leaderboard
 sigrank board --window 30d`}</code>
           </pre>
         </div>

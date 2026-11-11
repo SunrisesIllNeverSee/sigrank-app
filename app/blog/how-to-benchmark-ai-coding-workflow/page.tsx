@@ -49,13 +49,13 @@ function howToJsonLd() {
         "@type": "HowToStep",
         position: 1,
         name: "Install the tools",
-        text: "Run `npx sigrank` to install the SigRank CLI, which bundles ccusage, tokscale, and the Token Dashboard. No global install required. Then run `sigrank enroll` to create your operator identity.",
+        text: "Run `npx sigrank` to install the SigRank CLI, which bundles ccusage, tokscale, and the Token Dashboard. No global install required. Then create a connect code in Settings on signalaf.com and run `sigrank enroll` to link this device.",
       },
       {
         "@type": "HowToStep",
         position: 2,
         name: "Establish a baseline",
-        text: "Code normally for one week. Do not change your habits. At the end of the week, run `sigrank me` to record your token cascade — input, output, cache-read, and cache-write. This is your baseline yield (Υ).",
+        text: "Code normally for one week. Do not change your habits. At the end of the week, run `npx sigrank` to record your token cascade — input, output, cache-read, and cache-write. This is your baseline yield (Υ).",
       },
       {
         "@type": "HowToStep",
@@ -73,7 +73,7 @@ function howToJsonLd() {
         "@type": "HowToStep",
         position: 5,
         name: "Re-measure",
-        text: "After applying the fix, code for another week under the new habit. Run `sigrank me` again and compare your new yield to your baseline. Did it go up? Down? Stay flat? The numbers tell you whether the fix worked.",
+        text: "After applying the fix, code for another week under the new habit. Run `npx sigrank` again and compare your new yield to your baseline. Did it go up? Down? Stay flat? The numbers tell you whether the fix worked.",
       },
       {
         "@type": "HowToStep",
@@ -95,7 +95,7 @@ const faqs = [
   {
     question: "How do I benchmark my AI coding workflow?",
     answer:
-      "Install the SigRank CLI (npx sigrank), code normally for one week to establish a baseline, record your token cascade with `sigrank me`, identify your weakest pillar (cache hit rate, input, or output), apply one fix, re-measure after a week, compare against the leaderboard, and iterate. The full seven-step guide is above.",
+      "Install the SigRank CLI (npx sigrank), code normally for one week to establish a baseline, record your token cascade with `npx sigrank`, identify your weakest pillar (cache hit rate, input, or output), apply one fix, re-measure after a week, compare against the leaderboard, and iterate. The full seven-step guide is above.",
   },
   {
     question: "What is a good yield (Υ) score for an AI coding workflow?",
@@ -252,7 +252,7 @@ sigrank enroll`}</code>
           logs automatically. For other platforms, SigRank&apos;s scanner
           detects the relevant log directories on its own. Run{" "}
           <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
-            sigrank me --dry-run
+            sigrank submit --dry-run
           </code>{" "}
           to see what it would parse before submitting anything.
         </p>
@@ -277,7 +277,7 @@ sigrank enroll`}</code>
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-elevated p-4">
           <pre className="overflow-x-auto font-mono text-sm text-gold">
-            <code>{`sigrank me
+            <code>{`npx sigrank
 
 # Example output:
 # ┌──────────────────────────────────────┐
@@ -408,7 +408,7 @@ sigrank enroll`}</code>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Code for another week under the new habit. At the end, run{" "}
           <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
-            sigrank me
+            npx sigrank
           </code>{" "}
           again and compare to your baseline:
         </p>

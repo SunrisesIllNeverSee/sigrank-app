@@ -93,7 +93,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use SigRank with Cursor specifically?",
     answer:
-      "Yes. The SigRank CLI reads token telemetry from Cursor's local logs the same way it reads Claude Code's (ccusage is bundled for Claude Code; additional readers cover other platforms). Run `sigrank enroll` to create your operator identity, then `sigrank submit` to score and publish. Your Cursor sessions contribute to the same leaderboard rank as your Claude Code or Copilot sessions — unified, not siloed.",
+      "Yes. The SigRank CLI reads token telemetry from Cursor's local logs the same way it reads Claude Code's (ccusage is bundled for Claude Code; additional readers cover other platforms). Create a connect code in Settings on signalaf.com, run `sigrank enroll` to link this device, then `sigrank submit` to score and publish. Your Cursor sessions contribute to the same leaderboard rank as your Claude Code or Copilot sessions — unified, not siloed.",
   },
   {
     question:

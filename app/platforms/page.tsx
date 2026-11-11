@@ -350,8 +350,8 @@ export default function PlatformsPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npx sigrank          # detect your agents, read logs, show cascade
-npx sigrank submit   # sign + publish to leaderboard
-npx sigrank me       # see your yield, archetype, and class tier`}
+npx sigrank enroll   # link this device (connect code from Settings)
+npx sigrank submit   # sign + publish to leaderboard`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">

@@ -32,7 +32,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 1,
       name: "Measure your current yield",
-      text: "Run `sigrank me` or paste your ccusage JSON into /score to get your baseline Υ Yield. You cannot improve what you do not measure.",
+      text: "Run `npx sigrank` or paste your ccusage JSON into /score to get your baseline Υ Yield. You cannot improve what you do not measure.",
     },
     {
       "@type": "HowToStep",
@@ -56,7 +56,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 5,
       name: "Re-measure and compare",
-      text: "After applying the strategies, run `sigrank me` again and compare your yield. Submit a new snapshot to update your leaderboard rank and class tier.",
+      text: "After applying the strategies, run `npx sigrank` again and compare your yield. Submit a new snapshot to update your leaderboard rank and class tier.",
     },
   ],
 };
@@ -92,7 +92,7 @@ export default function HowToImproveYourYieldPage() {
             {
               question: "How do I know if my yield improved?",
               answer:
-                "Run `sigrank me` before and after applying the strategies, or use the /score calculator to compare. Submit a new snapshot with `sigrank submit` to update your leaderboard rank and class tier. Track your yield over 7-day, 30-day, 90-day, and all-time windows.",
+                "Run `npx sigrank` before and after applying the strategies, or use the /score calculator to compare. Submit a new snapshot with `sigrank submit` to update your leaderboard rank and class tier. Track your yield over 7-day, 30-day, 90-day, and all-time windows.",
             },
             {
               question: "What yield is considered good?",
@@ -383,7 +383,7 @@ export default function HowToImproveYourYieldPage() {
               How do I know if my yield improved?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Run `sigrank me` before and after, or use the /score calculator.
+              Run `npx sigrank` before and after, or use the /score calculator.
               Submit a new snapshot to update your leaderboard rank and class
               tier. Track across 7d, 30d, 90d, and all-time windows.
             </dd>

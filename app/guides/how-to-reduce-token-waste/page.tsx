@@ -30,7 +30,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 1,
       name: "Identify your waste sources",
-      text: "Run `sigrank me` and examine your cascade. High input with low cache-read indicates repeated context. Low cache hit rate indicates poor caching. High input with low output indicates verbose prompts or re-rolls.",
+      text: "Run `npx sigrank` and examine your cascade. High input with low cache-read indicates repeated context. Low cache hit rate indicates poor caching. High input with low output indicates verbose prompts or re-rolls.",
     },
     {
       "@type": "HowToStep",
@@ -54,7 +54,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 5,
       name: "Measure improvement",
-      text: "Run `sigrank me` again after a week of applying the fixes. Compare your yield, cache hit rate, and input count against your pre-fix baseline. Submit a new snapshot to update your rank.",
+      text: "Run `npx sigrank` again after a week of applying the fixes. Compare your yield, cache hit rate, and input count against your pre-fix baseline. Submit a new snapshot to update your rank.",
     },
   ],
 };
@@ -80,7 +80,7 @@ export default function HowToReduceTokenWastePage() {
             {
               question: "How do I identify token waste in my cascade?",
               answer:
-                "Run `sigrank me` and examine your four pillars. High input with low cache-read means repeated context. Low cache hit rate (cache_read / (cache_read + cache_write) below 50%) means poor caching. High input with low output means verbose prompts or re-rolls. Each pattern points to a specific waste source.",
+                "Run `npx sigrank` and examine your four pillars. High input with low cache-read means repeated context. Low cache hit rate (cache_read / (cache_read + cache_write) below 50%) means poor caching. High input with low output means verbose prompts or re-rolls. Each pattern points to a specific waste source.",
             },
             {
               question: "How do I fix repeated context waste?",
@@ -90,7 +90,7 @@ export default function HowToReduceTokenWastePage() {
             {
               question: "How do I measure token waste reduction?",
               answer:
-                "Compare your Υ Yield before and after applying fixes. Yield = (cache_read × output) / input², so reducing input (less waste) and increasing cache-read (more reuse) both raise yield. Track cache hit rate and input count as secondary indicators. Use `sigrank me` across 7d, 30d, and 90d windows.",
+                "Compare your Υ Yield before and after applying fixes. Yield = (cache_read × output) / input², so reducing input (less waste) and increasing cache-read (more reuse) both raise yield. Track cache hit rate and input count as secondary indicators. Use `npx sigrank` across 7d, 30d, and 90d windows.",
             },
             {
               question: "Does reducing token waste save money?",
@@ -182,7 +182,7 @@ export default function HowToReduceTokenWastePage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Run{" "}
           <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-            sigrank me
+            npx sigrank
           </code>{" "}
           and examine your four pillars. Each waste source leaves a specific
           fingerprint:
@@ -330,7 +330,7 @@ export default function HowToReduceTokenWastePage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           After applying the fixes for a week, run{" "}
           <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-            sigrank me
+            npx sigrank
           </code>{" "}
           again and compare against your pre-fix baseline. The key indicators:
         </p>
@@ -383,7 +383,7 @@ export default function HowToReduceTokenWastePage() {
               How do I identify waste in my cascade?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Run `sigrank me` and examine your pillars. High input + low
+              Run `npx sigrank` and examine your pillars. High input + low
               cache-read = repeated context. Low cache hit rate = poor caching.
               High input + low output = verbose prompts. High input + high
               output + low cache-read = re-rolls.

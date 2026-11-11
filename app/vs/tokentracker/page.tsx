@@ -266,14 +266,14 @@ export default function VsTokentrackerPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npx sigrank          # read your logs, show your cascade
-npx sigrank me       # see your yield, archetype, and class tier
+npx sigrank enroll   # link this device (connect code from Settings)
 npx sigrank submit   # sign + publish to leaderboard`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank me --dry-run
+            sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

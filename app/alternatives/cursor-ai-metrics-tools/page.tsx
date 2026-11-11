@@ -158,7 +158,7 @@ const FAQS = [
   {
     question: "Does SigRank work with Cursor?",
     answer:
-      "Yes. SigRank reads Cursor token telemetry locally and scores it on the same cascade axis as Claude Code, Copilot, ChatGPT, Gemini, and 15+ other platforms. Run `npm install -g sigrank`, then `sigrank enroll` to create your operator identity, and `sigrank submit` to score and publish. Your Cursor sessions contribute to the same leaderboard rank as your Claude Code or Copilot sessions — unified, not siloed. SigRank reads token counts only, never prompt content, and signs snapshots with ed25519 before they leave your device.",
+      "Yes. SigRank reads Cursor token telemetry locally and scores it on the same cascade axis as Claude Code, Copilot, ChatGPT, Gemini, and 15+ other platforms. Run `npm install -g sigrank`, create a connect code in Settings on signalaf.com, run `sigrank enroll` to link this device, and `sigrank submit` to score and publish. Your Cursor sessions contribute to the same leaderboard rank as your Claude Code or Copilot sessions — unified, not siloed. SigRank reads token counts only, never prompt content, and signs snapshots with ed25519 before they leave your device.",
   },
   {
     question: "Are Cursor's built-in metrics enough?",
