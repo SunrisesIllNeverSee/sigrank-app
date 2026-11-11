@@ -22,8 +22,8 @@ import {
   type ReadResourceCallback,
   type PromptCallback,
 } from "@modelcontextprotocol/server";
-import { PostHog } from "posthog-node";
 import { instrument } from "@posthog/mcp";
+import { posthogMcp } from "@/lib/mcp/posthog";
 import { TOOLS, NAME_BEARING_TOOLS, callTool } from "@/lib/mcp/tools";
 import { UNTRUSTED_TEXT_NOTICE } from "@/lib/mcp/untrusted";
 import { RESOURCES, readResource } from "@/lib/mcp/resources";
@@ -36,28 +36,8 @@ import {
 import type { NextRequest } from "next/server";
 import { SIGRANK_STANDARD_VERSION } from "@/lib/mcp/standard";
 
-// Module-scope PostHog client for MCP analytics — created once, flushed per invocation.
-// Guards against a missing token: analytics is additive and must never break the server.
-// Reads the SAME env vars as the existing PostHog integration (lib/infra/posthog/*),
-// including the Vercel PostHog integration fallbacks.
-const _phToken = process.env.POSTHOG_KEY
-  || process.env.POSTHOG_PROJECT_TOKEN
-  || process.env.NEXT_PUBLIC_POSTHOG_KEY
-  || process.env.NEXT_PUBLIC_sigrank_POSTHOG_PROJECT_TOKEN
-  || process.env.sigrank_POSTHOG_PROJECT_TOKEN;
-const _phHost = process.env.NEXT_PUBLIC_POSTHOG_HOST
-  || process.env.POSTHOG_HOST
-  || process.env.NEXT_PUBLIC_sigrank_POSTHOG_HOST
-  || "https://us.i.posthog.com";
-export const posthogMcp: PostHog | null = _phToken
-  ? new PostHog(_phToken, {
-      host: _phHost,
-      flushAt: 1,
-      flushInterval: 0,
-      requestTimeout: 5000,
-      enableExceptionAutocapture: true,
-    })
-  : null;
+// MCP analytics client: shared with the Analyst plugin server (lib/mcp/posthog.ts).
+export { posthogMcp };
 
 /**
  * Create a SignalAF MCP server with all tools, resources, and prompts registered.

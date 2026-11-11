@@ -2,12 +2,16 @@ import { McpServer, fromJsonSchema, type StandardSchemaWithJSON, type CallToolRe
 import contracts from "./contracts.json";
 import { callPluginTool } from "./service";
 import { UNTRUSTED_TEXT_NOTICE } from "../untrusted";
+import { posthogMcp } from "../posthog";
+import { instrumentAnalyst } from "./analytics";
 
 export function createPluginServer(request: Request): McpServer {
   const server = new McpServer(
     { name: "sigrank-signalaf", title: "SigRank | SignalAF Analyst", version: "1.1.0", websiteUrl: "https://signalaf.com" },
     { capabilities: { tools: { listChanged: false } }, instructions: "Tokenpull measures → SigRank evaluates → SignalAF publishes. Metrics describe observable AI operating structure, not intelligence, productivity, or work quality. Archetypes are operating patterns, not personality. Public exploration does not scan local logs." },
   );
+  // PostHog MCP analytics ($mcp_tool_call), before tools are registered.
+  instrumentAnalyst(server, posthogMcp);
   for (const tool of contracts.tools) {
     const inputSchema = fromJsonSchema(tool.inputSchema as Record<string, unknown>) as StandardSchemaWithJSON<Record<string, unknown>, Record<string, unknown>>;
     const outputSchema = fromJsonSchema(tool.outputSchema as Record<string, unknown>) as StandardSchemaWithJSON<Record<string, unknown>, Record<string, unknown>>;
