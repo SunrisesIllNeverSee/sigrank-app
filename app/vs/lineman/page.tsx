@@ -91,7 +91,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does lineman not measure that SigRank does?",
     answer:
-      "lineman reports dollars spent on Claude Code. SigRank reads the same token telemetry and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). lineman tells you what you paid; SigRank tells you whether the cascade it funded is compounding or burning.",
+      "lineman reports dollars spent on Claude Code. SigRank reads the same token telemetry and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). lineman tells you what you paid; SigRank tells you whether the cascade it funded is compounding or burning.",
   },
   {
     question: "Can I use both lineman and SigRank?",

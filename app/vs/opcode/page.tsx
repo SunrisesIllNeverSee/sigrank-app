@@ -90,7 +90,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does opcode not measure that SigRank does?",
     answer:
-      "opcode doesn't measure anything about the operator — it's a tool, not a measurement system. SigRank reads the four token pillars (input, output, cache-read, cache-write) from your AI coding sessions and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). opcode executes commands; SigRank scores the operator.",
+      "opcode doesn't measure anything about the operator — it's a tool, not a measurement system. SigRank reads the four token pillars (input, output, cache-read, cache-write) from your AI coding sessions and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). opcode executes commands; SigRank scores the operator.",
   },
   {
     question: "Can I use both opcode and SigRank?",

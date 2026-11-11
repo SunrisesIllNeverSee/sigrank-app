@@ -97,7 +97,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does clawdboard not measure that SigRank does?",
     answer:
-      "clawdboard reports cost, token totals, streaks, and active days, then blends them into a composite rank. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). clawdboard rewards showing up; SigRank rewards driving well. Streaks measure consistency; Yield measures skill.",
+      "clawdboard reports cost, token totals, streaks, and active days, then blends them into a composite rank. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). clawdboard rewards showing up; SigRank rewards driving well. Streaks measure consistency; Yield measures skill.",
   },
   {
     question: "Can I use both clawdboard and SigRank?",

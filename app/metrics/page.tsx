@@ -38,8 +38,8 @@ const METRICS = [
   },
   {
     href: "/metrics/compression-ratio",
-    title: "Compression Ratio — Output per Input",
-    desc: "output / input — how much you get back per token sent to an AI model. What it means and how to improve it.",
+    title: "Compression Ratio — Word-Era Metric",
+    desc: "A word-era SigRank metric. On the live token-era board, output per fresh input is Velocity.",
   },
   {
     href: "/metrics/leverage",
@@ -48,7 +48,7 @@ const METRICS = [
   },
   {
     href: "/metrics/velocity",
-    title: "Velocity — Token Production Rate",
+    title: "Velocity — Output per Fresh Input",
     desc: "output / input — output efficiency ratio in AI coding. Why it's a secondary metric and how it interacts with yield.",
   },
   {

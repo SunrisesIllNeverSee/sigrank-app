@@ -101,7 +101,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does viberank not measure that SigRank does?",
     answer:
-      "viberank reports total tokens burned and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). viberank tells you who burned the most; SigRank tells you who got the most signal per token spent. Burn rate rewards the operator who never stops typing; yield rewards the one who compounds.",
+      "viberank reports total tokens burned and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). viberank tells you who burned the most; SigRank tells you who got the most signal per token spent. Burn rate rewards the operator who never stops typing; yield rewards the one who compounds.",
   },
   {
     question: "Can I use both viberank and SigRank?",

@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does mytokentracker not measure that SigRank does?",
     answer:
-      "mytokentracker reports dollars spent and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). mytokentracker tells you what you paid; SigRank tells you what you got for it. Spend is a receipt; Yield is a result.",
+      "mytokentracker reports dollars spent and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). mytokentracker tells you what you paid; SigRank tells you what you got for it. Spend is a receipt; Yield is a result.",
   },
   {
     question: "Can I use both mytokentracker and SigRank?",

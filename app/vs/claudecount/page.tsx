@@ -91,7 +91,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does claudecount not measure that SigRank does?",
     answer:
-      "claudecount reports raw token counts per session. SigRank reads the same four pillars and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). claudecount tells you what you spent; SigRank tells you whether the cascade it describes is compounding or burning.",
+      "claudecount reports raw token counts per session. SigRank reads the same four pillars and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). claudecount tells you what you spent; SigRank tells you whether the cascade it describes is compounding or burning.",
   },
   {
     question: "Can I use both claudecount and SigRank?",

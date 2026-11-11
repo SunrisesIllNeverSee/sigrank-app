@@ -89,7 +89,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does clauderank not measure that SigRank does?",
     answer:
-      "clauderank reports Claude Code user rankings. SigRank reads the same four token pillars and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). clauderank tells you who ranks highest on Claude Code; SigRank tells you who is the most efficient operator across every platform.",
+      "clauderank reports Claude Code user rankings. SigRank reads the same four token pillars and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). clauderank tells you who ranks highest on Claude Code; SigRank tells you who is the most efficient operator across every platform.",
   },
   {
     question: "Can I use both clauderank and SigRank?",

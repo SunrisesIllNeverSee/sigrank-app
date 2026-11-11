@@ -254,7 +254,7 @@ export const ABOUT_MORE_FAQS: Faq[] = [
   {
     question: "How do you measure AI operator performance?",
     answer:
-      "AI operator performance is measured by Yield (Υ = cache_read × output / input²) and five supporting metrics: Cache Hit Rate (context reuse), Compression Ratio (output per input), Leverage (cached context amplification), Velocity (token production rate), and Signal-to-Noise Ratio (signal density). All six are computed from signed token telemetry read locally by the sigrank CLI.",
+      "AI operator performance is measured by Yield (Υ = cache_read × output / input²) and five supporting metrics: Cache Hit Rate (context reuse), Compression Ratio (output per input), Leverage (cached context amplification), Velocity (output per fresh input), and Signal-to-Noise Ratio (signal density). All six are computed from signed token telemetry read locally by the sigrank CLI.",
   },
   {
     question: "What is token cascade efficiency?",

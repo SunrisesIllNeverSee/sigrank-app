@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does sculptor not measure that SigRank does?",
     answer:
-      "sculptor is a coding agent — it does not measure operator efficiency at all. It is the tool being driven, not the instrument panel. SigRank derives the cascade architecture from the operator's token telemetry: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). sculptor writes the code; SigRank tells you whether the operator behind it is compounding or burning.",
+      "sculptor is a coding agent — it does not measure operator efficiency at all. It is the tool being driven, not the instrument panel. SigRank derives the cascade architecture from the operator's token telemetry: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). sculptor writes the code; SigRank tells you whether the operator behind it is compounding or burning.",
   },
   {
     question: "Should I use sculptor or SigRank?",

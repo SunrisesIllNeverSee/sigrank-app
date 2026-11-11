@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does omnara not measure that SigRank does?",
     answer:
-      "omnara monitors AI agent behavior and infrastructure. SigRank derives the cascade architecture from the operator's token telemetry: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). omnara tells you what your agents are doing; SigRank tells you whether the operator behind them is compounding or burning.",
+      "omnara monitors AI agent behavior and infrastructure. SigRank derives the cascade architecture from the operator's token telemetry: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). omnara tells you what your agents are doing; SigRank tells you whether the operator behind them is compounding or burning.",
   },
   {
     question: "Can I use both omnara and SigRank?",

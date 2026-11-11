@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does vibe-island not measure that SigRank does?",
     answer:
-      "vibe-island is a community platform — it does not measure operator efficiency at all. SigRank derives the cascade architecture from the operator's token telemetry: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). vibe-island gives you a community; SigRank gives you a score and a rank.",
+      "vibe-island is a community platform — it does not measure operator efficiency at all. SigRank derives the cascade architecture from the operator's token telemetry: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). vibe-island gives you a community; SigRank gives you a score and a rank.",
   },
   {
     question: "Can I use both vibe-island and SigRank?",

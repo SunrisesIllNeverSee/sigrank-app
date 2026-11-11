@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does sessionwatcher not measure that SigRank does?",
     answer:
-      "sessionwatcher reports per-session token usage. SigRank derives the cascade architecture across an operator's entire body of work: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). sessionwatcher tells you what happened in one session; SigRank tells you whether the operator's cascade is compounding or burning across all of them.",
+      "sessionwatcher reports per-session token usage. SigRank derives the cascade architecture across an operator's entire body of work: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). sessionwatcher tells you what happened in one session; SigRank tells you whether the operator's cascade is compounding or burning across all of them.",
   },
   {
     question: "Can I use both sessionwatcher and SigRank?",

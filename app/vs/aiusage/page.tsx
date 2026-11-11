@@ -96,7 +96,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does aiusage not measure that SigRank does?",
     answer:
-      "aiusage reports API call counts and token usage per provider. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). aiusage tells you how many calls you made; SigRank tells you whether your cascade is compounding or burning. Call count is volume; yield is efficiency.",
+      "aiusage reports API call counts and token usage per provider. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). aiusage tells you how many calls you made; SigRank tells you whether your cascade is compounding or burning. Call count is volume; yield is efficiency.",
   },
   {
     question: "Why is counting API calls not the same as scoring operators?",

@@ -51,7 +51,7 @@ const COMPARE_ROWS: { feature: string; wakatime: string; sigrank: string }[] = [
   },
   { feature: "Signal-to-noise ratio", wakatime: "No", sigrank: "Yes" },
   {
-    feature: "Velocity (tokens per unit time)",
+    feature: "Velocity (output per fresh input)",
     wakatime: "No",
     sigrank: "Yes",
   },
@@ -92,7 +92,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use SigRank alongside WakaTime?",
     answer:
-      "Yes — they are complementary, not exclusive. WakaTime tells you how many hours you coded; SigRank tells you how efficiently you drove the AI during those hours. Together they answer &quot;how much did I work?&quot; and &quot;how well did I work?&quot; SigRank even computes Velocity (output tokens per unit session time), which bridges the two views — productivity per hour, measured in signal rather than keystrokes.",
+      "Yes — they are complementary, not exclusive. WakaTime tells you how many hours you coded; SigRank tells you how efficiently you drove the AI during those hours. Together they answer &quot;how much did I work?&quot; and &quot;how well did I work?&quot; SigRank also computes Velocity (output per fresh input), a secondary metric that measures output in tokens rather than in hours or keystrokes.",
   },
   {
     question: "What does WakaTime not see that SigRank does?",
@@ -102,7 +102,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does SigRank track time at all?",
     answer:
-      "Yes, as one input to Velocity (output tokens per unit session time) — but time is a denominator, not the headline. SigRank&apos;s primary metric is Υ Yield, which is unitless and measures cascade efficiency independent of how long you sat there. An operator who produces more signal per token ranks higher regardless of whether they worked 20 minutes or 2 hours. Time rewards presence; Υ rewards driving.",
+      "Time is not an input to Velocity (output per fresh input), and it is not the headline either. SigRank&apos;s primary metric is Υ Yield, which is unitless and measures cascade efficiency independent of how long you sat there. An operator who produces more signal per token ranks higher regardless of whether they worked 20 minutes or 2 hours. Time rewards presence; Υ rewards driving.",
   },
 ];
 
@@ -245,19 +245,19 @@ export default function VsWakatimePage() {
         </p>
       </section>
 
-      {/* The bridge: Velocity */}
+      {/* Velocity (canon: output per fresh input, not a time rate) */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Where time still matters: Velocity
+          What SigRank measures instead of time: Velocity
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank doesn&apos;t ignore time — it demotes it to a denominator.
-          Velocity = output / input measures how much signal you produce
-          per unit time. That bridges the WakaTime view (productivity per hour)
-          with the cascade view (signal per token). An operator with high Υ{" "}
+          SigRank doesn&apos;t measure time at all. Velocity = output / input
+          measures how much output you produce per token of fresh input — a
+          token-based view, not an hours-based one. An operator with high Υ{" "}
           <em>and</em> high Velocity is the full picture: efficient{" "}
-          <strong className="text-text-primary">and</strong> fast. WakaTime can
-          only see the speed, never the efficiency behind it.
+          <strong className="text-text-primary">and</strong> productive per
+          fresh input. WakaTime can only see the clock, never the efficiency
+          behind it.
         </p>
       </section>
 

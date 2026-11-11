@@ -101,7 +101,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does tokenmaxxer not measure that SigRank does?",
     answer:
-      "tokenmaxxer reports total tokens burned, streaks, and badges. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). tokenmaxxer tells you how much you burned and how many days in a row; SigRank tells you whether your cascade is compounding or burning.",
+      "tokenmaxxer reports total tokens burned, streaks, and badges. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). tokenmaxxer tells you how much you burned and how many days in a row; SigRank tells you whether your cascade is compounding or burning.",
   },
   {
     question: "Can I use both tokenmaxxer and SigRank?",

@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does ccburn not measure that SigRank does?",
     answer:
-      "ccburn reports tokens burned per unit time. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). ccburn tells you how fast you are burning; SigRank tells you whether your cascade is compounding or burning. Burn rate is a speedometer; yield is a lap time.",
+      "ccburn reports tokens burned per unit time. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccburn tells you how fast you are burning; SigRank tells you whether your cascade is compounding or burning. Burn rate is a speedometer; yield is a lap time.",
   },
   {
     question: "Can I use both ccburn and SigRank?",

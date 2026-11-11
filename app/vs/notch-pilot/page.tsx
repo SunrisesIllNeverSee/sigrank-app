@@ -92,7 +92,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does notch-pilot not measure that SigRank does?",
     answer:
-      "notch-pilot doesn't measure anything about the operator — it's a tool, not a measurement system. SigRank reads the four token pillars (input, output, cache-read, cache-write) from your AI coding sessions and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). notch-pilot writes code; SigRank scores the writing.",
+      "notch-pilot doesn't measure anything about the operator — it's a tool, not a measurement system. SigRank reads the four token pillars (input, output, cache-read, cache-write) from your AI coding sessions and derives the cascade architecture: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). notch-pilot writes code; SigRank scores the writing.",
   },
   {
     question: "Can I use both notch-pilot and SigRank?",

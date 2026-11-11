@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does token-forest not measure that SigRank does?",
     answer:
-      "token-forest visualizes token usage as forest growth. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). token-forest tells you how big your forest is; SigRank tells you whether your cascade is compounding or burning. Tree count is volume; yield is efficiency.",
+      "token-forest visualizes token usage as forest growth. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). token-forest tells you how big your forest is; SigRank tells you whether your cascade is compounding or burning. Tree count is volume; yield is efficiency.",
   },
   {
     question: "Can I use both token-forest and SigRank?",

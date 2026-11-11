@@ -97,7 +97,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does TokenRank not measure that SigRank does?",
     answer:
-      "TokenRank reports aggregate token activity and ranks by that total. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). TokenRank rewards the operator who burns the most; SigRank rewards the one who compounds the most. Burning to rank is a volume game; building to rank is a skill game.",
+      "TokenRank reports aggregate token activity and ranks by that total. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). TokenRank rewards the operator who burns the most; SigRank rewards the one who compounds the most. Burning to rank is a volume game; building to rank is a skill game.",
   },
   {
     question: "Can I use both TokenRank and SigRank?",

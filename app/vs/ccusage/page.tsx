@@ -98,7 +98,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does ccusage not measure that SigRank does?",
     answer:
-      "ccusage reports raw token counts per session — input, output, cache creation, and cache read. SigRank derives the cascade architecture from those counts: Υ Yield = cache_read × output / input² (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). ccusage tells you what you spent; SigRank tells you how efficiently you drove.",
+      "ccusage reports raw token counts per session — input, output, cache creation, and cache read. SigRank derives the cascade architecture from those counts: Υ Yield = cache_read × output / input² (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). ccusage tells you what you spent; SigRank tells you how efficiently you drove.",
   },
   {
     question: "Can I use SigRank with my existing ccusage output?",

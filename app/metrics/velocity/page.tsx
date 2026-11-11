@@ -1,9 +1,10 @@
 /**
- * app/metrics/velocity/page.tsx — "Velocity — Token Production Rate"
+ * app/metrics/velocity/page.tsx — "Velocity — Output per Fresh Input"
  *
- * Defines velocity: tokens produced per unit time. Explains why it's a secondary
- * metric (high velocity without yield = fast waste), how it interacts with yield,
- * and when velocity matters (throughput-oriented tasks).
+ * Defines velocity per canon (lib/identity/canon-ids.ts Y.04): T.01 / T.02 —
+ * output per fresh input. It is NOT a time rate. Explains why it's a secondary
+ * metric (high velocity without yield = wasteful volume), how it interacts with
+ * yield, and when velocity matters (throughput-oriented tasks).
  *
  * JSON-LD: breadcrumb + definedTerm + faqPage.
  */
@@ -17,9 +18,9 @@ import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFram
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Velocity Metric — Token Production Rate",
+  title: "Velocity Metric — Output per Fresh Input",
   description:
-    "Velocity = output / input \u2014 the token production rate metric for AI coding. Learn why velocity is a secondary metric, how it interacts with yield, and what it reveals about your workflow.",
+    "Velocity = output / input \u2014 output per fresh input, the secondary token-era metric for AI coding. Learn why velocity is a secondary metric, how it interacts with yield, and what it reveals about your workflow.",
   path: "/metrics/velocity",
 });
 
@@ -32,7 +33,7 @@ export default function VelocityPage() {
           eyebrow="SIGRANK METRIC"
           terminalText="VELOCITY"
           title="Velocity"
-          subtitle={<>How fast signal moves through the cascade.</>}
+          subtitle={<>Output per fresh input.</>}
         />
       }
       current="/metrics/velocity"
@@ -45,8 +46,8 @@ export default function VelocityPage() {
             { name: "Velocity", path: "/metrics/velocity" },
           ]),
           definedTerm(
-            "Velocity — Token Production Rate",
-            "Velocity = output / input. The ratio of output tokens to fresh input tokens — how much the model generates per unit of fresh context provided. A secondary metric: high velocity without yield is fast waste. Velocity matters most for throughput-oriented tasks where raw output volume per input is the goal.",
+            "Velocity — Output per Fresh Input",
+            "Velocity = output / input. The ratio of output tokens to fresh input tokens — how much the model generates per token of fresh context provided. A secondary metric: high velocity without yield is wasteful volume. Velocity matters most for throughput-oriented tasks where raw output volume per input is the goal.",
             "/metrics/velocity",
           ),
           faqPage([
@@ -58,17 +59,17 @@ export default function VelocityPage() {
             {
               question: "Why is velocity a secondary metric?",
               answer:
-                "High velocity without yield is fast waste. An operator who generates 10,000 output tokens per hour but sends 50,000 fresh input tokens with no cache reuse has high velocity but low yield — they are burning tokens quickly. Velocity measures speed; yield measures efficiency. Speed without efficiency is just faster waste. Yield is the headline; velocity is context.",
+                "High velocity without yield is wasteful volume. An operator who generates 10,000 output tokens from 50,000 fresh input tokens with no cache reuse has a high output-to-input ratio but low yield — they are burning fresh input. Velocity measures the output ratio; yield measures cascade efficiency. Output ratio without efficiency is just wasteful volume. Yield is the headline; velocity is context.",
             },
             {
               question: "How does velocity interact with yield?",
               answer:
-                "They measure different dimensions. Yield = (cache_read × output) / input² measures cascade efficiency. Velocity = output / input measures output efficiency. An operator can have high yield and low velocity (efficient but low output ratio — deep, careful work with minimal fresh input). Or high velocity and low yield (fast output but wasteful — rapid-fire prompts with no cache reuse). The best operators have both: high yield AND high velocity — efficient cascades that also produce high output per input.",
+                "They measure different dimensions. Yield = (cache_read × output) / input² measures cascade efficiency. Velocity = output / input measures output efficiency. An operator can have high yield and low velocity (efficient but low output ratio — deep, careful work with minimal fresh input). Or high velocity and low yield (high output per input but wasteful — rapid-fire prompts with no cache reuse). The best operators have both: high yield AND high velocity — efficient cascades that also produce high output per input.",
             },
             {
               question: "When does velocity matter?",
               answer:
-                "Velocity matters most for throughput-oriented tasks: bulk code generation, large refactors, test suite generation, documentation writing. In these cases, raw output volume per hour is the goal, and velocity is the relevant metric. For precision tasks — debugging, architecture decisions, security review — yield matters more than velocity. Use velocity as a diagnostic, not a target.",
+                "Velocity matters most for throughput-oriented tasks: bulk code generation, large refactors, test suite generation, documentation writing. In these cases, raw output volume per fresh input is the goal, and velocity is the relevant metric. For precision tasks — debugging, architecture decisions, security review — yield matters more than velocity. Use velocity as a diagnostic, not a target.",
             },
           ]),
         ]}
@@ -135,7 +136,7 @@ export default function VelocityPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The fundamental insight:{" "}
           <strong className="text-text-primary">
-            high velocity without yield is fast waste
+            high velocity without yield is wasteful volume
           </strong>
           . An operator who generates 10,000 output tokens from 50,000 fresh
           input tokens with no cache reuse has high velocity but low yield.
@@ -192,9 +193,9 @@ export default function VelocityPage() {
             High velocity, low yield
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
-            Fast but wasteful. Rapid-fire prompts, minimal review, no cache
+            High output ratio but wasteful. Rapid-fire prompts, minimal review, no cache
             reuse. Output volume is high but each turn starts from scratch. The
-            cascade doesn&rsquo;t compound — tokens are burned quickly. This is
+            cascade doesn&rsquo;t compound — fresh input is burned every turn. This is
             the signature of volume-oriented work without context discipline.
           </p>
         </div>
@@ -204,11 +205,11 @@ export default function VelocityPage() {
           </p>
           <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
             The ideal. An efficient cascade that also produces a lot of output
-            quickly. Stable cached context (high yield) plus rapid, substantive
+            per fresh input. Stable cached context (high yield) plus substantive
             output requests (high velocity). This is the signature of a{" "}
             <strong className="text-text-primary">TRANSMITTER</strong> operating
-            at full capacity — the flywheel is spinning fast <em>and</em>{" "}
-            efficiently.
+            at full capacity — the flywheel is compounding <em>and</em>{" "}
+            producing.
           </p>
         </div>
       </section>
@@ -223,7 +224,7 @@ export default function VelocityPage() {
           <strong className="text-text-primary">
             throughput-oriented tasks
           </strong>{" "}
-          where raw output volume per hour is the goal:
+          where output volume per fresh input is the goal:
         </p>
         <ul className="flex flex-col gap-1.5 font-sans text-sm leading-relaxed text-text-secondary">
           <li>
@@ -273,7 +274,7 @@ export default function VelocityPage() {
             <strong className="text-gold">
               2. Reduce review-loop overhead.
             </strong>{" "}
-            Time spent reviewing and editing between turns is input that
+            Review and editing between turns adds fresh input that
             doesn&rsquo;t produce output. Trust the cascade — if your context is
             stable and your prompts are specific, the output quality is high
             enough to reduce round-trip edits.
@@ -289,8 +290,8 @@ export default function VelocityPage() {
           </li>
           <li className="rounded-lg border border-bg-border-subtle bg-bg-surface p-4">
             <strong className="text-gold">4. Maintain cache continuity.</strong>{" "}
-            Cache reads are faster than fresh input processing — high cache hit
-            rate reduces model latency, which increases velocity. Context
+            A stable, cached context means you re-send less fresh input to get
+            the same output, which raises output per fresh input. Context
             discipline improves both yield and velocity simultaneously.
           </li>
         </ul>
@@ -317,11 +318,11 @@ export default function VelocityPage() {
               Why is velocity a secondary metric?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              High velocity without yield is fast waste. An operator generating
+              High velocity without yield is wasteful volume. An operator generating
               high output per input with no cache reuse has high velocity but
               low yield — they are burning input efficiently. Yield measures
               efficiency; velocity measures output ratio. Output without
-              compounding is just faster waste. Yield is the headline; velocity
+              compounding is just wasteful volume. Yield is the headline; velocity
               is context.
             </dd>
           </div>
@@ -332,9 +333,9 @@ export default function VelocityPage() {
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
               They measure orthogonal dimensions. You can have high yield and
               low velocity (efficient but deliberate — precision work) or high
-              velocity and low yield (fast but wasteful — volume without context
+              velocity and low yield (high output ratio but wasteful — volume without context
               discipline). The best operators have both: efficient cascades that
-              also produce a lot of output quickly.
+              also produce a lot of output per fresh input.
             </dd>
           </div>
           <div className="flex flex-col gap-1">

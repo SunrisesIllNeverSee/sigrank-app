@@ -96,7 +96,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "What does whoburnedmore not measure that SigRank does?",
     answer:
-      "whoburnedmore reports total tokens burned and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (tokens per unit time). whoburnedmore tells you who burned the most; SigRank tells you who got the most signal per token spent.",
+      "whoburnedmore reports total tokens burned and ranks by that single number. SigRank derives the cascade architecture from the same four pillars: Υ Yield (is signal compounding or burning?), compression ratio (output per input), SNR (signal density), Leverage (how much cached context amplifies your input), and Velocity (output per fresh input). whoburnedmore tells you who burned the most; SigRank tells you who got the most signal per token spent.",
   },
   {
     question: "Can I use both whoburnedmore and SigRank?",
