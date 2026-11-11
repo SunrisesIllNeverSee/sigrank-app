@@ -74,12 +74,21 @@ export default function PluginPage() {
             <p className="mt-3">
               In Claude Code, add the plugin from its GitHub marketplace:
             </p>
-            <pre className="mt-3 overflow-x-auto rounded border border-border-base bg-surface p-3 font-mono text-xs text-text-primary">
-              /plugin install signalaf-analyst --marketplace SunrisesIllNeverSee/signalaf-analyst-claude
+            <pre className="mt-3 whitespace-pre-wrap break-all rounded border border-border-base bg-surface p-3 font-mono text-xs text-text-primary">
+              {"/plugin marketplace add SunrisesIllNeverSee/signalaf-analyst-claude\n/plugin install signalaf-analyst@signalaf"}
             </pre>
             <p className="mt-3">
-              It works the same in Claude chat and Cowork. The plugin connects to the same public,
-              sign-in-free Analyst server as ChatGPT and Codex, so results match across hosts.
+              For Claude chat and Cowork, open <strong className="text-text-primary">Customize → Connectors</strong>
+              {" "}(or <strong className="text-text-primary">Settings → Connectors</strong>), choose{" "}
+              <strong className="text-text-primary">Add custom connector</strong>, and enter this server URL:
+            </p>
+            <pre className="mt-3 whitespace-pre-wrap break-all rounded border border-border-base bg-surface p-3 font-mono text-xs text-text-primary">
+              {ANALYST_MCP_URL}
+            </pre>
+            <p className="mt-3">
+              Name it <strong className="text-text-primary">SignalAF Analyst</strong>, select{" "}
+              <strong className="text-text-primary">No sign in</strong> if asked, and enable the connector
+              for your chat. It uses the same public Analyst server as ChatGPT and Codex.
             </p>
             <a
               className="mt-3 inline-block text-gold underline underline-offset-4"
@@ -107,11 +116,17 @@ export default function PluginPage() {
       <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
         <h2 className="font-mono text-xl font-bold text-text-primary">Get on the board</h2>
         <p>
-          This connector reads public board records; it does not measure you. To appear on the board, use the SigRank CLI
-          (<span className="font-mono">npx sigrank</span>): create a connect code in{" "}
+          This connector reads public board records; it does not measure you. To appear on the board,
+          create a connect code in{" "}
           <Link className="text-gold underline underline-offset-4" href="/settings">Settings</Link>,
-          run <span className="font-mono">sigrank enroll</span>, then{" "}
-          <span className="font-mono">sigrank submit</span>. The CLI is separate from this plugin.
+          then run these SigRank CLI commands in order:
+        </p>
+        <pre className="whitespace-pre-wrap break-words rounded border border-border-base bg-surface p-3 font-mono text-xs text-text-primary">
+          {"npx sigrank enroll\nnpx sigrank submit --dry-run\nnpx sigrank submit"}
+        </pre>
+        <p>
+          Review the dry-run payload before publishing a signed submission. The CLI is separate
+          from this plugin.
         </p>
       </section>
 
