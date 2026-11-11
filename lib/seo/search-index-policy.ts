@@ -273,6 +273,7 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/vercel/config": "UTILITY", // serves noindex,nofollow — removed from STATIC_ROUTES (closeout A)
   "/terms": "UTILITY",
   "/login": "UTILITY", // serves noindex,follow
+  "/signup": "UTILITY", // serves noindex,follow
   "/upgrade/success": "UTILITY", // Stripe success_url — noindex,follow
   "/upgrade/canceled": "UTILITY", // Stripe cancel_url — noindex,follow
   "/search": "UTILITY", // flag-gated site search (404 while off)
