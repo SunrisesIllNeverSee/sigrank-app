@@ -214,6 +214,7 @@ export function organization() {
       "https://pypi.org/project/sigrank/",
       "https://smithery.ai/servers/burnmydays/sigrank-mcp",
       "https://x.com/signalaf",
+      "https://medium.com/@burnmydays",
       "https://doi.org/10.5281/zenodo.20029607",
       "https://doi.org/10.5281/zenodo.19105225",
       "https://doi.org/10.5281/zenodo.19109397",
