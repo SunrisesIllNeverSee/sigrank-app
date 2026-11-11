@@ -96,7 +96,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both lineman and SigRank?",
     answer:
-      "Yes. lineman gives you the spend dashboard for budget tracking. SigRank gives you the efficiency layer that spend tracking cannot provide. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep lineman for the budget view. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "Yes. lineman gives you the spend dashboard for budget tracking. SigRank gives you the efficiency layer that spend tracking cannot provide. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep lineman for the budget view. The two are complementary, not mutually exclusive. The same local logs feed both.",
   },
   {
     question: "Which is better for improving my AI coding efficiency?",

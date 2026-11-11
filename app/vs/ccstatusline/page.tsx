@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both ccstatusline and SigRank?",
     answer:
-      "Yes, and they complement each other well. ccstatusline gives you the ambient token count in your terminal while you work. SigRank gives you the scored, ranked, comparable efficiency layer. Run ccstatusline for real-time awareness. Run `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. The widget is for glancing; the panel is for evaluating.",
+      "Yes, and they complement each other well. ccstatusline gives you the ambient token count in your terminal while you work. SigRank gives you the scored, ranked, comparable efficiency layer. Run ccstatusline for real-time awareness. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. The widget is for glancing; the panel is for evaluating.",
   },
   {
     question: "Does ccstatusline work with tools other than Claude Code?",

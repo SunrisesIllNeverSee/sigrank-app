@@ -101,7 +101,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both Tokscale and SigRank?",
     answer:
-      "Yes, and many operators do. Tokscale gives you the widest tool coverage and the largest community board. SigRank gives you the efficiency layer that volume rankings cannot. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your Tokscale profile for the volume crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "Yes, and many operators do. Tokscale gives you the widest tool coverage and the largest community board. SigRank gives you the efficiency layer that volume rankings cannot. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your Tokscale profile for the volume crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
   },
   {
     question: "Which is better for finding the most skilled AI operators?",

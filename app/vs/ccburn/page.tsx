@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both ccburn and SigRank?",
     answer:
-      "Yes. ccburn is a real-time burn-rate monitor; SigRank is a scoring and ranking tool. Run ccburn for the live burn-rate dashboard while you work. Run `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. ccburn is for real-time awareness; SigRank is for evaluation and competition.",
+      "Yes. ccburn is a real-time burn-rate monitor; SigRank is a scoring and ranking tool. Run ccburn for the live burn-rate dashboard while you work. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. ccburn is for real-time awareness; SigRank is for evaluation and competition.",
   },
   {
     question: "Does ccburn work with tools other than Claude Code?",

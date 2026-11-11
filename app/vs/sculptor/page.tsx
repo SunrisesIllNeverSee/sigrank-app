@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can SigRank score me if I use sculptor?",
     answer:
-      "Yes. SigRank is platform-neutral — it scores operators across Claude Code, Cursor, GitHub Copilot, Gemini, and 15+ other platforms. If sculptor produces token telemetry that SigRank can read, your cascade efficiency will be scored. Run `sigrank submit` to publish your cascade score to the leaderboard. SigRank measures the operator, not the tool, so your score is comparable to operators using any other AI coding agent.",
+      "Yes. SigRank is platform-neutral — it scores operators across Claude Code, Cursor, GitHub Copilot, Gemini, and 15+ other platforms. If sculptor produces token telemetry that SigRank can read, your cascade efficiency will be scored. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the leaderboard. SigRank measures the operator, not the tool, so your score is comparable to operators using any other AI coding agent.",
   },
   {
     question: "What does sculptor not measure that SigRank does?",

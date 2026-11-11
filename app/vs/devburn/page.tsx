@@ -87,7 +87,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use DevBurn and SigRank together?",
     answer:
-      "Yes. DevBurn's stop-hook sync makes it the easiest daily pulse — install once and your activity accrues automatically. Add `sigrank submit` when you want the signed efficiency score on the global board. The automatic tracker plus the deliberate score.",
+      "Yes. DevBurn's stop-hook sync makes it the easiest daily pulse — install once and your activity accrues automatically. Add `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` when you want the signed efficiency score on the global board. The automatic tracker plus the deliberate score.",
   },
   {
     question: "Which is better for cross-tool evaluation?",

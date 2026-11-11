@@ -94,7 +94,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both clauderank and SigRank?",
     answer:
-      "Yes. clauderank gives you the Claude Code ranking. SigRank gives you the cross-platform operator ranking. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep clauderank for the Claude Code crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "Yes. clauderank gives you the Claude Code ranking. SigRank gives you the cross-platform operator ranking. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep clauderank for the Claude Code crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
   },
   {
     question: "Which is better for finding the best AI operator?",

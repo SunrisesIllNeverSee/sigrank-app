@@ -94,7 +94,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both ccgather and SigRank?",
     answer:
-      "Yes. ccgather gives you the Claude Code usage leaderboard. SigRank gives you the cross-platform yield ranking. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep ccgather for the Claude Code crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "Yes. ccgather gives you the Claude Code usage leaderboard. SigRank gives you the cross-platform yield ranking. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep ccgather for the Claude Code crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
   },
   {
     question: "Which is better for comparing operators across platforms?",

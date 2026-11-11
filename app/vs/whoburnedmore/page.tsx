@@ -101,7 +101,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both whoburnedmore and SigRank?",
     answer:
-      "Yes. whoburnedmore gives you the burn-rate competition. SigRank gives you the efficiency layer that burn rankings cannot provide. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your whoburnedmore profile for the burn crowd. The two are complementary, not mutually exclusive. The same local logs feed both. Just know that a high whoburnedmore rank and a high SigRank yield are not the same thing.",
+      "Yes. whoburnedmore gives you the burn-rate competition. SigRank gives you the efficiency layer that burn rankings cannot provide. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your whoburnedmore profile for the burn crowd. The two are complementary, not mutually exclusive. The same local logs feed both. Just know that a high whoburnedmore rank and a high SigRank yield are not the same thing.",
   },
   {
     question: "Which is better for finding skilled AI operators?",

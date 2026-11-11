@@ -88,7 +88,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Is SigRank a ccusage alternative or a ccusage upgrade?",
     answer:
-      "Both. SigRank bundles ccusage as its local log reader, so you keep every number ccusage gives you — then layers cascade scoring (Υ Yield), a global leaderboard, operator profiles, class tiers, and MCP integration on top. ccusage is the sensor that reads the logs; SigRank is the instrument panel that turns those readings into a ranked, comparable signal. If you already run ccusage, `sigrank submit` is the upgrade path.",
+      "Both. SigRank bundles ccusage as its local log reader, so you keep every number ccusage gives you — then layers cascade scoring (Υ Yield), a global leaderboard, operator profiles, class tiers, and MCP integration on top. ccusage is the sensor that reads the logs; SigRank is the instrument panel that turns those readings into a ranked, comparable signal. If you already run ccusage, `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` is the upgrade path.",
   },
   {
     question: "Does SigRank replace ccusage?",

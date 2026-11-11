@@ -102,7 +102,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both clawdboard and SigRank?",
     answer:
-      "Yes, and they serve different purposes. clawdboard gives you the habit layer: streaks, active days, project labels, a clean UI that keeps you coming back. SigRank gives you the efficiency layer that streak counts cannot. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep clawdboard for the motivation loop. The same local logs feed both.",
+      "Yes, and they serve different purposes. clawdboard gives you the habit layer: streaks, active days, project labels, a clean UI that keeps you coming back. SigRank gives you the efficiency layer that streak counts cannot. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep clawdboard for the motivation loop. The same local logs feed both.",
   },
   {
     question: "Which is better for measuring AI coding skill?",

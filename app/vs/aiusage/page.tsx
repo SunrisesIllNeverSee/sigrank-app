@@ -106,7 +106,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both aiusage and SigRank?",
     answer:
-      "Yes. aiusage is a usage tracker; SigRank is a scoring and ranking tool. Run aiusage for the multi-provider API accounting dashboard. Run `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. Many operators use a usage tracker for day-to-day accounting and SigRank for efficiency scoring and leaderboard submission.",
+      "Yes. aiusage is a usage tracker; SigRank is a scoring and ranking tool. Run aiusage for the multi-provider API accounting dashboard. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. Many operators use a usage tracker for day-to-day accounting and SigRank for efficiency scoring and leaderboard submission.",
   },
   {
     question: "Does aiusage have a leaderboard?",

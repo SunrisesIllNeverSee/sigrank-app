@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both vibe-island and SigRank?",
     answer:
-      "Yes, and they complement each other. vibe-island gives you the vibe coding community — a place to connect with other vibe coders. SigRank gives you the efficiency layer — a score, a class tier, and a global leaderboard rank. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your vibe-island profile for the community. The two are complementary, not mutually exclusive.",
+      "Yes, and they complement each other. vibe-island gives you the vibe coding community — a place to connect with other vibe coders. SigRank gives you the efficiency layer — a score, a class tier, and a global leaderboard rank. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your vibe-island profile for the community. The two are complementary, not mutually exclusive.",
   },
   {
     question: "Does vibe-island have a leaderboard?",

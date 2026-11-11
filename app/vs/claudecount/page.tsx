@@ -96,7 +96,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both claudecount and SigRank?",
     answer:
-      "Yes. claudecount gives you the raw token counts. SigRank gives you the scoring layer that counting cannot provide. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep claudecount for the raw view. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "Yes. claudecount gives you the raw token counts. SigRank gives you the scoring layer that counting cannot provide. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep claudecount for the raw view. The two are complementary, not mutually exclusive. The same local logs feed both.",
   },
   {
     question: "Which is better for improving my AI coding efficiency?",

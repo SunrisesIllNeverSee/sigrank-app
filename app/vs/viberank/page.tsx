@@ -106,7 +106,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both viberank and SigRank?",
     answer:
-      "Yes. viberank gives you the gamified burn-rate competition and the vibe coding community. SigRank gives you the efficiency layer that burn rankings cannot provide. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your viberank profile for the burn crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "Yes. viberank gives you the gamified burn-rate competition and the vibe coding community. SigRank gives you the efficiency layer that burn rankings cannot provide. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your viberank profile for the burn crowd. The two are complementary, not mutually exclusive. The same local logs feed both.",
   },
   {
     question: "Which is better for finding the most skilled AI operators?",

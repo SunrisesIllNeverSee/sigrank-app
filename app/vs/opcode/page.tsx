@@ -80,7 +80,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Is SigRank an opcode alternative?",
     answer:
-      "They solve different problems. opcode is an AI coding CLI — a tool you drive from the terminal. SigRank scores the operator driving any CLI. You don't choose between them; you use opcode (or Claude Code, Cursor, or any of 15+ tools) to code, then run `sigrank submit` to score how efficiently you drove it. The tool is not the skill; the cascade yield is.",
+      "They solve different problems. opcode is an AI coding CLI — a tool you drive from the terminal. SigRank scores the operator driving any CLI. You don't choose between them; you use opcode (or Claude Code, Cursor, or any of 15+ tools) to code, then run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to score how efficiently you drove it. The tool is not the skill; the cascade yield is.",
   },
   {
     question: "Why would I need SigRank if I already use opcode?",
@@ -95,7 +95,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both opcode and SigRank?",
     answer:
-      "Yes — that's the intended setup. Use opcode (or any supported CLI) to write code. Run `sigrank submit` to read the token telemetry from those sessions, score your cascade yield, sign it with ed25519, and publish to the leaderboard. The CLI and the scorecard are complementary, not competitive.",
+      "Yes — that's the intended setup. Use opcode (or any supported CLI) to write code. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to read the token telemetry from those sessions, score your cascade yield, sign it with ed25519, and publish to the leaderboard. The CLI and the scorecard are complementary, not competitive.",
   },
   {
     question: "Which is better for improving my AI coding skill?",

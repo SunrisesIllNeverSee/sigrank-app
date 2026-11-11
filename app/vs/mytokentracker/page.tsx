@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both mytokentracker and SigRank?",
     answer:
-      "Yes, and they complement each other. mytokentracker gives you the cost layer: per-model pricing, spend totals, budget tracking across 2,300+ models. SigRank gives you the efficiency layer that spend rankings cannot. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep mytokentracker for the budget view. The same local logs feed both.",
+      "Yes, and they complement each other. mytokentracker gives you the cost layer: per-model pricing, spend totals, budget tracking across 2,300+ models. SigRank gives you the efficiency layer that spend rankings cannot. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep mytokentracker for the budget view. The same local logs feed both.",
   },
   {
     question: "Which is better for optimizing AI coding spend?",

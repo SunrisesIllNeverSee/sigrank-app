@@ -86,7 +86,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use ccwarriors and SigRank together?",
     answer:
-      "Yes — same local logs feed both. Keep the warrior card and the README badge for the burn crowd; the org-board model is a genuinely good idea and worth supporting. Then run `sigrank submit` to put a signed Υ score on the global efficiency board. Burn rate for the arena, yield for the record.",
+      "Yes — same local logs feed both. Keep the warrior card and the README badge for the burn crowd; the org-board model is a genuinely good idea and worth supporting. Then run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to put a signed Υ score on the global efficiency board. Burn rate for the arena, yield for the record.",
   },
   {
     question: "Which is better for evaluating operators?",

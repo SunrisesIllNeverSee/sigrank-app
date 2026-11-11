@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both sessionwatcher and SigRank?",
     answer:
-      "Yes. sessionwatcher is a session-level monitor; SigRank is an operator-level scoring and ranking tool. Run sessionwatcher for per-session token usage awareness while you work. Run `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. sessionwatcher is for watching sessions; SigRank is for ranking operators.",
+      "Yes. sessionwatcher is a session-level monitor; SigRank is an operator-level scoring and ranking tool. Run sessionwatcher for per-session token usage awareness while you work. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. sessionwatcher is for watching sessions; SigRank is for ranking operators.",
   },
   {
     question: "Does sessionwatcher work with tools other than Claude Code?",

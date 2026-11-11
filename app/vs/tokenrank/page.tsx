@@ -102,7 +102,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both TokenRank and SigRank?",
     answer:
-      "Yes, and they share a similar privacy stance: both publish token counts only, no code, no prompts, no secrets. TokenRank gives you the volume view across six major platforms. SigRank gives you the efficiency layer that volume rankings cannot. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep TokenRank for the burn-rate crowd. The same local logs feed both.",
+      "Yes, and they share a similar privacy stance: both publish token counts only, no code, no prompts, no secrets. TokenRank gives you the volume view across six major platforms. SigRank gives you the efficiency layer that volume rankings cannot. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep TokenRank for the burn-rate crowd. The same local logs feed both.",
   },
   {
     question: "Which is better for comparing AI operators across platforms?",

@@ -106,7 +106,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both tokenmaxxer and SigRank?",
     answer:
-      "Yes, but they pull in opposite directions. tokenmaxxer incentivizes burning more tokens to maintain streaks and earn badges. SigRank incentivizes burning fewer tokens more efficiently. If you want the gamification layer for motivation, keep tokenmaxxer. If you want the efficiency layer for skill measurement, run `sigrank submit`. The same local logs feed both. Just know that a high tokenmaxxer score and a high SigRank yield are not the same thing — they are often inversely correlated.",
+      "Yes, but they pull in opposite directions. tokenmaxxer incentivizes burning more tokens to maintain streaks and earn badges. SigRank incentivizes burning fewer tokens more efficiently. If you want the gamification layer for motivation, keep tokenmaxxer. If you want the efficiency layer for skill measurement, run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit`. The same local logs feed both. Just know that a high tokenmaxxer score and a high SigRank yield are not the same thing — they are often inversely correlated.",
   },
   {
     question: "Which is better for measuring AI operator skill?",
