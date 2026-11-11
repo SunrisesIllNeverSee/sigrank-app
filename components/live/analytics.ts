@@ -41,4 +41,10 @@ export const liveTrack = {
     if (on())
       posthog.capture("live_board_mode_changed", { mode, ...baseProps() });
   },
+  /** A SigRank CLI command copied from the You row or the Rank me sheet
+   *  (funnel step: score_viewed → cli_command_copied → enroll/submit). */
+  cliCommandCopied: (extra: { command: string; surface: "you_row" | "rank_me" }) => {
+    if (on())
+      posthog.capture("cli_command_copied", { ...extra, ...baseProps() });
+  },
 };

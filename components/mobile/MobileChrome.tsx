@@ -28,6 +28,7 @@ import { WorkspaceAccountOptions } from "../live/WorkspaceAccountOptions";
 import type { RailNavId } from "../live/GroupedRailNav";
 import type { IconSetName } from "../live/PixelIcon";
 import { BottomTabBar } from "./BottomTabBar";
+import { RankMeCommands } from "../live/RankMe";
 import { Drawer } from "./Drawer";
 import { MenuNav } from "./MenuNav";
 import { SearchOverlay } from "./SearchOverlay";
@@ -73,6 +74,7 @@ export function MobileChrome({
   const [details, setDetails] = useState(false);
   const [search, setSearch] = useState(false);
   const [acct, setAcct] = useState(false);
+  const [rankMe, setRankMe] = useState(false);
   const session = useBoardSession(true);
 
   const closeMenu = useCallback(() => setMenu(false), []);
@@ -175,7 +177,12 @@ export function MobileChrome({
 
       {children}
 
-      <BottomTabBar active={active} profileHref={profileHref} searchOpen={search} onSearch={() => setSearch(true)} />
+      <BottomTabBar active={active} profileHref={profileHref} searchOpen={search} onSearch={() => setSearch(true)}
+        rankMeOpen={rankMe} onRankMe={() => setRankMe(true)} />
+
+      <Sheet open={rankMe} onClose={() => setRankMe(false)} label="Rank me">
+        <RankMeCommands />
+      </Sheet>
 
       <Drawer open={menu} onClose={closeMenu} label="Menu" side="left">
         <MenuNav active={active} onNavigate={closeMenu} />

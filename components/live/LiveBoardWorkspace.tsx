@@ -84,6 +84,7 @@ import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
 import { MobileChrome } from "../mobile/MobileChrome";
 import { BoardCards } from "../board-mobile/BoardCards";
 import { BoardFilterSheet, BoardMobileBar } from "../board-mobile/BoardMobileBar";
+import { YouRow } from "./RankMe";
 import { usePhone } from "../board-mobile/usePhone";
 import {
   OperatorDock,
@@ -2099,6 +2100,7 @@ export function LiveBoardWorkspace({
                         colMode={colMode}
                         viewMode={viewMode}
                         ownCodename={session.codename}
+                        showYou={acct.mode === "out"}
                       />
                       <div className="bm-more">
                         {ordered.length === 0 ? (
@@ -2143,6 +2145,8 @@ export function LiveBoardWorkspace({
                         />
                       </thead>
                       <tbody>
+                        {/* Ghost "You" row for signed-out visitors, above #1 on page 1 */}
+                        {acct.mode === "out" && pageStart === 0 && <YouRow />}
                         {pageRows.map(([o, i], d) => (
                           <BoardRow
                             key={`${i}-${o.codename}`}

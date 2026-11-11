@@ -1,0 +1,38 @@
+/* RankMe — the You row (desktop + phone) and the Rank me sheet steps.
+   Scoped to the workspace root; uses the theme tokens from proto-scoped.css. */
+.lbw-root .rm-cmd{display:inline-flex;align-items:center;gap:6px;max-width:100%}
+.lbw-root .rm-cmd code{font-family:var(--font-mono);font-size:12px;color:var(--ac);
+  background:var(--ac-soft);border:1px solid var(--line2);border-radius:3px;padding:3px 7px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lbw-root .rm-copy{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.04em;
+  color:var(--tx2);background:transparent;border:1px solid var(--line2);border-radius:3px;
+  padding:3px 8px;min-height:28px;cursor:pointer}
+.lbw-root .rm-copy:hover{color:var(--tx);border-color:var(--ac)}
+.lbw-root .rm-copy:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+/* desktop ghost row */
+.lbw-root .board-t tr.you-row td{padding:8px 12px;border-bottom:1px dashed var(--line2);text-align:left;
+  background:color-mix(in srgb,var(--ac) 5%,transparent);font-size:12px;color:var(--tx2);white-space:nowrap}
+/* sticky inner so the row stays in view while the wide table scrolls sideways */
+.lbw-root tr.you-row .you-in{position:sticky;left:12px;display:inline-flex;align-items:center;gap:14px}
+.lbw-root .you-rank{font-family:var(--font-mono);color:var(--mut)}
+.lbw-root .you-name{font-family:var(--font-disp);font-weight:700;color:var(--tx)}
+.lbw-root .you-y{font-family:var(--font-mono);color:var(--mut)}
+.lbw-root .you-note{color:var(--mut)}
+.lbw-root .you-link{color:var(--ac);text-decoration:underline;text-underline-offset:2px}
+
+/* phone ghost card */
+.lbw-root .bc-you{list-style:none;display:flex;flex-direction:column;gap:6px;padding:10px 12px;
+  border:1px dashed var(--line2);border-radius:6px;margin-bottom:8px;
+  background:color-mix(in srgb,var(--ac) 5%,transparent);font-size:12px}
+.lbw-root .bc-you .you-top{display:flex;gap:10px;align-items:baseline}
+
+/* Rank me sheet */
+.lbw-root .rm-steps{display:flex;flex-direction:column;gap:14px}
+.lbw-root .rm-step-t{font-family:var(--font-mono);font-weight:700;font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--tx);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.lbw-root .rm-n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;
+  background:var(--ac);color:var(--ac-tx);font-size:11px}
+.lbw-root .rm-note{margin:6px 0 0;font-size:12px;color:var(--mut);line-height:1.45}
+.lbw-root .rm-foot{margin:4px 0 0;font-size:12px;color:var(--tx2)}
+.lbw-root .rm-foot a{color:var(--ac);text-decoration:underline;text-underline-offset:2px}
