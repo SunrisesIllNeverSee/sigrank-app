@@ -47,11 +47,16 @@ const COMMAND_PATTERNS = [
   /<code[^>]*>\s*(?:\{`)?(?:npx )?sigrank(?:@latest)? ([a-z][a-z-]*)/g,
 ];
 
-async function* sourceFiles(dir) {
+// Removed subcommands are rejected in any shape (plain strings, <span>, prose),
+// across page source and the files served from public/.
+const REMOVED = /\bsigrank (me|init)\b/g;
+const SERVED_DIRS = [...SCAN_DIRS, "public"];
+
+async function* sourceFiles(dir, ext = /\.(ts|tsx)$/) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name);
-    if (entry.isDirectory()) yield* sourceFiles(path);
-    else if (/\.(ts|tsx)$/.test(entry.name)) yield path;
+    if (entry.isDirectory()) yield* sourceFiles(path, ext);
+    else if (ext.test(entry.name)) yield path;
   }
 }
 
@@ -77,6 +82,19 @@ test("site copy names only CLI subcommands that exist", async () => {
   }
   assert.ok(seen > 50, `expected to find CLI mentions to check, found ${seen}`);
   assert.deepEqual(bad, [], `unknown CLI subcommands in site copy:\n${bad.join("\n")}`);
+});
+
+test("removed CLI subcommands appear nowhere in served copy", async () => {
+  const bad = [];
+  for (const dir of SERVED_DIRS) {
+    for await (const file of sourceFiles(join(ROOT, dir), /\.(ts|tsx|mdx?|txt|json|html)$/)) {
+      const text = await readFile(file, "utf8");
+      for (const m of text.matchAll(REMOVED)) {
+        bad.push(`${relative(ROOT, file)}:${lineOf(text, m.index)} ${m[0]}`);
+      }
+    }
+  }
+  assert.deepEqual(bad, [], `removed CLI subcommands in served copy:\n${bad.join("\n")}`);
 });
 
 for (const route of ["app/llms.txt/route.ts", "app/llms-full.txt/route.ts"]) {
