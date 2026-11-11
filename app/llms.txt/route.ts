@@ -95,7 +95,7 @@ The portable v0.1 draft core contains four telemetry primitives (input, output, 
 To get an operator on the leaderboard:
 
 1. Sign in at ${SITE_ORIGIN} and create a connect code in Settings.
-2. Run \`npx sigrank enroll\` with that connect code — binds this device's signing key to the operator account. The private key stays on the device.
+2. Run \`npx sigrank enroll\` and paste the connect code when prompted — binds this device's signing key to the operator account. The private key stays on the device.
 3. Run \`npx sigrank submit --dry-run\` to inspect the signed payload without sending it, then \`npx sigrank submit\` to publish.
 4. The server verifies and re-scores the submission; your Yield (Υ) and rank appear on the board at ${SITE_ORIGIN}/board/all.
 
@@ -152,13 +152,13 @@ A: TTEOP (Token Telemetry Evaluation Operator Protocol) is the open, vendor-neut
 A: An operator is the individual whose AI-work telemetry is measured. It is not necessarily a legal person, employer, or unique human: one operator can have devices, submissions, and an optional authenticated account link. See ${SITE_ORIGIN}/ai-operator-scoring.
 
 **Q: How do I check my AI coding efficiency?**
-A: Run \`npx sigrank\` in your terminal. It reads local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. Or visit ${SITE_ORIGIN}/score to paste token counts manually.
+A: Run \`npx sigrank\` in your terminal. It reads local AI session logs, extracts four token pillars (input, output, cache_write, cache_read), and computes your Yield score locally; nothing is published. Or visit ${SITE_ORIGIN}/score to paste token counts manually.
 
 **Q: What is Yield (Υ)?**
 A: Yield is the headline efficiency metric: Υ = (cache_read × output) / input². It measures how much reusable signal you create from each unit of input.
 
 **Q: Does Upsilon read my prompts?**
-A: No. Upsilon only reads token counts. It never reads, stores, or transmits prompt content, code, or transcripts. Submissions are ed25519-signed and contain only four numbers.
+A: No. Upsilon only reads token counts. It never reads, stores, or transmits prompt or response content, code, transcripts or file paths. Signed submissions carry the four token pillars plus account and device identifiers, a signature, and platform and report metadata.
 
 **Q: How do I compare two AI operators?**
 A: Open ${SITE_ORIGIN}/compare and pick operator A and operator B (or link \`/compare?a=<codename>&b=<codename>\`). Each side gets raw-pillar and cascade-metric radars; the center ledger counts metric wins, and Yield over time shares one axis.
@@ -194,7 +194,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - Median Yield (all-time yieldable snapshots): ${medianYield.toFixed(2)}
 - Top Yield (latest 30-day snapshots): ${topYield.toLocaleString()} (${topOperatorName})
 - Dataset DOI: 10.5281/zenodo.21900519
-- Install: \`npx sigrank\`
+- Install: \`npx sigrank\` (local, publishes nothing); to publish, create a connect code in Settings, then \`sigrank enroll\` and \`sigrank submit\`
 
 ## Ask AI about us
 - "What is SigRank?" → ${SITE_ORIGIN}/sigrank

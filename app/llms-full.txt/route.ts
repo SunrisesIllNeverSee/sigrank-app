@@ -257,16 +257,16 @@ ${await editorialPagesMarkdown(SITE_ORIGIN, UTM)}
 A: SigRank is an AI operator benchmark measuring token cascade efficiency, not AI models. It ranks the accounts operating AI by Yield (Υ = cache_read × output / input²), not raw token volume.
 
 **Q: How do I check my AI coding efficiency?**
-A: Run \`npx sigrank\` in your terminal. It reads your local AI session logs, extracts four token pillars (input, output, cache_creation, cache_read), and computes your Yield score. No install, no sign-in. Or visit ${SITE_ORIGIN}/score to paste your token counts manually.
+A: Run \`npx sigrank\` in your terminal. It reads your local AI session logs, extracts four token pillars (input, output, cache_write, cache_read), and computes your Yield score locally. No install or sign-in is needed to see your score; publishing to the board needs a connect code from Settings. Or visit ${SITE_ORIGIN}/score to paste your token counts manually.
 
 **Q: What is Yield (Υ)?**
 A: Yield is the headline efficiency metric: Υ = (cache_read × output) / input². It measures how much reusable signal you create from each unit of input. High yield means you're compounding context, not burning tokens.
 
 **Q: Is SigRank free?**
-A: Yes. The CLI (\`npx sigrank\`), the leaderboard, the score calculator, and the methodology are all free. No account required to see your score or browse the board.
+A: Yes. The CLI (\`npx sigrank\`), the leaderboard, the score calculator, and the methodology are all free. No account is needed to see your score or browse the board; publishing your own snapshot needs a free account and a connect code.
 
 **Q: Does SigRank read my prompts?**
-A: No. SigRank only reads token counts: input, output, cache_creation, cache_read. It never reads, stores, or transmits prompt content, code, or transcripts. Submissions are ed25519-signed and contain only four numbers.
+A: No. SigRank only reads token counts: input, output, cache_write, cache_read. It never reads, stores, or transmits prompt or response content, code, transcripts or file paths. A signed submission carries the four token pillars plus your codename, device id and public key, an ed25519 signature, platform and version, message and session counts, and the weekly report block. Run \`sigrank submit --dry-run\` to see exactly what would be sent.
 
 **Q: What's the difference between SigRank and ccusage?**
 A: ccusage shows your token usage. SigRank scores your token efficiency. ccusage tells you how much you spent; SigRank tells you how well you spent it. SigRank also provides a public leaderboard, operator archetypes, and cascade analytics that ccusage doesn't.
@@ -300,7 +300,7 @@ A: An 8-tier qualification system: ARCH+, ARCH, POWER, BASE, SEEKER, REFINER, BE
 - npm package: https://www.npmjs.com/package/sigrank
 - MCP server + CLI source: https://github.com/SunrisesIllNeverSee/sigrank-mcp
 - Install: \`npm install -g sigrank\`, or run it with \`npx sigrank\` to see your cascade locally (publishes nothing)
-- To publish: create a connect code at ${SITE_ORIGIN}/settings, then \`sigrank enroll\`, \`sigrank submit --dry-run\` to inspect, and \`sigrank submit\`
+- To publish: create a connect code at ${SITE_ORIGIN}/settings, then \`sigrank enroll\` (paste the code when prompted), \`sigrank submit --dry-run\` to inspect, and \`sigrank submit\`
 
 ## Academic foundation
 
