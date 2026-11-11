@@ -76,7 +76,17 @@ export function createSigrankServer(req?: NextRequest): McpServer {
     // as a $exception event, polluting PostHog error tracking with user errors.
     // Tool errors are still captured as $mcp_tool_call events with isError: true
     // in the properties, which is the correct way to track them as data.
-    instrument(server, posthogMcp, { enableExceptionAutocapture: false });
+    //
+    // context / captureModel / enableConversationId are off: in @posthog/mcp
+    // 0.25 each one injects an extra parameter (context, llm_model,
+    // conversation_id) into every tool's input schema, and context and
+    // llm_model are marked required. The published tool schemas stay as written.
+    instrument(server, posthogMcp, {
+      enableExceptionAutocapture: false,
+      enableConversationId: false,
+      captureModel: false,
+      context: false,
+    });
   }
 
   // ── Register all 16 SigRank tools ──────────────────────────────────────
