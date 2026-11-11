@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both token-forest and SigRank?",
     answer:
-      "Yes. token-forest is a tracking and visualization tool; SigRank is a scoring and ranking tool. Run token-forest for the forest metaphor and growth visualization. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. Many operators use a tracker for day-to-day awareness and SigRank for efficiency scoring and leaderboard submission.",
+      "Yes. token-forest is a tracking and visualization tool; SigRank is a scoring and ranking tool. Run token-forest for the forest metaphor and growth visualization. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. Many operators use a tracker for day-to-day awareness and SigRank for efficiency scoring and leaderboard submission.",
   },
   {
     question: "Does token-forest have a leaderboard?",
@@ -274,13 +274,14 @@ export default function VsTokenForestPage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
 sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank submit --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

@@ -79,22 +79,22 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does SigRank replace Cline?",
     answer:
-      "No — SigRank is not a VS Code extension. Cline is the AI agent that operates inside your editor; SigRank is the scoring layer that measures how efficiently you drive any AI tool, including Cline. You keep using Cline (or Claude Code, or Copilot) and run the SigRank CLI alongside it. SigRank reads your token telemetry locally, computes your Υ Yield, and publishes a signed snapshot to the leaderboard. Your agent stays; your efficiency gets measured.",
+      "No. Cline is a separate coding tool; SigRank measures token efficiency from supported sources. The current SigRank CLI has no dedicated Cline log adapter, so merely installing SigRank does not import Cline sessions or publish them to the leaderboard.",
   },
   {
     question: "Does Cline have token usage metrics?",
     answer:
-      "Cline surfaces some token and cost information within its own VS Code panel — how many tokens a task consumed, running cost estimates. That is editor-scoped and editor-locked: the numbers live inside Cline, in Cline's format, visible only in VS Code. SigRank reads the same underlying token flow but computes the full cascade architecture (Υ Yield, compression ratio, SNR, Leverage, Velocity), assigns a class tier, and lets you compare against every other operator on the board — including ones who never touch Cline.",
+      "Usage or cost figures displayed by Cline belong to that tool's own interface. SigRank does not automatically read Cline logs; it measures supported local adapters and can separately calculate metrics from supplied four-pillar token counts. A manual calculation alone is not a verified leaderboard submission.",
   },
   {
     question: "Why does platform neutrality matter?",
     answer:
-      "Because most operators do not use one tool. You might use Cline for VS Code-based agentic tasks, Claude Code for terminal work, Copilot for inline completions, and Cursor for refactoring. Cline's metrics cover only the Cline slice; your actual efficiency is the union across all of them. SigRank is platform-neutral — it reads telemetry from Cline, Claude Code, Copilot, Cursor, ChatGPT, Gemini, and 15+ others, scores them on the same cascade axis, and gives you one comparable rank. Your score follows you across tools, not the other way around.",
+      "Using multiple AI tools makes cross-tool comparison valuable, but input coverage matters. SigRank can aggregate two or more supported active sources when explicitly invoked with `npx sigrank submit --platform multi`; it does not automatically include Cline. The default `npx sigrank submit` uses Claude telemetry.",
   },
   {
     question: "Can I use SigRank with Cline specifically?",
     answer:
-      "Yes. The SigRank CLI reads token telemetry from Cline's local logs the same way it reads Claude Code's (ccusage is bundled for Claude Code; additional readers cover other platforms). Create a connect code in Settings on signalaf.com, run `sigrank enroll` to link this device, then `sigrank submit` to score and publish. Your Cline sessions contribute to the same leaderboard rank as your Claude Code or Copilot sessions — unified, not siloed.",
+      "You can use Cline alongside SigRank, but there is no dedicated Cline log adapter at present. To publish from a supported local source, first create a connect code under SignalAF Settings, run `npx sigrank enroll`, preview with `npx sigrank submit --dry-run`, and then submit. The bare submit command uses Claude; other supported sources require an explicit --platform selection.",
   },
   {
     question:
@@ -276,10 +276,10 @@ export default function VsClinePage() {
           Keep Cline. Add the score that follows you.
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Cline measures your tasks. SigRank measures your driving — across
-          Cline and every other tool you use. Install the CLI, submit a signed
-          snapshot, and get a rank that doesn&apos;t reset when you switch
-          editors.
+          SigRank can measure supported local token sources while you keep
+          using Cline. It has no dedicated Cline log reader at present.
+          To compare, use SigRank&apos;s manual calculator for supplied counts
+          or enroll to submit signed telemetry from a supported platform.
         </p>
         <div className="flex flex-wrap gap-3">
           <a

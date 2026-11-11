@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both ccflare and SigRank?",
     answer:
-      "Yes. ccflare is a visualization tool; SigRank is a scoring and ranking tool. Run ccflare for the consumption charts and trend visualizations. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. Many operators use a visualizer for day-to-day awareness and SigRank for efficiency scoring and leaderboard submission.",
+      "Yes. ccflare is a visualization tool; SigRank is a scoring and ranking tool. Run ccflare for the consumption charts and trend visualizations. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. Many operators use a visualizer for day-to-day awareness and SigRank for efficiency scoring and leaderboard submission.",
   },
   {
     question: "Does ccflare work with tools other than Claude Code?",
@@ -272,13 +272,14 @@ export default function VsCcflarePage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
 sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank submit --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both vibe-island and SigRank?",
     answer:
-      "Yes, and they complement each other. vibe-island gives you the vibe coding community — a place to connect with other vibe coders. SigRank gives you the efficiency layer — a score, a class tier, and a global leaderboard rank. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your vibe-island profile for the community. The two are complementary, not mutually exclusive.",
+      "Yes, and they complement each other. vibe-island gives you the vibe coding community — a place to connect with other vibe coders. SigRank gives you the efficiency layer — a score, a class tier, and a global leaderboard rank. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep your vibe-island profile for the community. The two are complementary, not mutually exclusive.",
   },
   {
     question: "Does vibe-island have a leaderboard?",
@@ -271,13 +271,14 @@ export default function VsVibeIslandPage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
 sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank submit --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

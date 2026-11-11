@@ -82,7 +82,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Is SigRank a notch-pilot alternative?",
     answer:
-      "They solve different problems. notch-pilot is an AI coding copilot — it helps you write code. SigRank scores the operator driving the copilot. You don't choose between them; you use notch-pilot (or any copilot) to code, then run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to score how efficiently you drove it. The tool is not the operator; the operator is what gets ranked.",
+      "They solve different problems. notch-pilot is an AI coding copilot — it helps you write code. SigRank scores the operator driving the copilot. You don't choose between them; you use notch-pilot (or any copilot) to code, then run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to score how efficiently you drove it. The tool is not the operator; the operator is what gets ranked.",
   },
   {
     question: "Why would I need SigRank if I already use notch-pilot?",
@@ -97,7 +97,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both notch-pilot and SigRank?",
     answer:
-      "Yes — that's the intended setup. Use notch-pilot (or Claude Code, Cursor, Copilot, or any of 15+ supported tools) to write code. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to read the token telemetry from those sessions, score your cascade yield, sign it with ed25519, and publish to the leaderboard. The copilot and the scorecard are complementary, not competitive.",
+      "Yes — that's the intended setup. Use notch-pilot (or Claude Code, Cursor, Copilot, or any of 15+ supported tools) to write code. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to read the token telemetry from those sessions, score your cascade yield, sign it with ed25519, and publish to the leaderboard. The copilot and the scorecard are complementary, not competitive.",
   },
   {
     question: "Which is better for improving my AI coding skill?",
@@ -264,13 +264,14 @@ export default function VsNotchPilotPage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
 sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank submit --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

@@ -351,6 +351,7 @@ export default function PlatformsPage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npx sigrank          # detect your agents, read logs, show cascade
 npx sigrank enroll   # link this device (connect code from Settings)
+npx sigrank submit --dry-run  # inspect payload; nothing sent
 npx sigrank submit   # sign + publish to leaderboard`}
           </pre>
         </div>

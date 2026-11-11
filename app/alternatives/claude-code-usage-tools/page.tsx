@@ -155,7 +155,7 @@ const FAQS = [
   {
     question: "How do I track my Claude Code token usage?",
     answer:
-      "The simplest way is ccusage — install it, run it, and it reads your Claude Code logs and reports token counts per session. If you want efficiency scoring on top of the raw counts, install SigRank (which bundles ccusage) and run `sigrank enroll` then `sigrank submit`. SigRank reads the same logs, computes your Υ Yield, and publishes a signed snapshot to the leaderboard. For a quick per-session check without installing anything, use Claude Code's built-in /cost command.",
+      "The simplest way is ccusage — install it, run it, and it reads your Claude Code logs and reports token counts per session. If you want efficiency scoring on top of the raw counts, install SigRank (which bundles ccusage) and run `npx sigrank enroll` then `npx sigrank submit`. SigRank reads the same logs, computes your Υ Yield, and publishes a signed snapshot to the leaderboard. For a quick per-session check without installing anything, use Claude Code's built-in /cost command.",
   },
   {
     question: "Does SigRank work with Claude Code?",

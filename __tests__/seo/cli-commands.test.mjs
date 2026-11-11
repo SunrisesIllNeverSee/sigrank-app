@@ -109,3 +109,76 @@ for (const route of ["app/llms.txt/route.ts", "app/llms-full.txt/route.ts"]) {
     }
   });
 }
+
+
+test("comparison FAQ snippets use commands executable without a global install", async () => {
+  const bad = [];
+  const answerRE = /answer:\s*"(?:\\.|[^"\\])*"/g;
+  for await (const file of sourceFiles(join(ROOT, "app/vs"))) {
+    const source = await readFile(file, "utf8");
+    for (const answer of source.matchAll(answerRE)) {
+      // An FAQ explicitly instructing a global install may use the bare binary.
+      if (answer[0].includes("npm install -g sigrank")) continue;
+      for (const cmd of answer[0].matchAll(/\bsigrank (enroll|submit)\b/g)) {
+        const prefix = answer[0].slice(Math.max(0, cmd.index - 4), cmd.index);
+        if (!prefix.endsWith("npx ")) {
+          bad.push(relative(ROOT, file) + ":" + lineOf(source, answer.index) + " " + cmd[0]);
+        }
+      }
+    }
+  }
+  assert.deepEqual(bad, [], "FAQ commands require a missing global install:\n" + bad.join("\n"));
+});
+
+test("global install code snippets preview before publishing", async () => {
+  let checked = 0;
+  const backtick = String.fromCharCode(96);
+  for await (const file of sourceFiles(join(ROOT, "app/vs"))) {
+    const source = await readFile(file, "utf8");
+    for (const part of source.split("npm install -g sigrank").slice(1)) {
+      const end = part.indexOf(backtick + "}");
+      if (end < 0) continue;
+      const snippet = part.slice(0, end);
+      if (!snippet.includes("sigrank enroll") || !snippet.includes("sigrank submit")) continue;
+      checked++;
+      assert.match(snippet, /sigrank submit --dry-run/,
+        relative(ROOT, file) + " must preview first");
+      assert.ok(
+        snippet.indexOf("sigrank enroll") < snippet.indexOf("sigrank submit --dry-run") &&
+        snippet.indexOf("sigrank submit --dry-run") < snippet.lastIndexOf("sigrank submit"),
+        relative(ROOT, file) + " must enroll, preview, then publish"
+      );
+    }
+  }
+  assert.ok(checked >= 20, "expected global-install examples; checked " + checked);
+});
+
+test("benchmark and yield guides explain web enrollment, preview, and Claude default", async () => {
+  for (const route of [
+    "app/blog/how-to-benchmark-ai-coding-workflow/page.tsx",
+    "app/guides/how-to-benchmark-ai-coding-workflow/page.tsx",
+    "app/guides/how-to-improve-your-yield/page.tsx",
+    "app/guides/how-to-track-token-cascade/page.tsx",
+  ]) {
+    const s = await readFile(join(ROOT, route), "utf8");
+    assert.match(s, /connect code/i, route + " omits a web connect code");
+    assert.match(s, /npx sigrank enroll/, route + " omits device enrollment");
+    assert.match(s, /npx sigrank submit --dry-run/, route + " omits the preview");
+    assert.match(s, /npx sigrank submit/, route + " omits publishing");
+    assert.match(s, /Claude by default|default submission source is Claude/i,
+      route + " omits the CLI default source");
+  }
+});
+
+test("FAQ comparisons do not promise direct logs from unregistered adapters", async () => {
+  for (const slug of [
+    "aider", "amazon-q", "cline", "continue", "cursor",
+    "roo-code", "sourcegraph-cody", "tabnine", "windsurf", "zed",
+  ]) {
+    const route = "app/vs/" + slug + "/page.tsx";
+    const s = await readFile(join(ROOT, route), "utf8");
+    assert.match(s, /no dedicated .* log adapter/i, route + " omits adapter limitation");
+    assert.doesNotMatch(s, /The SigRank CLI reads token telemetry from/i,
+      route + " falsely promises a dedicated local reader");
+  }
+});

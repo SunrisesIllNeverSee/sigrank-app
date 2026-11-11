@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both ccburn and SigRank?",
     answer:
-      "Yes. ccburn is a real-time burn-rate monitor; SigRank is a scoring and ranking tool. Run ccburn for the live burn-rate dashboard while you work. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. ccburn is for real-time awareness; SigRank is for evaluation and competition.",
+      "Yes. ccburn is a real-time burn-rate monitor; SigRank is a scoring and ranking tool. Run ccburn for the live burn-rate dashboard while you work. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. ccburn is for real-time awareness; SigRank is for evaluation and competition.",
   },
   {
     question: "Does ccburn work with tools other than Claude Code?",
@@ -273,13 +273,14 @@ export default function VsCcburnPage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
 sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank submit --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

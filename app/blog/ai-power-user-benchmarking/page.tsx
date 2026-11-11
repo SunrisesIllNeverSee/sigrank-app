@@ -63,7 +63,7 @@ const faqs = [
   {
     question: "How do I benchmark my AI usage against others?",
     answer:
-      "Install sigrank (npm i -g sigrank), run `npx sigrank` or paste your ccusage JSON at /score, then compare your Υ Yield, class tier, and rank against other operators on the /board/all leaderboard.",
+      "Run `npx sigrank` without a global install (or install globally if you prefer), or paste your ccusage JSON at /score, then compare your Υ Yield, class tier, and rank against other operators on the /board/all leaderboard.",
   },
   {
     question: "What separates a power user from a regular AI user?",
@@ -253,10 +253,10 @@ npm i -g sigrank
 sigrank
 
 # 3. Link this device (connect code from signalaf.com Settings)
-sigrank enroll
+npx sigrank enroll
 
 # 4. Submit your signed snapshot
-sigrank submit
+npx sigrank submit
 
 # 5. Check the leaderboard
 sigrank board --window 30d`}</code>

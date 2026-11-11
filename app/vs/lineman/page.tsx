@@ -96,7 +96,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both lineman and SigRank?",
     answer:
-      "Yes. lineman gives you the spend dashboard for budget tracking. SigRank gives you the efficiency layer that spend tracking cannot provide. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep lineman for the budget view. The two are complementary, not mutually exclusive. The same local logs feed both.",
+      "Yes. lineman gives you the spend dashboard for budget tracking. SigRank gives you the efficiency layer that spend tracking cannot provide. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep lineman for the budget view. The two are complementary, not mutually exclusive. The same local logs feed both.",
   },
   {
     question: "Which is better for improving my AI coding efficiency?",
@@ -261,13 +261,14 @@ export default function VsLinemanPage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
 sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank submit --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both mytokentracker and SigRank?",
     answer:
-      "Yes, and they complement each other. mytokentracker gives you the cost layer: per-model pricing, spend totals, budget tracking across 2,300+ models. SigRank gives you the efficiency layer that spend rankings cannot. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep mytokentracker for the budget view. The same local logs feed both.",
+      "Yes, and they complement each other. mytokentracker gives you the cost layer: per-model pricing, spend totals, budget tracking across 2,300+ models. SigRank gives you the efficiency layer that spend rankings cannot. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep mytokentracker for the budget view. The same local logs feed both.",
   },
   {
     question: "Which is better for optimizing AI coding spend?",
@@ -282,13 +282,14 @@ export default function VsMytokentrackerPage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
 sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank submit --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

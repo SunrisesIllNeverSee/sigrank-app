@@ -102,7 +102,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both TokenRank and SigRank?",
     answer:
-      "Yes, and they share a similar privacy stance: both publish token counts only, no code, no prompts, no secrets. TokenRank gives you the volume view across six major platforms. SigRank gives you the efficiency layer that volume rankings cannot. Run `sigrank enroll` (with a connect code from Settings) and then `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep TokenRank for the burn-rate crowd. The same local logs feed both.",
+      "Yes, and they share a similar privacy stance: both publish token counts only, no code, no prompts, no secrets. TokenRank gives you the volume view across six major platforms. SigRank gives you the efficiency layer that volume rankings cannot. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep TokenRank for the burn-rate crowd. The same local logs feed both.",
   },
   {
     question: "Which is better for comparing AI operators across platforms?",
@@ -278,13 +278,14 @@ export default function VsTokenrankPage() {
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
 sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank submit --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

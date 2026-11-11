@@ -43,12 +43,12 @@ const TOOLS: Tool[] = [
   {
     name: "SigRank",
     measures:
-      "Operator-level token-cascade efficiency across Cursor and 15+ other platforms — Υ Yield (cache_read × output / input²), compression ratio, SNR, cache hit rate, leverage, velocity, and class tier. Reads Cursor token telemetry locally and scores it on the same axis as Claude Code, Copilot, ChatGPT, and Gemini.",
+      "Operator-level token-cascade efficiency for supported telemetry sources — Υ Yield (cache_read × output / input²), compression ratio, SNR, leverage, velocity, and class tier. No dedicated Cursor log adapter is currently registered; Cursor's native metrics or separately supplied counts are distinct from signed SigRank submissions.",
     pros: [
-      "Platform-neutral — scores Cursor alongside Claude Code, Copilot, ChatGPT, Gemini, and 15+ others",
-      "Scores the operator with Υ Yield — tells you if your Cursor context is compounding or burning",
+      "Platform-neutral metrics for supported local adapters, plus a separate manual scoring path",
+      "Scores supported or supplied token pillars with Υ Yield; no automatic Cursor ingestion",
       "Live leaderboard with 7d/30d/90d/all-time windows and head-to-head comparison",
-      "Your score follows you across editors — switch from Cursor to Claude Code and your rank reflects both",
+      "Explicit --platform multi can combine two or more supported active telemetry sources",
       "MCP server mode — your AI agents can read their own metrics",
       "ed25519-signed submissions, token counts only — no prompt content leaves your device",
     ],
@@ -57,7 +57,7 @@ const TOOLS: Tool[] = [
       "Leaderboard sample is still growing in 2026",
     ],
     pricing: "Free (open-source CLI, MIT-licensed code, CC-BY-4.0 data)",
-    bestFor: "Cursor operators who want efficiency scoring and cross-platform ranking, not just in-editor stats",
+    bestFor: "Cursor operators who also use supported SigRank sources or want to score supplied counts",
     featured: true,
   },
   {
@@ -153,27 +153,27 @@ const FAQS = [
   {
     question: "How do I measure my Cursor AI usage?",
     answer:
-      "Cursor has built-in insights that show lines accepted, edits, and tab completions within the editor. For raw token counts, you need a tool that reads Cursor's telemetry — SigRank does this and scores it with Υ Yield (cache_read × output / input²). For a quick in-editor check, Cursor's built-in stats work without installing anything. For efficiency scoring and cross-platform ranking, install SigRank, enroll, and submit.",
+      "Cursor's built-in insights can display editor usage and acceptance metrics. SigRank currently has no dedicated Cursor log adapter, so it does not read Cursor telemetry automatically. You can separately score supplied four-pillar token counts; this is not equivalent to a verified leaderboard submission.",
   },
   {
     question: "Does SigRank work with Cursor?",
     answer:
-      "Yes. SigRank reads Cursor token telemetry locally and scores it on the same cascade axis as Claude Code, Copilot, ChatGPT, Gemini, and 15+ other platforms. Run `npm install -g sigrank`, create a connect code in Settings on signalaf.com, run `sigrank enroll` to link this device, and `sigrank submit` to score and publish. Your Cursor sessions contribute to the same leaderboard rank as your Claude Code or Copilot sessions — unified, not siloed. SigRank reads token counts only, never prompt content, and signs snapshots with ed25519 before they leave your device.",
+      "SigRank and Cursor can be used alongside one another. For supported local sources, run `npx sigrank` to inspect telemetry; to publish, generate a connect code in SignalAF Settings, run `npx sigrank enroll`, preview with `npx sigrank submit --dry-run`, and submit. The default source is Claude, not Cursor.",
   },
   {
     question: "Are Cursor's built-in metrics enough?",
     answer:
-      "It depends on what you want. Cursor's built-in insights show acceptance rate and edit counts — useful for quick in-editor feedback. But they are editor-locked (no data from Claude Code, ChatGPT, or Copilot), editor-scoped (no cross-session aggregation), and use acceptance rate as a weak proxy for efficiency. If you only use Cursor and only want a quick acceptance-rate check, the built-in stats are fine. If you want to know whether your AI usage is compounding or burning — and where you rank against operators who use other tools — you need SigRank.",
+      "Cursor's built-in metrics are useful for in-editor activity. SigRank offers different, token-cascade-based metrics for supported telemetry and supplied counts. The two views are complementary; a native Cursor log connection is not currently part of the CLI.",
   },
   {
     question: "What is the best Cursor AI metrics tool?",
     answer:
-      "For in-editor feedback, Cursor's built-in insights are the default. For time tracking, WakaTime supports Cursor. For efficiency scoring and cross-platform ranking, SigRank is the only tool that reads Cursor token telemetry and scores it with Υ Yield, compression ratio, SNR, leverage, and velocity — then ranks you on a live leaderboard alongside operators who use Claude Code, Copilot, ChatGPT, and 15+ other platforms. SigRank bundles ccusage, tokscale, and token-dashboard, so you get the raw counts and the scoring in one install.",
+      "Cursor's built-in stats are the direct option for editor feedback. WakaTime may help with editor activity tracking. SigRank is an option for cross-platform efficiency metrics when supported sources or separately supplied counts are available; it does not currently ingest Cursor logs automatically.",
   },
   {
     question: "Can I track Cursor and Claude Code usage together?",
     answer:
-      "Yes — SigRank is platform-neutral. It reads token telemetry from Cursor, Claude Code, Copilot, ChatGPT, Gemini, and 15+ other platforms, scores them all on the same cascade axis (Υ Yield), and gives you one comparable rank. Your score follows you across editors, not the other way around. Cursor's built-in metrics cover only Cursor; ccusage covers only Claude Code. SigRank is the only tool that unifies them.",
+      "You can inspect Claude Code and other registered adapters with SigRank. Use `npx sigrank submit --platform multi` only when two or more supported sources have local data, after enrollment and a dry run. Cursor is not one of the currently registered dedicated adapters.",
   },
 ];
 

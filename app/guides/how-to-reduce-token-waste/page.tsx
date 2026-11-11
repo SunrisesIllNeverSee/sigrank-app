@@ -355,7 +355,7 @@ export default function HowToReduceTokenWastePage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Submit a new snapshot with{" "}
           <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-            sigrank submit
+            npx sigrank submit
           </code>{" "}
           to update your leaderboard rank and class tier. If your yield improved
           significantly, you may have jumped a tier.

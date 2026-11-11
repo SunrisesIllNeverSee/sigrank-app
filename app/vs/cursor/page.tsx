@@ -78,22 +78,22 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does SigRank replace Cursor?",
     answer:
-      "No — SigRank is not an editor. Cursor is where you write code; SigRank is the scoring layer that measures how efficiently you drive any AI tool, including Cursor. You keep using Cursor (or Claude Code, or Copilot) and run the SigRank CLI alongside it. SigRank reads your token telemetry locally, computes your Υ Yield, and publishes a signed snapshot to the leaderboard. Your editor stays; your efficiency gets measured.",
+      "No. Cursor is a separate coding tool; SigRank measures token efficiency from supported sources. The current SigRank CLI has no dedicated Cursor log adapter, so merely installing SigRank does not import Cursor sessions or publish them to the leaderboard.",
   },
   {
     question: "Does Cursor have token usage metrics already?",
     answer:
-      "Cursor shows some token usage within its own UI — how many tokens a request consumed, context window usage. That is editor-scoped and editor-locked: the numbers live inside Cursor and do not leave it. SigRank reads the same underlying token flow but computes the full cascade architecture (Υ Yield, compression ratio, SNR, Leverage, Velocity), assigns a class tier, and lets you compare against every other operator on the board — including ones who never touch Cursor.",
+      "Usage or cost figures displayed by Cursor belong to that tool's own interface. SigRank does not automatically read Cursor logs; it measures supported local adapters and can separately calculate metrics from supplied four-pillar token counts. A manual calculation alone is not a verified leaderboard submission.",
   },
   {
     question: "Why does platform neutrality matter for token metrics?",
     answer:
-      "Because most operators do not use one tool. You might use Cursor for refactoring, Claude Code for agentic tasks, and Copilot for inline completions. Cursor's metrics cover only the Cursor slice; your actual efficiency is the union across all of them. SigRank is platform-neutral — it reads telemetry from Cursor, Claude Code, Copilot, ChatGPT, Gemini, and 15+ others, scores them on the same cascade axis, and gives you one comparable rank. Your score follows you across tools, not the other way around.",
+      "Using multiple AI tools makes cross-tool comparison valuable, but input coverage matters. SigRank can aggregate two or more supported active sources when explicitly invoked with `npx sigrank submit --platform multi`; it does not automatically include Cursor. The default `npx sigrank submit` uses Claude telemetry.",
   },
   {
     question: "Can I use SigRank with Cursor specifically?",
     answer:
-      "Yes. The SigRank CLI reads token telemetry from Cursor's local logs the same way it reads Claude Code's (ccusage is bundled for Claude Code; additional readers cover other platforms). Create a connect code in Settings on signalaf.com, run `sigrank enroll` to link this device, then `sigrank submit` to score and publish. Your Cursor sessions contribute to the same leaderboard rank as your Claude Code or Copilot sessions — unified, not siloed.",
+      "You can use Cursor alongside SigRank, but there is no dedicated Cursor log adapter at present. To publish from a supported local source, first create a connect code under SignalAF Settings, run `npx sigrank enroll`, preview with `npx sigrank submit --dry-run`, and then submit. The bare submit command uses Claude; other supported sources require an explicit --platform selection.",
   },
   {
     question:
@@ -272,10 +272,10 @@ export default function VsCursorPage() {
           Keep Cursor. Add the score that follows you.
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Cursor measures your requests. SigRank measures your driving — across
-          Cursor and every other tool you use. Install the CLI, submit a signed
-          snapshot, and get a rank that doesn&apos;t reset when you switch
-          editors.
+          SigRank can measure supported local token sources while you keep
+          using Cursor. It has no dedicated Cursor log reader at present.
+          To compare, use SigRank&apos;s manual calculator for supplied counts
+          or enroll to submit signed telemetry from a supported platform.
         </p>
         <div className="flex flex-wrap gap-3">
           <a
