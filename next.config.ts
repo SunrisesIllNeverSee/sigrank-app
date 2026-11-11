@@ -194,11 +194,11 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       // The seeded leaderboard used to live at sigeconomy.com/all-time. That
-      // domain is retired (owner, 2026-11-11), so old bookmarks and search
-      // indexes go to the all-time board here.
+      // domain is retired (owner, 2026-11-11). The historic seed archive is
+      // /board/history, so old bookmarks and search indexes go there.
       {
         source: "/board/seeded",
-        destination: "/board/all",
+        destination: "/board/history",
         permanent: true,
       },
       // NS-02.04 named category pages — redirect to nearest existing equivalents

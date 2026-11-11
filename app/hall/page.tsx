@@ -63,8 +63,8 @@ export default async function HallPage() {
   // Pre-fetch base rows for all 4 windows (no class/platform filter).
   // The Hall has two scopes:
   //   Active = claimed operators only (server-side filtered for all_time)
-  //   All = same as Active — only claimed/live operators. (sigeconomy.com, which
-  //         held the seeded board, is retired.)
+  //   All = same as Active — only claimed/live operators. The historic seed archive
+  //         is /board/history.
   // For all_time: fetch 1000 rows (claimed ops are buried below rank
   // 100), then filter for claimed && !retired SERVER-SIDE before passing to
   // the client — avoids serializing 1000 rows into RSC flight data.

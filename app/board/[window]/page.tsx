@@ -49,6 +49,7 @@
 import { notFound, redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getLeaderboard, getLiveBoardInitialState } from "@/lib/board";
 import { scoreRadarField } from "@/lib/radar/points";
 import { toEntry } from "@/lib/board/to-entry";
@@ -126,7 +127,8 @@ export default async function BoardWindowPage({
   const isAllTime = win.slug === "all";
 
   // All windows query the DB directly; ISR (revalidate=3600) bounds egress to
-  // 1 query/hour. Only claimed/live operators are shown.
+  // 1 query/hour. Only claimed/live operators are shown — the historic seed
+  // archive is /board/history.
   //
   // ONE ranking scope, two projections. getLiveBoardInitialState issues the
   // SAME getLeaderboard call (identical param literal → identical memo key),
@@ -351,6 +353,20 @@ export default async function BoardWindowPage({
           four token pillars and publishes a signed record. No prompt content
           leaves your machine — only the four counts.
         </p>
+        {win.slug === "all" && (
+          <p className="mt-4 border-t border-bg-border-subtle pt-4 font-sans text-xs leading-relaxed text-text-muted">
+            This board shows claimed operators with verified submissions. The
+            historic seed archive (the original board, including the seed
+            corpus) is at{" "}
+            <Link
+              href="/board/history"
+              className="text-gold underline underline-offset-2 hover:text-text-primary"
+            >
+              /board/history
+            </Link>
+            .
+          </p>
+        )}
       </section>
           </>
         }
