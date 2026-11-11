@@ -252,8 +252,8 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
               <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-xs text-gold">
                 output / input
               </code>
-              . How much you get out per token you put in. High compression =
-              efficient prompting.
+              . How much output you get per fresh input token. Velocity is
+              secondary to yield.
             </p>
           </div>
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">

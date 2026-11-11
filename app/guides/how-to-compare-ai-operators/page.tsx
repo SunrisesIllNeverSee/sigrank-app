@@ -213,8 +213,8 @@ export default function HowToCompareAIOperatorsPage() {
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               output / input. How much signal each operator gets per fresh input
-              token. High compression means concise, high-signal prompting. Low
-              compression means verbose prompts or wasted input.
+              token. High velocity means a lot of output for each fresh input token. Low
+              velocity means most of the fresh input did not turn into output.
             </p>
           </div>
           <div className="rounded-lg border border-bg-border bg-bg-surface p-5">

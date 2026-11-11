@@ -178,7 +178,7 @@ your own logs.
 - **Velocity** = output / input — how much real output per token in
 - **output_fraction** (displayed as SNR) = output / (input + output) — output share of fresh conversational traffic. Note: SNR is a display alias; the canonical TTEOP (Token Telemetry Evaluation Operator Protocol) name is output_fraction, and the formula is not a signal-to-noise ratio in the signal-processing sense.
 - **log_leverage** (displayed as 10xDEV) = log₁₀(Leverage) — leverage on a readable scale. 10xDEV is a display alias; the canonical TTEOP name is log_leverage.
-- **Compression Ratio** — a word-era SigRank metric (canon M.01), retained as background and not part of the live token-era board. On the token board, output per fresh input is Velocity (above).
+- **Compression Ratio** — a word-era SigRank metric (canon M.01) that the board still shows as a legacy Compression view. It is not a token-era metric; the token-era output-per-fresh-input ratio is Velocity (above).
 - **SIGNA RATE** = a composite signal quality score (proprietary weights, used for the TRANSMITTER badge, not for class assignment)
 
 ## The telescoping identity

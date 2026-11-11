@@ -1,7 +1,7 @@
 /**
  * app/metrics/page.tsx — Metrics index.
  *
- * Hub page listing all six metric definition pages. Each child page carries
+ * Hub page listing the SigRank metric definition pages. Each child page carries
  * DefinedTerm + FAQPage + BreadcrumbList schema. This index adds an ItemList
  * so AI engines see the full metric set as a structured collection.
  *
@@ -19,7 +19,7 @@ import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Metrics — AI Operator Token Efficiency Definitions",
   description:
-    "The live token-era SigRank metrics: Yield (Υ), Cache Hit Rate, Leverage, Velocity, and Signal-to-Noise Ratio. Definitions, formulas, and how to improve each one. Compression Ratio is a word-era metric.",
+    "The token-era SigRank metrics: Yield (Υ), Cache Hit Rate, Leverage, Velocity, and Signal-to-Noise Ratio. Definitions, formulas, and how to improve each one. Compression Ratio is a word-era metric, still shown as a legacy view.",
   path: "/metrics",
 });
 
@@ -39,7 +39,7 @@ const METRICS = [
   {
     href: "/metrics/compression-ratio",
     title: "Compression Ratio — Word-Era Metric",
-    desc: "A word-era SigRank metric. On the live token-era board, output per fresh input is Velocity.",
+    desc: "A word-era SigRank metric (M.01), still shown as a legacy Compression view. The token-era output-per-fresh-input ratio is Velocity.",
   },
   {
     href: "/metrics/leverage",
@@ -80,7 +80,7 @@ export default function MetricsIndex() {
       <JsonLd
         data={[
           breadcrumb([{ name: "Metrics", path: "/metrics" }]),
-          alternativesItemList(METRICS.map((m) => ({ name: m.title, url: `${SITE_ORIGIN}${m.href}` })), "/metrics", "SigRank Metrics — All Six Definitions"),
+          alternativesItemList(METRICS.map((m) => ({ name: m.title, url: `${SITE_ORIGIN}${m.href}` })), "/metrics", "SigRank Metrics — All Definitions"),
         ]}
       />
       <JsonLd
