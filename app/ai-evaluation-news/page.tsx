@@ -5,7 +5,7 @@
  * milestones, what to watch. Links into /blog, /ai-evaluation,
  * /ai-operator-scoring, /science.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";
@@ -35,8 +35,8 @@ const RELATED = [
   },
   {
     href: "/ai-operator-scoring",
-    title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks are saturating. Operator benchmarks are emerging. The trend from model-only to operator benchmarking.",
+    title: "AI Operator Evaluation with Token Telemetry",
+    desc: "Model benchmarks are saturating. Operator evaluation is emerging. The trend from model-only benchmarking to operator evaluation.",
   },
   {
     href: "/science",

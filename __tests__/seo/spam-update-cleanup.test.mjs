@@ -64,6 +64,19 @@ test("dropFaqPageSchema removes FAQPage objects and keeps the rest", () => {
   );
 });
 
+test("dropFaqPageSchema handles @type arrays and @graph nodes", () => {
+  const arr = [{ "@type": ["FAQPage", "WebPage"] }, { "@type": ["WebPage"] }];
+  assert.deepEqual(dropFaqPageSchema(arr), [{ "@type": ["WebPage"] }]);
+  const graph = {
+    "@context": "https://schema.org",
+    "@graph": [{ "@type": "Article" }, { "@type": "FAQPage" }, { "@type": ["Q", "FAQPage"] }],
+  };
+  assert.deepEqual(dropFaqPageSchema([graph]), [
+    { "@context": "https://schema.org", "@graph": [{ "@type": "Article" }] },
+  ]);
+  assert.deepEqual(dropFaqPageSchema([{ "@graph": [{ "@type": "FAQPage" }] }]), []);
+});
+
 test("JsonLd drops FAQPage unless a caller opts in with allowFaqPage", () => {
   const src = read("components/seo/JsonLd.tsx");
   assert.match(src, /dropFaqPageSchema/);

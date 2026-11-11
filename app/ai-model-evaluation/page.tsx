@@ -6,7 +6,7 @@
  * complementary operator layer. Links into /ai-operator-scoring, /vs/lmsys-arena,
  * /methodology, /ai-evaluation.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";
@@ -26,8 +26,8 @@ export const metadata: Metadata = withOG({
 const RELATED = [
   {
     href: "/ai-operator-scoring",
-    title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement to model-only benchmarking.",
+    title: "AI Operator Evaluation with Token Telemetry",
+    desc: "Model benchmarks rank models. Operator evaluation ranks the operators driving them. The complement to model-only benchmarking.",
   },
   {
     href: "/vs/lmsys-arena",

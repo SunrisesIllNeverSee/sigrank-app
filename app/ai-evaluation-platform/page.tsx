@@ -5,7 +5,7 @@
  * four properties: content-free, continuous, cohort-relative, governed.
  * Links into /methodology, /developers, /mcp, /pricing.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";

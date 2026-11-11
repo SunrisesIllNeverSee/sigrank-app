@@ -6,7 +6,7 @@
  * SigRank extends continuous testing to operators. Links into /ai-evaluation,
  * /ai-model-evaluation, /methodology, /ai-compliance-standards.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";

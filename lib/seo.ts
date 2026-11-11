@@ -74,6 +74,7 @@ export function withOG(opts: {
   const { title, description, path, ogImage, article, titleAbsolute } = opts;
   const image = ogImage ?? OG_IMAGE;
   const url = path ? `${SITE_ORIGIN}${path}` : SITE_ORIGIN;
+  const robots = googleOnlyRobots(path);
   const base = {
     title,
     description,
@@ -86,7 +87,7 @@ export function withOG(opts: {
     description,
     alternates: path ? { canonical: path } : undefined,
     // Google-only noindex for templated pages (see lib/seo/search-index-policy.ts).
-    ...(googleOnlyRobots(path) ? { robots: googleOnlyRobots(path) } : {}),
+    ...(robots ? { robots } : {}),
     openGraph: article
       ? {
           ...base,

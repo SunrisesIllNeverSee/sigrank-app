@@ -326,6 +326,11 @@ export function routesInClass(cls: RouteClass): string[] {
 // <meta name="googlebot" content="noindex, follow">. robots.txt is untouched
 // and no X-Robots-Tag header is used (that would hit every bot).
 //
+// DELIBERATE: these googlebot-noindex URLs stay in sitemap.xml and llms.txt
+// because Bing and AI crawlers (OAI-SearchBot, PerplexityBot, Bingbot) use
+// them. Google Search Console will therefore report "Submitted URL marked
+// 'noindex'" for them; that is expected, not a bug.
+//
 // Hubs (/vs, /alternatives, /guides, /blog) and the pages listed in the
 // KEEP sets stay fully indexable. /user/* profiles are governed by
 // lib/seo/indexing-policy.ts and never match here.
@@ -374,7 +379,31 @@ export function googleOnlyRobots(path: string | undefined) {
 
 // ── FAQPage structured data: /faq only ────────────────────────────────────
 
-/** Remove FAQPage JSON-LD objects (visible FAQ text on pages is unaffected). */
+function hasFaqType(t: unknown): boolean {
+  return t === "FAQPage" || (Array.isArray(t) && t.includes("FAQPage"));
+}
+
+/**
+ * Remove FAQPage JSON-LD (visible FAQ text on pages is unaffected). Handles
+ * `@type: "FAQPage"`, `@type: ["FAQPage", ...]`, and FAQPage nodes nested in
+ * an `@graph` array (an emptied `@graph` object is dropped entirely).
+ */
 export function dropFaqPageSchema<T extends object>(items: T[]): T[] {
-  return items.filter((o) => (o as { "@type"?: unknown })["@type"] !== "FAQPage");
+  const out: T[] = [];
+  for (const o of items) {
+    const node = o as { "@type"?: unknown; "@graph"?: unknown };
+    if (hasFaqType(node["@type"])) continue;
+    if (Array.isArray(node["@graph"])) {
+      const graph = (node["@graph"] as unknown[]).filter(
+        (g) => !(g && typeof g === "object" && hasFaqType((g as { "@type"?: unknown })["@type"])),
+      );
+      if (graph.length === 0) continue;
+      if (graph.length !== node["@graph"].length) {
+        out.push({ ...o, "@graph": graph } as T);
+        continue;
+      }
+    }
+    out.push(o);
+  }
+  return out;
 }

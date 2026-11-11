@@ -8,7 +8,7 @@
  * efficiency. Links into /token-telemetry, /metrics/yield-cascade,
  * and the comparison pages for token-tracking tools.
  *
- * JSON-LD: breadcrumb() + faqPage() + definedTerm().
+ * JSON-LD: breadcrumb() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only) + definedTerm().
  */
 
 import type { Metadata } from "next";
@@ -49,6 +49,29 @@ const PILLARS = [
     glyph: "✎",
     role: "Investment",
     desc: "New tokens written to cache for future reuse. An investment in the next turn — you pay now to compound later.",
+  },
+];
+
+const PATTERNS = [
+  {
+    name: "The Compounder",
+    signal: "High cache-read, low input, high output",
+    read: "Signal is compounding. You reuse cached context well and send minimal fresh input. This is the cascade architecture yield rewards.",
+  },
+  {
+    name: "The Burner",
+    signal: "High input, low cache-read, low output",
+    read: "Tokens are burning. You send large fresh prompts without reusing context and get thin output back. Yield is low. Cut input, build cache, reuse context.",
+  },
+  {
+    name: "The Echo",
+    signal: "High input, high output, low cache-read",
+    read: "The model is parroting your input back. Output may look fine, but without cache reuse the cascade is not compounding. Yield stays flat because input² punishes the spend.",
+  },
+  {
+    name: "The Hoarder",
+    signal: "High cache-write, low cache-read, low output",
+    read: "You are writing context to cache but never reading it back. The investment is not paying off. Either the cached context is not reusable or you are not structuring turns to recall it.",
   },
 ];
 
@@ -260,6 +283,54 @@ export default function TokenCascadePage() {
           the model returned. This is what makes a global, continuous operator
           ranking possible without reading anyone&apos;s prompts.
         </p>
+      </section>
+
+      {/* ── How to read your cascade ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          How to read your cascade
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Read the four pillars together, never in isolation. A high input
+          number is bad if cache-read is low (you are spending without
+          compounding) but fine if cache-read is also high (you are sending
+          fresh input on top of a large cached foundation). A high output number
+          is good only if it is dense — SNR tells you that. The yield metric Υ =
+          cache_read × output / input² is the synthesis: it rewards high cache
+          reuse and high output while punishing high fresh input. If your yield
+          is low, the four pillars tell you why.
+        </p>
+      </section>
+
+      {/* ── Diagnostic patterns ── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Diagnostic patterns
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The four pillars combine into recognizable shapes. Here are the four
+          most common — and what each one tells you.
+        </p>
+        <div className="flex flex-col gap-3">
+          {PATTERNS.map((p) => (
+            <div
+              key={p.name}
+              className="rounded-lg border border-bg-border bg-bg-surface p-5"
+            >
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <h3 className="font-mono text-sm font-bold text-text-primary">
+                  {p.name}
+                </h3>
+                <code className="rounded bg-bg-elevated px-2 py-1 font-mono text-xs text-gold">
+                  {p.signal}
+                </code>
+              </div>
+              <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+                {p.read}
+              </p>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* ── Related pages ── */}

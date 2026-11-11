@@ -5,7 +5,7 @@
  * positions SigRank as an AI evaluator for the operator layer. Links into
  * /ai-evaluation, /methodology, /score, /board/all.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";

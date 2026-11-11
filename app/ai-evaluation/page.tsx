@@ -7,7 +7,7 @@
  * operator layer, and links into /ai-operator-scoring, /methodology, the LMSYS
  * comparison, and the yield-cascade metric page.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";
@@ -27,8 +27,8 @@ export const metadata: Metadata = withOG({
 const RELATED = [
   {
     href: "/ai-operator-scoring",
-    title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement to model-only benchmarking that AI evaluation has been missing.",
+    title: "AI Operator Evaluation with Token Telemetry",
+    desc: "Model benchmarks rank models. Operator evaluation ranks the operators driving them. The complement to model-only benchmarking that AI evaluation has been missing.",
   },
   {
     href: "/methodology",

@@ -6,7 +6,7 @@
  * is like evaluating a car without evaluating the driver. Links into
  * /ai-evaluation, /ai-operator-scoring, /methodology, and the blog post.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";
@@ -31,8 +31,8 @@ const RELATED = [
   },
   {
     href: "/ai-operator-scoring",
-    title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement that evaluating AI has been missing.",
+    title: "AI Operator Evaluation with Token Telemetry",
+    desc: "Model benchmarks rank models. Operator evaluation ranks the operators driving them. The complement that evaluating AI has been missing.",
   },
   {
     href: "/methodology",

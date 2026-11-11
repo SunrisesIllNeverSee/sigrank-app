@@ -6,7 +6,7 @@
  * Braintrust, SigRank) and positions SigRank as the framework for the
  * operator layer. Links into /methodology, /science, /standard, /ai-evaluation.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";
