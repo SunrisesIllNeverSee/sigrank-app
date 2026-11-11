@@ -119,7 +119,7 @@ export function WasteCalculator() {
       </h2>
       <p className="mt-1 font-sans text-sm leading-relaxed text-text-secondary">
         From <code className="font-mono text-text-primary">ccusage --json</code>{" "}
-        or <code className="font-mono text-text-primary">npx sigrank me</code>.
+        or <code className="font-mono text-text-primary">npx sigrank</code>.
         Token counts only.
       </p>
 

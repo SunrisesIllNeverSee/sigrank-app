@@ -97,7 +97,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use SigRank alongside LangChain?",
     answer:
-      "Yes — they are complementary, not competitive. Build your AI application with LangChain (chains, agents, RAG). Then score the operator who drives it — or any other AI tool — with SigRank. The SigRank CLI reads token telemetry locally, computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. Your LangChain app keeps running; the operator who drives it gets a measured rank. Run `sigrank enroll` to create your operator identity, then `sigrank submit` to score and publish.",
+      "Yes — they are complementary, not competitive. Build your AI application with LangChain (chains, agents, RAG). Then score the operator who drives it — or any other AI tool — with SigRank. The SigRank CLI reads token telemetry locally, computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. Your LangChain app keeps running; the operator who drives it gets a measured rank. Create a connect code in Settings on signalaf.com, run `npx sigrank enroll` to link this device, then `npx sigrank submit` to score and publish.",
   },
   {
     question: "What is the difference between an AI framework and an operator leaderboard?",

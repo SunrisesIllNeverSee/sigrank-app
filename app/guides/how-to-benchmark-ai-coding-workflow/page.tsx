@@ -33,19 +33,19 @@ const howTo = {
       "@type": "HowToStep",
       position: 1,
       name: "Capture your baseline",
-      text: "Run `sigrank me` to read your current token cascade across 7d, 30d, 90d, and all-time windows. Record your Υ Yield, cache hit rate, leverage, and class tier as your baseline.",
+      text: "Run `npx sigrank` to read your current token cascade across 7d, 30d, 90d, and all-time windows. Record your Υ Yield, cache hit rate, leverage, and class tier as your baseline.",
     },
     {
       "@type": "HowToStep",
       position: 2,
       name: "Submit your baseline snapshot",
-      text: "Run `sigrank submit` to publish your signed baseline to the SigRank leaderboard. This establishes your starting rank and class tier.",
+      text: "Sign in at signalaf.com, create a connect code in Settings, and run `npx sigrank enroll` once. Preview with `npx sigrank submit --dry-run`; then `npx sigrank submit` publishes Claude telemetry by default (use --platform for another supported source). A rank is not guaranteed.",
     },
     {
       "@type": "HowToStep",
       position: 3,
       name: "Make a change and re-measure",
-      text: "Apply a workflow change (e.g. better context windows, fewer re-rolls). After a week, run `sigrank me` again and compare the new yield against your baseline.",
+      text: "Apply a workflow change (e.g. better context windows, fewer re-rolls). After a week, run `npx sigrank` again and compare the new yield against your baseline.",
     },
     {
       "@type": "HowToStep",
@@ -88,7 +88,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
             {
               question: "How do I measure AI coding productivity?",
               answer:
-                "Track the four token pillars (input, output, cache-read, cache-write) and derive yield, leverage, velocity, and cache hit rate. SigRank does this automatically — run `sigrank me` to read your cascade. The field average is 4.67M tokens per task; top operators use 810K.",
+                "Track the four token pillars (input, output, cache-read, cache-write) and derive yield, leverage, velocity, and cache hit rate. SigRank does this automatically — run `npx sigrank` to read your cascade. The field average is 4.67M tokens per task; top operators use 810K.",
             },
             {
               question: "Why should I benchmark my AI coding workflow?",
@@ -103,7 +103,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
             {
               question: "How do I establish a baseline?",
               answer:
-                "Run `sigrank me` to read your current token cascade across 7d, 30d, 90d, and all-time windows. Record your yield, cache hit rate, leverage, and class tier. Submit a signed snapshot with `sigrank submit` to lock in your starting rank on the leaderboard.",
+                "Run `npx sigrank` to read your current token cascade across 7d, 30d, 90d, and all-time windows. Record your yield, cache hit rate, leverage, and class tier. After creating a connect code in SignalAF Settings, enroll with `npx sigrank enroll`. Preview with `npx sigrank submit --dry-run`, then publish with `npx sigrank submit` (Claude by default). A verified submission does not guarantee a rank.",
             },
             {
               question: "How do I compare across time periods?",
@@ -303,7 +303,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Run{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank me
+                npx sigrank
               </code>{" "}
               to read your current token cascade across all time windows. Record
               the four pillars and all five derived metrics. This is your
@@ -312,15 +312,17 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
           </li>
           <li className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5">
             <p className="font-mono text-sm font-bold text-gold">
-              Step 2 — Submit your baseline
+              Step 2 — Enroll, preview, and submit your baseline
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
-              Run{" "}
-              <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank submit
-              </code>{" "}
-              to publish your signed baseline to the leaderboard. This locks in
-              your starting rank and class tier — your external anchor.
+              Sign in to SignalAF, create a connect code in Settings, and run
+              <code className="font-mono text-gold"> npx sigrank enroll </code>
+              once. Preview with
+              <code className="font-mono text-gold"> npx sigrank submit --dry-run </code>
+              before running
+              <code className="font-mono text-gold"> npx sigrank submit </code>
+              to publish Claude telemetry by default. Other supported sources
+              require --platform. Publication does not guarantee a rank.
             </p>
           </li>
           <li className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5">
@@ -535,7 +537,7 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
               Track the four token pillars (input, output, cache-read,
               cache-write) and derive yield, leverage, velocity, and cache hit
               rate. SigRank does this automatically — run{" "}
-              <code className="font-mono text-gold">sigrank me</code> to read
+              <code className="font-mono text-gold">npx sigrank</code> to read
               your cascade. The field average is 4.67M tokens per task; top
               operators use 810K.
             </dd>
@@ -566,9 +568,10 @@ export default function HowToBenchmarkAICodingWorkflowPage() {
               How do I establish a baseline?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Run `sigrank me` to read your current cascade, then `sigrank
-              submit` to lock in your starting rank. Record your yield, cache
-              hit rate, leverage, and class tier as your baseline.
+              Run `npx sigrank` to inspect your current cascade. To publish,
+              create a connect code in SignalAF Settings and run `npx sigrank
+              enroll`. Preview with `npx sigrank submit --dry-run`, then publish
+              with `npx sigrank submit` (Claude by default). A rank is not guaranteed.
             </dd>
           </div>
           <div className="flex flex-col gap-1">

@@ -10,7 +10,7 @@ import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
  *
  * Cookie-session auth'd. The operator's old device is marked trust_status='revoked'
  * (audit trail intact), and a NEW device row is inserted with trust_status='trusted'
- * bound to the same operator_id. The operator must re-run `sigrank init` with the new
+ * bound to the same operator_id. The operator must re-run `sigrank enroll` with the new
  * key on their agent.
  *
  * This closes the gap noted in revoke/route.ts:12 ("Key rotation / re-enroll is deferred

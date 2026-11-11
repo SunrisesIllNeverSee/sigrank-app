@@ -102,7 +102,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both clawdboard and SigRank?",
     answer:
-      "Yes, and they serve different purposes. clawdboard gives you the habit layer: streaks, active days, project labels, a clean UI that keeps you coming back. SigRank gives you the efficiency layer that streak counts cannot. Run `sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep clawdboard for the motivation loop. The same local logs feed both.",
+      "Yes, and they serve different purposes. clawdboard gives you the habit layer: streaks, active days, project labels, a clean UI that keeps you coming back. SigRank gives you the efficiency layer that streak counts cannot. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to publish your cascade score to the SigRank leaderboard, and keep clawdboard for the motivation loop. The same local logs feed both.",
   },
   {
     question: "Which is better for measuring AI coding skill?",
@@ -277,14 +277,15 @@ export default function VsClawdboardPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank me --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

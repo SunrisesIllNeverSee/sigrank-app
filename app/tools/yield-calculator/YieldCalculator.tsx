@@ -111,7 +111,7 @@ export function YieldCalculator() {
       <p className="mt-1 font-sans text-sm leading-relaxed text-text-secondary">
         Pull these from{" "}
         <code className="font-mono text-text-primary">ccusage --json</code> or{" "}
-        <code className="font-mono text-text-primary">npx sigrank me</code>.
+        <code className="font-mono text-text-primary">npx sigrank</code>.
         Token counts only — no prompt content.
       </p>
 

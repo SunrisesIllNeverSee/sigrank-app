@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both omnara and SigRank?",
     answer:
-      "Yes, and they are complementary. Use omnara to monitor your AI agents and infrastructure health. Use SigRank to score the operator who drives those agents. The SigRank CLI reads token telemetry locally (token counts only, never agent behavior logs), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. omnara sees the agents; SigRank scores the operator behind them. Run `sigrank enroll` then `sigrank submit` to get your rank.",
+      "Yes, and they are complementary. Use omnara to monitor your AI agents and infrastructure health. Use SigRank to score the operator who drives those agents. The SigRank CLI reads token telemetry locally (token counts only, never agent behavior logs), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. omnara sees the agents; SigRank scores the operator behind them. Run `npx sigrank enroll` then `npx sigrank submit` to get your rank.",
   },
   {
     question: "What is the difference between agent monitoring and operator scoring?",
@@ -272,14 +272,15 @@ export default function VsOmnaraPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank me --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

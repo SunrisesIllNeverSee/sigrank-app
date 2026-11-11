@@ -30,7 +30,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 1,
       name: "Get your cascade numbers",
-      text: "Run `sigrank me` or paste your ccusage JSON into /score to get your four pillars: input, output, cache-read, cache-write.",
+      text: "Run `npx sigrank` or paste your ccusage JSON into /score to get your four pillars: input, output, cache-read, cache-write.",
     },
     {
       "@type": "HowToStep",
@@ -126,7 +126,7 @@ export default function HowToReadYourCascadePage() {
           something specific about your workflow&rsquo;s health. Read together,
           they tell you exactly what to fix. Run{" "}
           <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-            sigrank me
+            npx sigrank
           </code>{" "}
           or paste your ccusage JSON into the{" "}
           <Link

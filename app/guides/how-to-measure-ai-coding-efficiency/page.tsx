@@ -33,19 +33,19 @@ const howTo = {
       "@type": "HowToStep",
       position: 1,
       name: "Install the sigrank CLI",
-      text: "Run `npm install -g sigrank` (or `npx sigrank` without installing). This bundles ccusage, tokscale, and token-dashboard for local log parsing.",
+      text: "Run `npx sigrank` to open the local CLI without installing globally, or use `npm install -g sigrank` for a global command. SigRank provides a terminal dashboard and supported local readers, including ccusage for Claude Code.",
     },
     {
       "@type": "HowToStep",
       position: 2,
       name: "Enroll your operator identity",
-      text: "Run `sigrank enroll` to generate an ed25519 keypair. This signs your submissions so the leaderboard can verify they came from you.",
+      text: "Run `npx sigrank enroll` to generate an ed25519 keypair. This signs your submissions so the leaderboard can verify they came from you.",
     },
     {
       "@type": "HowToStep",
       position: 3,
       name: "Read your token cascade locally",
-      text: "Run `sigrank me` (or `ccusage --json`) to read your local session logs and count the four token pillars: input, output, cache-read, cache-write.",
+      text: "Run `npx sigrank` (or `ccusage --json`) to read your local session logs and count the four token pillars: input, output, cache-read, cache-write.",
     },
     {
       "@type": "HowToStep",
@@ -57,7 +57,7 @@ const howTo = {
       "@type": "HowToStep",
       position: 5,
       name: "Submit a signed snapshot",
-      text: "Run `sigrank submit` to publish your four token pillars (signed, no prompt content) to the SigRank leaderboard. The server re-scores authoritatively and assigns your class tier.",
+      text: "Run `npx sigrank submit` to publish your four token pillars (signed, no prompt content) to the SigRank leaderboard. The server re-scores authoritatively and assigns your class tier.",
     },
   ],
 };
@@ -98,7 +98,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
             {
               question: "What tools do I need to measure AI coding efficiency?",
               answer:
-                "Install the sigrank CLI (npm: sigrank), which bundles ccusage for local Claude Code log parsing, tokscale for token scaling, and token-dashboard for visualization. Alternatively, use `npx sigrank` without a global install, or paste your ccusage JSON into the /score calculator.",
+                "Install the sigrank CLI (npm: sigrank), which includes a local terminal dashboard, ccusage for Claude Code, and readers for supported platforms. Alternatively, use `npx sigrank` without a global install, or paste your ccusage JSON into the /score calculator.",
             },
             {
               question: "What are build archetypes and class tiers?",
@@ -356,7 +356,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Run{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank enroll
+                npx sigrank enroll
               </code>
               . This generates an ed25519 keypair on your device. Your private
               key never leaves your machine; your public key is what signs
@@ -370,7 +370,7 @@ export default function HowToMeasureAICodingEfficiencyPage() {
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Run{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank me
+                npx sigrank
               </code>{" "}
               (or{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
@@ -405,13 +405,13 @@ export default function HowToMeasureAICodingEfficiencyPage() {
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               Run{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank submit
+                npx sigrank submit
               </code>
               . Only the four token integers (signed) are transmitted — never
               your prompts, never your code. The server re-scores
               authoritatively and assigns your class tier. Use{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank submit --dry-run
+                npx sigrank submit --dry-run
               </code>{" "}
               to inspect the payload before sending.
             </p>

@@ -86,7 +86,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use ccwarriors and SigRank together?",
     answer:
-      "Yes — same local logs feed both. Keep the warrior card and the README badge for the burn crowd; the org-board model is a genuinely good idea and worth supporting. Then run `sigrank submit` to put a signed Υ score on the global efficiency board. Burn rate for the arena, yield for the record.",
+      "Yes — same local logs feed both. Keep the warrior card and the README badge for the burn crowd; the org-board model is a genuinely good idea and worth supporting. Then run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to put a signed Υ score on the global efficiency board. Burn rate for the arena, yield for the record.",
   },
   {
     question: "Which is better for evaluating operators?",
@@ -232,7 +232,8 @@ export default function VsCcwarriorsPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>

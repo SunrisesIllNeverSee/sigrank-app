@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both ccstatusline and SigRank?",
     answer:
-      "Yes, and they complement each other well. ccstatusline gives you the ambient token count in your terminal while you work. SigRank gives you the scored, ranked, comparable efficiency layer. Run ccstatusline for real-time awareness. Run `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. The widget is for glancing; the panel is for evaluating.",
+      "Yes, and they complement each other well. ccstatusline gives you the ambient token count in your terminal while you work. SigRank gives you the scored, ranked, comparable efficiency layer. Run ccstatusline for real-time awareness. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. The widget is for glancing; the panel is for evaluating.",
   },
   {
     question: "Does ccstatusline work with tools other than Claude Code?",
@@ -273,14 +273,15 @@ export default function VsCcstatuslinePage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank me --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

@@ -94,7 +94,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use tokenmaxxing.sh and SigRank together?",
     answer:
-      "Yes — the same local ccusage data feeds both. Keep your tokenmaxxing.sh entry for the spend board, and run `sigrank submit` to add your signed efficiency score to the SigRank leaderboard. Minimalist on one side, measured on the other.",
+      "Yes — the same local ccusage data feeds both. Keep your tokenmaxxing.sh entry for the spend board, and run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to add your signed efficiency score to the SigRank leaderboard. Minimalist on one side, measured on the other.",
   },
 ];
 
@@ -242,7 +242,8 @@ export default function VsTokenmaxxingPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>

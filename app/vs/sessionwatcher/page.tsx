@@ -105,7 +105,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use both sessionwatcher and SigRank?",
     answer:
-      "Yes. sessionwatcher is a session-level monitor; SigRank is an operator-level scoring and ranking tool. Run sessionwatcher for per-session token usage awareness while you work. Run `sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. sessionwatcher is for watching sessions; SigRank is for ranking operators.",
+      "Yes. sessionwatcher is a session-level monitor; SigRank is an operator-level scoring and ranking tool. Run sessionwatcher for per-session token usage awareness while you work. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to get your Yield score, class tier, and leaderboard rank. They read from the same local session logs and do not conflict. sessionwatcher is for watching sessions; SigRank is for ranking operators.",
   },
   {
     question: "Does sessionwatcher work with tools other than Claude Code?",
@@ -274,14 +274,15 @@ export default function VsSessionwatcherPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank me --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

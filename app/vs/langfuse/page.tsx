@@ -98,7 +98,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use SigRank alongside Langfuse?",
     answer:
-      "Yes — they are complementary. Use Langfuse to trace and debug your application&apos;s LLM calls. Use SigRank to score the operator who drives your AI tools — including the app Langfuse is observing. The SigRank CLI reads token telemetry locally (token counts only, never prompt content), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. Langfuse sees the app&apos;s calls; SigRank scores the operator behind them. Run `sigrank enroll` then `sigrank submit` to get your rank.",
+      "Yes — they are complementary. Use Langfuse to trace and debug your application&apos;s LLM calls. Use SigRank to score the operator who drives your AI tools — including the app Langfuse is observing. The SigRank CLI reads token telemetry locally (token counts only, never prompt content), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. Langfuse sees the app&apos;s calls; SigRank scores the operator behind them. To publish telemetry from a supported source, create a connect code in SignalAF Settings, run `npx sigrank enroll`, preview with `npx sigrank submit --dry-run`, then run `npx sigrank submit`. The default source is Claude; this does not import Langfuse traces, and publication does not guarantee a rank.",
   },
   {
     question: "What is the difference between LLM tracing and operator scoring?",

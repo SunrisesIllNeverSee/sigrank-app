@@ -27,7 +27,7 @@ const FAQS = [
   {
     question: "Where do I get my token counts?",
     answer:
-      "Run `ccusage --json` or `npx sigrank me` to read the four token pillars (input, output, cache-read, cache-write) from your local AI session logs on-device. No prompt content is ever read — only the four integers.",
+      "Run `ccusage --json` or `npx sigrank` to read the four token pillars (input, output, cache-read, cache-write) from your local AI session logs on-device. No prompt content is ever read — only the four integers.",
   },
   {
     question: "What is a good yield score?",

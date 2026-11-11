@@ -79,22 +79,22 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Does SigRank replace Tabnine?",
     answer:
-      "No — SigRank is not a code completion tool. Tabnine predicts and completes your code inline; SigRank is the scoring layer that measures how efficiently you drive any AI tool, including Tabnine. You keep using Tabnine (or Claude Code, or Copilot) and run the SigRank CLI alongside it. SigRank reads your token telemetry locally, computes your Υ Yield, and publishes a signed snapshot to the leaderboard. Your completion tool stays; your efficiency gets measured.",
+      "No. Tabnine is a separate coding tool; SigRank measures token efficiency from supported sources. The current SigRank CLI has no dedicated Tabnine log adapter, so merely installing SigRank does not import Tabnine sessions or publish them to the leaderboard.",
   },
   {
     question: "Does Tabnine have token usage metrics?",
     answer:
-      "Tabnine is focused on code completion quality, not token telemetry. It does not surface input, output, cache-read, or cache-write counts in a way you can export or compare. SigRank reads the underlying token flow from whatever AI tool you drive — Tabnine included — and computes the full cascade architecture (Υ Yield, compression ratio, SNR, Leverage, Velocity), assigns a class tier, and lets you compare against every other operator on the board, including ones who never touch Tabnine.",
+      "Usage or cost figures displayed by Tabnine belong to that tool's own interface. SigRank does not automatically read Tabnine logs; it measures supported local adapters and can separately calculate metrics from supplied four-pillar token counts. A manual calculation alone is not a verified leaderboard submission.",
   },
   {
     question: "Why does platform neutrality matter?",
     answer:
-      "Because most operators do not use one tool. You might use Tabnine for inline completions, Claude Code for agentic tasks, and Cursor for refactoring. Tabnine's scope covers only the completion slice; your actual efficiency is the union across all of them. SigRank is platform-neutral — it reads telemetry from Tabnine, Claude Code, Copilot, Cursor, ChatGPT, Gemini, and 15+ others, scores them on the same cascade axis, and gives you one comparable rank. Your score follows you across tools, not the other way around.",
+      "Using multiple AI tools makes cross-tool comparison valuable, but input coverage matters. SigRank can aggregate two or more supported active sources when explicitly invoked with `npx sigrank submit --platform multi`; it does not automatically include Tabnine. The default `npx sigrank submit` uses Claude telemetry.",
   },
   {
     question: "Can I use SigRank with Tabnine specifically?",
     answer:
-      "Yes. The SigRank CLI reads token telemetry from Tabnine's local logs the same way it reads Claude Code's (ccusage is bundled for Claude Code; additional readers cover other platforms). Run `sigrank enroll` to create your operator identity, then `sigrank submit` to score and publish. Your Tabnine sessions contribute to the same leaderboard rank as your Claude Code or Copilot sessions — unified, not siloed.",
+      "You can use Tabnine alongside SigRank, but there is no dedicated Tabnine log adapter at present. To publish from a supported local source, first create a connect code under SignalAF Settings, run `npx sigrank enroll`, preview with `npx sigrank submit --dry-run`, and then submit. The bare submit command uses Claude; other supported sources require an explicit --platform selection.",
   },
   {
     question:
@@ -276,10 +276,10 @@ export default function VsTabninePage() {
           Keep Tabnine. Add the score that follows you.
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Tabnine completes your code. SigRank measures your driving — across
-          Tabnine and every other tool you use. Install the CLI, submit a signed
-          snapshot, and get a rank that doesn&apos;t reset when you switch
-          tools.
+          SigRank can measure supported local token sources while you keep
+          using Tabnine. It has no dedicated Tabnine log reader at present.
+          To compare, use SigRank&apos;s manual calculator for supplied counts
+          or enroll to submit signed telemetry from a supported platform.
         </p>
         <div className="flex flex-wrap gap-3">
           <a

@@ -49,13 +49,13 @@ function howToJsonLd() {
         "@type": "HowToStep",
         position: 1,
         name: "Install the tools",
-        text: "Run `npx sigrank` to install the SigRank CLI, which bundles ccusage, tokscale, and the Token Dashboard. No global install required. Then run `sigrank enroll` to create your operator identity.",
+        text: "Run `npx sigrank` to open the local SigRank dashboard (no global install required). To publish later, sign in at signalaf.com, create a connect code in Settings, and run `npx sigrank enroll` to link this device.",
       },
       {
         "@type": "HowToStep",
         position: 2,
         name: "Establish a baseline",
-        text: "Code normally for one week. Do not change your habits. At the end of the week, run `sigrank me` to record your token cascade — input, output, cache-read, and cache-write. This is your baseline yield (Υ).",
+        text: "Code normally for one week. Do not change your habits. At the end of the week, run `npx sigrank` to record your token cascade — input, output, cache-read, and cache-write. This is your baseline yield (Υ).",
       },
       {
         "@type": "HowToStep",
@@ -73,13 +73,13 @@ function howToJsonLd() {
         "@type": "HowToStep",
         position: 5,
         name: "Re-measure",
-        text: "After applying the fix, code for another week under the new habit. Run `sigrank me` again and compare your new yield to your baseline. Did it go up? Down? Stay flat? The numbers tell you whether the fix worked.",
+        text: "After applying the fix, code for another week under the new habit. Run `npx sigrank` again and compare your new yield to your baseline. Did it go up? Down? Stay flat? The numbers tell you whether the fix worked.",
       },
       {
         "@type": "HowToStep",
         position: 6,
         name: "Compare against the field",
-        text: "Submit your snapshot with `sigrank submit` and check the leaderboard. See your class tier (IGNITER to ARCH+) and your rank. Compare your pillar ratios against the top decile to find your next gap.",
+        text: "After enrollment, preview with `npx sigrank submit --dry-run`, then publish with `npx sigrank submit` (Claude by default; use --platform for other supported sources). Check the submission result: ranking is not guaranteed.",
       },
       {
         "@type": "HowToStep",
@@ -95,7 +95,7 @@ const faqs = [
   {
     question: "How do I benchmark my AI coding workflow?",
     answer:
-      "Install the SigRank CLI (npx sigrank), code normally for one week to establish a baseline, record your token cascade with `sigrank me`, identify your weakest pillar (cache hit rate, input, or output), apply one fix, re-measure after a week, compare against the leaderboard, and iterate. The full seven-step guide is above.",
+      "Run the SigRank CLI with npx sigrank, code normally for one week to establish a baseline, record your token cascade with `npx sigrank`, identify your weakest pillar (cache hit rate, input, or output), apply one fix, re-measure after a week, compare against the leaderboard, and iterate. The full seven-step guide is above.",
   },
   {
     question: "What is a good yield (Υ) score for an AI coding workflow?",
@@ -218,12 +218,12 @@ export default function HowToBenchmarkAiCodingWorkflowPage() {
       {/* ── Step 1 ── */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Step 1 — Install the tools
+          Step 1 — Run the CLI and connect your device
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          The fastest path is a single command. The SigRank CLI bundles
-          everything you need — ccusage for parsing local logs, tokscale for
-          token scaling, and the Token Dashboard for visualization:
+          Run the SigRank terminal dashboard without a global install. It
+          reads supported local telemetry, including Claude Code logs through
+          ccusage. Other sources require a supported adapter:
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-elevated p-4">
           <pre className="overflow-x-auto font-mono text-sm text-gold">
@@ -233,26 +233,26 @@ npx sigrank
 # Or install globally for daily use
 npm install -g sigrank
 
-# Create your operator identity (one-time)
-sigrank enroll`}</code>
+# Sign in at signalaf.com and create a connect code in Settings
+npx sigrank enroll`}</code>
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
-            sigrank enroll
+            npx sigrank enroll
           </code>{" "}
-          creates your operator identity and generates an ed25519 keypair
-          on-device. The private key never leaves your machine; the public key
-          is what signs your snapshots. No account, no email, no cloud — your
-          identity is cryptographic, not personal.
+          links this device to your existing SignalAF operator account with
+          the connect code from Settings. The local private key signs each
+          snapshot; the public key lets the server verify it. Enrollment
+          requires sign-in and a network request.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           If you use Claude Code specifically, the bundled{" "}
           <strong className="text-text-primary">ccusage</strong> will find your
-          logs automatically. For other platforms, SigRank&apos;s scanner
-          detects the relevant log directories on its own. Run{" "}
+          logs automatically. Other platforms require a supported reader or a configured input;
+          the default submission source is Claude. Run{" "}
           <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
-            sigrank me --dry-run
+            npx sigrank submit --dry-run
           </code>{" "}
           to see what it would parse before submitting anything.
         </p>
@@ -277,7 +277,7 @@ sigrank enroll`}</code>
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-elevated p-4">
           <pre className="overflow-x-auto font-mono text-sm text-gold">
-            <code>{`sigrank me
+            <code>{`npx sigrank
 
 # Example output:
 # ┌──────────────────────────────────────┐
@@ -408,7 +408,7 @@ sigrank enroll`}</code>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Code for another week under the new habit. At the end, run{" "}
           <code className="rounded bg-bg-elevated px-1 py-0.5 font-mono text-sm text-gold">
-            sigrank me
+            npx sigrank
           </code>{" "}
           again and compare to your baseline:
         </p>
@@ -462,8 +462,11 @@ sigrank enroll`}</code>
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-elevated p-4">
           <pre className="overflow-x-auto font-mono text-sm text-gold">
-            <code>{`# Submit your signed snapshot
-sigrank submit
+            <code>{`# Check the signed payload first (nothing sent)
+npx sigrank submit --dry-run
+
+# Submit your signed snapshot (Claude by default)
+npx sigrank submit
 
 # Then check the board
 sigrank board --window 30d`}</code>

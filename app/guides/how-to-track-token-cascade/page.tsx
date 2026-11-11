@@ -32,25 +32,25 @@ const howTo = {
       "@type": "HowToStep",
       position: 1,
       name: "Install sigrank",
-      text: "Run `npm install -g sigrank` or `npx sigrank` to install the CLI. It bundles ccusage for Claude Code log parsing and works across 15+ platforms.",
+      text: "Run `npx sigrank` to open SigRank without a global install; `npm install -g sigrank` is optional. The terminal dashboard reads supported local telemetry, including Claude Code via ccusage.",
     },
     {
       "@type": "HowToStep",
       position: 2,
       name: "Enroll your operator identity",
-      text: "Run `sigrank enroll` to generate an ed25519 keypair that signs your submissions. Your private key never leaves your device.",
+      text: "Sign in at signalaf.com, generate a connect code in Settings, and run `npx sigrank enroll` to bind this device to your operator account. A local private key signs snapshots and remains on-device.",
     },
     {
       "@type": "HowToStep",
       position: 3,
       name: "Read your token cascade",
-      text: "Run `sigrank me` to read local session logs and count the four pillars across 7d, 30d, 90d, and all-time windows. The cascade is computed on-device.",
+      text: "Run `npx sigrank` to read local session logs and count the four pillars across 7d, 30d, 90d, and all-time windows. The cascade is computed on-device.",
     },
     {
       "@type": "HowToStep",
       position: 4,
       name: "Submit a signed snapshot",
-      text: "Run `sigrank submit` to publish the four token integers (signed, no prompt content) to the SigRank leaderboard. Use --dry-run to inspect first.",
+      text: "After enrollment, inspect with `npx sigrank submit --dry-run`, then publish with `npx sigrank submit` (Claude by default; select another supported source using --platform). A submission does not guarantee a public rank.",
     },
   ],
 };
@@ -81,7 +81,7 @@ export default function HowToTrackTokenCascadePage() {
             {
               question: "How do I track my token cascade automatically?",
               answer:
-                "Install the sigrank CLI (npm: sigrank), which bundles ccusage for local log parsing. Run `sigrank me` to read your session logs on-device and count the four pillars across multiple time windows. Run `sigrank submit` to publish signed snapshots to the leaderboard.",
+                "Install the sigrank CLI (npm: sigrank), which bundles ccusage for local log parsing. Run `npx sigrank` to inspect supported logs locally. To publish, generate a connect code in SignalAF Settings, run `npx sigrank enroll`, preview with `npx sigrank submit --dry-run`, then use `npx sigrank submit` (Claude by default).",
             },
             {
               question: "Does sigrank read my prompt content?",
@@ -284,8 +284,8 @@ export default function HowToTrackTokenCascadePage() {
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
                 npm install -g sigrank
               </code>
-              . This gives you the full toolkit: ccusage for Claude Code logs,
-              tokscale for scaling, and token-dashboard for visualization.
+              . This optional global installation provides the SigRank CLI. You can
+              also run npx sigrank without installing it globally.
             </p>
           </li>
           <li className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5">
@@ -294,11 +294,11 @@ export default function HowToTrackTokenCascadePage() {
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank enroll
+                npx sigrank enroll
               </code>
-              . Generates an ed25519 keypair. Your submissions are
-              cryptographically signed so the leaderboard can verify they came
-              from you.
+              . First sign in to SignalAF and generate a connect code in Settings.
+              This links the device to your existing operator account and
+              generates a local signing keypair.
             </p>
           </li>
           <li className="flex flex-col gap-2 rounded-lg border border-bg-border bg-bg-surface p-5">
@@ -307,7 +307,7 @@ export default function HowToTrackTokenCascadePage() {
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank me
+                npx sigrank
               </code>
               . Reads local session logs and counts the four pillars across 7d,
               30d, 90d, and all-time windows. You see the full cascade on-device
@@ -320,9 +320,10 @@ export default function HowToTrackTokenCascadePage() {
             </p>
             <p className="font-sans text-sm leading-relaxed text-text-secondary">
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
-                sigrank submit
+                npx sigrank submit
               </code>
-              . Publishes the four signed integers to the leaderboard. Use{" "}
+              . Publishes Claude telemetry by default, after enrollment.
+              To use another supported source, select --platform. Use{" "}
               <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-sm text-gold">
                 --dry-run
               </code>{" "}
@@ -365,9 +366,10 @@ export default function HowToTrackTokenCascadePage() {
               How do I track my cascade automatically?
             </dt>
             <dd className="font-sans text-sm leading-relaxed text-text-secondary">
-              Install the sigrank CLI and run `sigrank me`. It reads your local
-              session logs on-device and counts the four pillars across multiple
-              time windows. Run `sigrank submit` to publish signed snapshots.
+              Run `npx sigrank` to inspect supported local telemetry. Create a
+              connect code in Settings, run `npx sigrank enroll`, preview with
+              `npx sigrank submit --dry-run`, then publish with
+              `npx sigrank submit` (Claude by default).
             </dd>
           </div>
           <div className="flex flex-col gap-1">

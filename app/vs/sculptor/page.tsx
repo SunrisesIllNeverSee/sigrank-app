@@ -100,7 +100,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can SigRank score me if I use sculptor?",
     answer:
-      "Yes. SigRank is platform-neutral — it scores operators across Claude Code, Cursor, GitHub Copilot, Gemini, and 15+ other platforms. If sculptor produces token telemetry that SigRank can read, your cascade efficiency will be scored. Run `sigrank submit` to publish your cascade score to the leaderboard. SigRank measures the operator, not the tool, so your score is comparable to operators using any other AI coding agent.",
+      "Yes. SigRank is platform-neutral — it scores operators across Claude Code, Cursor, GitHub Copilot, Gemini, and 15+ other platforms. If sculptor produces token telemetry that SigRank can read, your cascade efficiency will be scored. Run `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` to publish your cascade score to the leaderboard. SigRank measures the operator, not the tool, so your score is comparable to operators using any other AI coding agent.",
   },
   {
     question: "What does sculptor not measure that SigRank does?",
@@ -271,14 +271,15 @@ export default function VsSculptorPage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs, scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank me --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your token counts into
           the{" "}

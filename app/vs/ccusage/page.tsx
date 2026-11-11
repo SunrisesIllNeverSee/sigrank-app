@@ -88,7 +88,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Is SigRank a ccusage alternative or a ccusage upgrade?",
     answer:
-      "Both. SigRank bundles ccusage as its local log reader, so you keep every number ccusage gives you — then layers cascade scoring (Υ Yield), a global leaderboard, operator profiles, class tiers, and MCP integration on top. ccusage is the sensor that reads the logs; SigRank is the instrument panel that turns those readings into a ranked, comparable signal. If you already run ccusage, `sigrank submit` is the upgrade path.",
+      "Both. SigRank bundles ccusage as its local log reader, so you keep every number ccusage gives you — then layers cascade scoring (Υ Yield), a global leaderboard, operator profiles, class tiers, and MCP integration on top. ccusage is the sensor that reads the logs; SigRank is the instrument panel that turns those readings into a ranked, comparable signal. If you already run ccusage, `npx sigrank enroll` (with a connect code from Settings) and then `npx sigrank submit` is the upgrade path.",
   },
   {
     question: "Does SigRank replace ccusage?",
@@ -103,7 +103,7 @@ const FAQS: { question: string; answer: string }[] = [
   {
     question: "Can I use SigRank with my existing ccusage output?",
     answer:
-      "Yes. The SigRank score calculator at /score accepts pasted ccusage JSON — paste your `ccusage --json` output and it computes your Υ Yield, class tier, and compression ratio instantly, no account required. To publish to the leaderboard, run `sigrank enroll` then `sigrank submit`; the CLI handles the ccusage read, scoring, signing, and submission in one flow.",
+      "Yes. The SigRank score calculator at /score accepts pasted ccusage JSON — paste your `ccusage --json` output and it computes your Υ Yield, class tier, and compression ratio instantly, no account required. To publish to the leaderboard, run `npx sigrank enroll` then `npx sigrank submit`; the CLI handles the ccusage read, scoring, signing, and submission in one flow.",
   },
   {
     question: "Does SigRank only work with Claude Code like ccusage?",
@@ -268,14 +268,15 @@ export default function VsCcusagePage() {
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
             {`npm install -g sigrank
-sigrank enroll      # create your operator identity
+sigrank enroll      # link this device (connect code from Settings)
+sigrank submit --dry-run  # inspect payload; nothing sent
 sigrank submit      # reads logs (ccusage bundled), scores, signs, publishes`}
           </pre>
         </div>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Prefer to inspect before you submit? Run{" "}
           <span className="font-mono text-text-primary">
-            sigrank me --dry-run
+            npx sigrank submit --dry-run
           </span>{" "}
           to see your scored payload locally, or paste your{" "}
           <span className="font-mono text-text-primary">ccusage --json</span>{" "}
