@@ -23,6 +23,7 @@ import {
   ROUTE_CLASSES,
   isSitemapPromoted,
   isGoogleOnlyNoindex,
+  GOOGLE_INDEX_KEEP_VS,
   googleOnlyRobots,
   dropFaqPageSchema,
 } from "../../lib/seo/search-index-policy.ts";
@@ -129,14 +130,33 @@ const BLOG_NOINDEX = [
   "/blog/how-to-answer-best-ai-user",
 ].sort();
 
-const KEEP_VS = ["/vs/ccusage", "/vs/langfuse"];
+const KEEP_VS = ["/vs/ccusage", "/vs/langfuse", "/vs/viberank", "/vs/ccgather"];
 
-test("googlebot noindex covers every /vs/[x] page except the two rebuilt ones, and not the /vs hub", () => {
+test("googlebot noindex covers every /vs/[x] page except the rebuilt ones, and not the /vs hub", () => {
   const vs = childRoutes("vs");
   assert.ok(vs.length > 40);
   for (const k of KEEP_VS) assert.ok(vs.includes(k), `${k} should exist`);
   for (const p of vs) assert.equal(isGoogleOnlyNoindex(p), !KEEP_VS.includes(p), p);
   assert.equal(isGoogleOnlyNoindex("/vs"), false);
+});
+
+test("rebuilt /vs/viberank and /vs/ccgather are Google-indexable and sitemap-promoted; other /vs pages stay googlebot-noindex", () => {
+  for (const p of ["/vs/viberank", "/vs/ccgather"]) {
+    assert.equal(googleOnlyRobots(p), undefined, p);
+    assert.equal(isSitemapPromoted(p), true, p);
+  }
+  assert.deepEqual(googleOnlyRobots("/vs/tokenmaxxer"), {
+    index: true,
+    follow: true,
+    googleBot: { index: false, follow: true },
+  });
+});
+
+test("every GOOGLE_INDEX_KEEP_VS path is sitemap-promoted, and every Google-indexable /vs child is in the keep set", () => {
+  for (const p of GOOGLE_INDEX_KEEP_VS) assert.equal(isSitemapPromoted(p), true, p);
+  for (const p of childRoutes("vs")) {
+    if (!isGoogleOnlyNoindex(p)) assert.ok(GOOGLE_INDEX_KEEP_VS.has(p), p);
+  }
 });
 
 test("googlebot noindex covers /alternatives/[x] except the two kept pages", () => {

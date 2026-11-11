@@ -177,8 +177,8 @@ const COMPARISONS = [
   },
   {
     href: "/vs/ccgather",
-    title: "SigRank vs ccgather — One Platform vs the Whole Field",
-    desc: "ccgather ranks Claude Code users by usage stats. SigRank ranks operators by cascade yield across 15+ platforms. Claude Code only is not the whole field.",
+    title: "SigRank vs ccgather — Community Board vs Yield Board",
+    desc: "ccgather is an open-source Claude Code leaderboard with country leagues and levels. SigRank ranks operators by Υ Yield. A worked example and how to use both.",
   },
   {
     href: "/vs/ccstatusline",
@@ -247,8 +247,8 @@ const COMPARISONS = [
   },
   {
     href: "/vs/viberank",
-    title: "SigRank vs viberank — Burn Rate vs Cascade Yield",
-    desc: "viberank ranks developers by token burn for vibe coding. SigRank ranks by cascade yield efficiency. Burn rate is participation; cascade yield is skill.",
+    title: "SigRank vs viberank — Two Ways to Read AI Coding Usage",
+    desc: "What viberank shows (API-equivalent cost, token totals, tiers) and what SigRank shows (Υ Yield, Leverage, Velocity, SNR), with a worked example and how to submit to both.",
   },
   {
     href: "/vs/whoburnedmore",
