@@ -346,6 +346,12 @@ export const GOOGLE_INDEX_KEEP_GUIDES: ReadonlySet<string> = new Set([
   "/guides/how-to-measure-ai-coding-efficiency",
 ]);
 
+/** /vs/<x> pages rebuilt as standalone pages (2026-11-11); Google-indexable. */
+export const GOOGLE_INDEX_KEEP_VS: ReadonlySet<string> = new Set([
+  "/vs/ccusage",
+  "/vs/langfuse",
+]);
+
 /** Blog posts hidden from Google: the "best X" listicles plus the AI-answer post. */
 export const GOOGLE_NOINDEX_BLOG_PREFIX = "/blog/best-";
 export const GOOGLE_NOINDEX_BLOG_EXACT: ReadonlySet<string> = new Set([
@@ -360,7 +366,7 @@ function isChildOf(path: string, hub: string): boolean {
 
 /** Should Google (only) be told not to index this page? */
 export function isGoogleOnlyNoindex(path: string): boolean {
-  if (isChildOf(path, "/vs")) return true;
+  if (isChildOf(path, "/vs")) return !GOOGLE_INDEX_KEEP_VS.has(path);
   if (isChildOf(path, "/alternatives")) return !GOOGLE_INDEX_KEEP_ALTERNATIVES.has(path);
   if (isChildOf(path, "/guides")) return !GOOGLE_INDEX_KEEP_GUIDES.has(path);
   if (GOOGLE_NOINDEX_BLOG_EXACT.has(path)) return true;

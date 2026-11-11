@@ -1,13 +1,12 @@
 /**
- * app/vs/langfuse/page.tsx — "SigRank vs Langfuse" SEO comparison page.
+ * app/vs/langfuse/page.tsx - "SigRank vs Langfuse" comparison page.
  *
- * Angle: Langfuse is an LLM observability/tracing platform (logs, metrics,
- * evaluation). SigRank is an operator leaderboard with scoring. Observability
- * vs competition — Langfuse traces LLM calls for debugging; SigRank scores the
- * operator's token efficiency for ranking.
+ * Rebuilt 2026-11-11 as a standalone page, not template text: competitor facts
+ * come from its primary sources (cited on the page with an as-of date); field
+ * facts come from the public SigRank analyst MCP, fetched the same day.
+ * Metric names follow lib/identity/canon-ids.ts (token-era board).
  *
- * RSC only — no client JS. Uses withOG(), JsonLd (breadcrumb + faqPage),
- * WaveHero, and a styled comparison table matching the repo's conventions.
+ * RSC only, no client JS.
  */
 
 import type { Metadata } from "next";
@@ -18,93 +17,99 @@ import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
 
 export const metadata: Metadata = withOG({
-  title: "SigRank vs Langfuse \u2014 Observability vs Competition",
+  title: "SigRank vs Langfuse — App Tracing vs Operator Ranking",
   description:
-    "Langfuse traces LLM calls for debugging and evaluation. SigRank scores the operator's token efficiency for ranking. Observability vs competition.",
+    "Langfuse traces and evaluates LLM applications. SigRank ranks how operators use tokens. What each answers, when to use which, and how they sit side by side.",
   path: "/vs/langfuse",
 });
 
-const COMPARE_ROWS: { feature: string; langfuse: string; sigrank: string }[] = [
+const COMPARE_ROWS: { feature: string; other: string; sigrank: string }[] = [
   {
-    feature: "What it is",
-    langfuse: "LLM observability & tracing platform",
-    sigrank: "Platform-neutral operator scoring layer",
+    "feature": "Main question answered",
+    "other": "What did my LLM app do, and was it good?",
+    "sigrank": "How efficiently does an operator use tokens compared with others?"
   },
   {
-    feature: "Traces LLM calls (logs, spans, generations)",
-    langfuse: "Yes",
-    sigrank: "No (token counts only)",
+    "feature": "Unit of measurement",
+    "other": "Trace, span, generation, session",
+    "sigrank": "Operator over a 7d / 30d / 90d / all-time window"
   },
   {
-    feature: "Scores operator token efficiency",
-    langfuse: "No (traces, not scores)",
-    sigrank: "Yes (cascade-derived)",
+    "feature": "How data arrives",
+    "other": "SDK, OpenTelemetry or gateway in your app",
+    "sigrank": "CLI reading local usage; four token counts"
   },
   {
-    feature: "Cascade efficiency score (Υ = cache_read × output / input²)",
-    langfuse: "No",
-    sigrank: "Yes",
+    "feature": "Reads prompt and response content",
+    "other": "Yes (that is how traces work)",
+    "sigrank": "No; ranked telemetry needs no prompt text"
   },
   {
-    feature: "SNR + Leverage + Velocity",
-    langfuse: "No",
-    sigrank: "Yes",
+    "feature": "Evaluation and prompt management",
+    "other": "Yes: scores, datasets, prompt versions",
+    "sigrank": "No"
   },
   {
-    feature: "Class tier (IGNITER to ARCH+)",
-    langfuse: "No",
-    sigrank: "Yes",
-  },
-  { feature: "Global operator leaderboard", langfuse: "No", sigrank: "Yes" },
-  {
-    feature: "Operator profiles + head-to-head compare",
-    langfuse: "No",
-    sigrank: "Yes",
+    "feature": "Cost and latency dashboards",
+    "other": "Yes, for your app",
+    "sigrank": "Cost per 1M tokens on the board; no latency"
   },
   {
-    feature: "ed25519-signed snapshot submission",
-    langfuse: "No",
-    sigrank: "Yes",
-  },
-  { feature: "MCP server for agent integration", langfuse: "No", sigrank: "Yes" },
-  {
-    feature: "Works across Cursor + Claude Code + Copilot + 15+",
-    langfuse: "Yes (via SDK integrations)",
-    sigrank: "Yes",
+    "feature": "Public ranking",
+    "other": "No",
+    "sigrank": "Yes, after enroll and submit"
   },
   {
-    feature: "Privacy-preserving (token counts only)",
-    langfuse: "Partial (logs may contain content)",
-    sigrank: "Yes",
-  },
+    "feature": "Open source and self-hosting",
+    "other": "MIT outside ee/; self-host or cloud",
+    "sigrank": "See the repository LICENSE"
+  }
 ];
 
 const FAQS: { question: string; answer: string }[] = [
   {
-    question: "Does SigRank replace Langfuse?",
-    answer:
-      "No — they solve different problems. Langfuse is an LLM observability platform: it traces LLM calls — logs, spans, generations, prompts, completions — so you can debug, monitor, and evaluate your AI application. SigRank is an operator leaderboard: it scores how efficiently an operator drives AI tools and ranks them globally. Langfuse is for understanding your app&apos;s LLM usage; SigRank is for ranking the operator behind it. Observability vs competition — different goals, different layers.",
+    "question": "Can SigRank replace Langfuse?",
+    "answer": "No. SigRank does not trace calls, store prompts, run evaluations or manage prompt versions. If you ship an LLM application you need an observability tool; SigRank is a separate measurement of how operators use tokens."
   },
   {
-    question: "Does Langfuse measure operator token efficiency?",
-    answer:
-      "Langfuse traces LLM calls and can aggregate token usage metrics — input tokens, output tokens, cost per call. That is application-level observability: it tells you what your app spent and where. It does not compute the cascade efficiency (Υ Yield = cache_read × output / input²), does not assign a class tier, and does not rank operators on a leaderboard. Langfuse answers &quot;what happened in this LLM call?&quot; SigRank answers &quot;how efficiently does this operator drive AI?&quot; Tracing vs scoring — different questions.",
+    "question": "Does SigRank read my Langfuse traces?",
+    "answer": "No. SigRank reads local token usage through its own CLI and submits signed summaries of four token counts. It does not connect to Langfuse."
   },
   {
-    question: "Why is a leaderboard different from observability?",
-    answer:
-      "Observability (Langfuse) is inward-facing: it helps a team understand and improve their own application&apos;s LLM usage. The data stays private, scoped to one project, used for debugging and evaluation. A leaderboard (SigRank) is outward-facing: it ranks operators against each other on a canonical, public metric. The score is signed, server-verified, and comparable across operators, tools, and platforms. Observability tells you what your app did; a leaderboard tells you how you compare to everyone else. The first is a debug tool; the second is a competition.",
+    "question": "Does Langfuse measure Yield, Leverage or Velocity?",
+    "answer": "Not as named metrics in its documentation. Langfuse reports cost, latency, quality scores and usage for your app. SigRank's Υ Yield, SNR, Leverage and Velocity are defined from an operator's four token pillars."
   },
   {
-    question: "Can I use SigRank alongside Langfuse?",
-    answer:
-      "Yes — they are complementary. Use Langfuse to trace and debug your application&apos;s LLM calls. Use SigRank to score the operator who drives your AI tools — including the app Langfuse is observing. The SigRank CLI reads token telemetry locally (token counts only, never prompt content), computes the cascade metrics, signs a snapshot with ed25519, and publishes it to the leaderboard. Langfuse sees the app&apos;s calls; SigRank scores the operator behind them. To publish telemetry from a supported source, create a connect code in SignalAF Settings, run `npx sigrank enroll`, preview with `npx sigrank submit --dry-run`, then run `npx sigrank submit`. The default source is Claude; this does not import Langfuse traces, and publication does not guarantee a rank.",
+    "question": "Which should a small team start with?",
+    "answer": "If you are shipping an LLM product, start with Langfuse: you need traces before anything else. Add SigRank if you also want to compare how your people use coding agents."
   },
   {
-    question: "What is the difference between LLM tracing and operator scoring?",
-    answer:
-      "LLM tracing (Langfuse) records what happened inside individual LLM calls — the prompt, the completion, the latency, the token count, the model used. It is a per-call, application-scoped debug log. Operator scoring (SigRank) aggregates the token telemetry across an operator&apos;s entire session — across tools, across platforms — and computes a single cascade efficiency score (Υ Yield) that is comparable globally. Tracing answers &quot;what did this call do?&quot; Scoring answers &quot;how efficiently does this person drive AI?&quot; The first is observability; the second is competition.",
+    "question": "Is the SigRank field large enough to trust ranks?",
+    "answer": "Not yet. On 2026-11-11 the public 30-day board held 7 operators. Read the distribution and your own trend rather than a single rank."
+  }
+];
+
+const SOURCES: { label: string; href: string }[] = [
+  {
+    "label": "Langfuse documentation (langfuse.com/docs)",
+    "href": "https://langfuse.com/docs"
   },
+  {
+    "label": "Langfuse pricing",
+    "href": "https://langfuse.com/pricing"
+  },
+  {
+    "label": "Langfuse repository and LICENSE",
+    "href": "https://github.com/langfuse/langfuse"
+  },
+  {
+    "label": "langfuse on PyPI",
+    "href": "https://pypi.org/project/langfuse/"
+  },
+  {
+    "label": "SigRank CLI and MCP (sigrank-mcp)",
+    "href": "https://github.com/SunrisesIllNeverSee/sigrank-mcp"
+  }
 ];
 
 export default function VsLangfusePage() {
@@ -118,8 +123,8 @@ export default function VsLangfusePage() {
           ]),
           faqPage(FAQS),
           comparisonArticle({
-            title: "SigRank vs Langfuse — Observability vs Competition",
-            description: "Langfuse traces LLM calls for debugging and evaluation. SigRank scores the operator's token efficiency for ranking. Observability vs competition.",
+            title: "SigRank vs Langfuse — App Tracing vs Operator Ranking",
+            description: "Langfuse traces and evaluates LLM applications. SigRank ranks how operators use tokens. What each answers, when to use which, and how they sit side by side.",
             path: "/vs/langfuse",
           }),
         ]}
@@ -127,52 +132,88 @@ export default function VsLangfusePage() {
 
       <WaveHero
         eyebrow="◈ SigRank vs Langfuse"
-        title="Observability vs Competition"
+        title="Langfuse Traces Your App. SigRank Ranks the Operator."
         subtitle={
           <>
-            Langfuse traces LLM calls for debugging and evaluation. SigRank{" "}
-            <span className="text-gold">scores the operator</span>&apos;s token
-            efficiency for ranking. Observability vs competition.
+            Langfuse records what your LLM application did so you can debug and evaluate it. SigRank looks only at four token counts and ranks the operator. Different layer, different reader; here is how to choose.
           </>
         }
       />
 
-      {/* TL;DR */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The short version: Langfuse
+          What Langfuse is, as of 2026-11-11
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Langfuse is an open-source LLM observability platform — it traces LLM
-          calls so you can debug, monitor, and evaluate your AI application. Logs,
-          spans, generations, prompt management, evaluation pipelines, cost
-          analytics: Langfuse gives you a dashboard into what your app&apos;s LLM
-          calls are doing. It is excellent at what it does, which is{" "}
-          <em>observability</em>. What it does not do is score the operator
-          or rank them against anyone.
+          Langfuse describes itself as an open-source AI engineering platform for teams building LLM and agent applications. Its documentation lists tracing (LLM and non-LLM calls, sessions, per-user tracking, agent graph and timeline views, alerts); prompt management with versions, labels and a playground; evaluation (LLM-as-a-judge, code evaluators, user feedback, annotation queues, custom scores); datasets and experiments; a metrics dashboard for quality, cost and latency; and an AI gateway. It has Python and JavaScript SDKs, OpenTelemetry-based tracing, and 100+ integrations such as the OpenAI SDK, LangChain and LlamaIndex.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          SigRank is a different thing entirely: an{" "}
-          <strong className="text-text-primary">operator leaderboard</strong>. It
-          reads token telemetry from any AI tool an operator drives, computes the
-          cascade efficiency (Υ Yield), and ranks them globally. Langfuse tells
-          you what your app did; SigRank tells you how you compare to every other
-          operator. Observability vs competition — different goals, different
-          layers.
+          Licensing and pricing: the repository is MIT-licensed outside its ee/ directories, which carry a separate licence. You can self-host or use Langfuse Cloud, whose pricing page lists Hobby (free, 50k units a month), Core ($29/month), Pro ($199/month) and Enterprise ($2,499/month). The Python package langfuse was at 5.2.0 on PyPI, released 2026-11-05.
         </p>
       </section>
 
-      {/* Comparison table */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Feature comparison
+          Different layer, different reader
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Langfuse instruments an application. You add its SDK or an OpenTelemetry exporter to code you ship, and it records every call so you can debug a bad answer, compare prompt versions or score outputs. The reader is the team that owns the app; the unit is a trace.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          SigRank measures an operator. It looks only at the four token counts a person or agent produced (input, output, cache write, cache read), computes Υ Yield, SNR, Leverage, Velocity, 10xDEV and Scale V, and places them on a public board. The unit is the operator over a time window, and nothing in it looks at content, prompts or correctness. If you are asking “why did this chain answer wrongly?”, SigRank cannot help; Langfuse can.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Use Langfuse when, use SigRank when
+        </h2>
+        <ul className="flex list-disc flex-col gap-1.5 pl-5 font-sans text-sm leading-relaxed text-text-secondary">
+          <li>Use <strong className="text-text-primary">Langfuse</strong> when you are building an LLM product and need traces, prompt versions, evaluation scores, datasets, or cost and latency dashboards for that product.</li>
+          <li>Use <strong className="text-text-primary">SigRank</strong> when your question is about how an individual or team drives coding agents: how much cached context you reuse, how much output you get per fresh input, and how that compares with other operators.</li>
+          <li>Use <strong className="text-text-primary">both</strong> if your team ships an LLM app with Langfuse tracing and also uses coding agents to build it. Langfuse watches the app in production; SigRank watches the coding sessions that produced it. They do not read the same data.</li>
+        </ul>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Adding SigRank next to a Langfuse setup
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          There is nothing to wire into your app or your Langfuse project. SigRank reads local usage from your coding tools, so it sits beside your tracing rather than inside it:
+        </p>
+        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
+          <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
+            {`npx sigrank                  # inspect local usage in the terminal
+npx sigrank enroll           # bind this device with a connect code from Settings
+npx sigrank submit --dry-run # inspect the payload; nothing is sent
+npx sigrank submit           # publish a signed snapshot`}
+          </pre>
+        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          SigRank does not read or upload Langfuse traces. Ranked telemetry needs no prompt text, responses or source code. If you only want a preview, the <a href="/score" className="text-gold underline underline-offset-2">score calculator</a> takes four token counts and needs no account.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          What the live board looks like
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Fetched from the public SigRank analyst MCP on 2026-11-11. The 30-day public board has <strong className="text-text-primary">7 operators</strong>, 6 of them claimed: a small, early field. Median Υ Yield is 3,037 (range 36.7 to 141,155), median Leverage 808.6, median Velocity 3.76, median SNR 0.79. The all-time window lists 1,626 public operators, with a median Yield of 1.95. These are operator patterns, not application quality; Langfuse has no equivalent number because it measures something else.
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Side-by-side
         </h2>
         <div className="overflow-x-auto rounded-lg border border-bg-border bg-bg-surface">
           <table className="w-full border-collapse font-sans text-sm">
             <thead>
               <tr className="border-b border-bg-border bg-bg-elevated">
                 <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
-                  Feature
+                  Question
                 </th>
                 <th className="px-4 py-3 text-left font-mono text-xs uppercase tracking-wide text-text-muted">
                   Langfuse
@@ -189,9 +230,7 @@ export default function VsLangfusePage() {
                   className="border-b border-bg-border-subtle last:border-0"
                 >
                   <td className="px-4 py-2.5 text-text-primary">{r.feature}</td>
-                  <td className="px-4 py-2.5 text-text-secondary">
-                    {r.langfuse}
-                  </td>
+                  <td className="px-4 py-2.5 text-text-secondary">{r.other}</td>
                   <td className="px-4 py-2.5 font-medium text-gold">
                     {r.sigrank}
                   </td>
@@ -202,62 +241,6 @@ export default function VsLangfusePage() {
         </div>
       </section>
 
-      {/* Inward-facing vs outward-facing */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-mono text-base font-bold text-text-primary">
-          Inward-facing vs outward-facing
-        </h2>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Observability is inward-facing. Langfuse helps a team understand and
-          improve their own application&apos;s LLM usage: which prompts are
-          expensive, which chains are slow, which generations failed evaluation.
-          The data stays private, scoped to one project, used for debugging. It
-          answers &quot;what is my app doing?&quot;
-        </p>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          A leaderboard is outward-facing. SigRank ranks operators against each
-          other on a canonical, public metric. The score —{" "}
-          <span className="font-mono text-gold">
-            Υ = cache_read × output / input²
-          </span>{" "}
-          — is signed with ed25519, server-verified, and comparable across
-          operators, tools, and platforms. It answers &quot;how do I compare to
-          everyone else?&quot; The first is a debug tool; the second is a
-          competition. You can run both — they do not overlap.
-        </p>
-        <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
-          <p className="font-mono text-xs uppercase tracking-wide text-text-muted">
-            Tracing vs scoring
-          </p>
-          <p className="mt-3 font-sans text-sm leading-relaxed text-text-secondary">
-            Langfuse traces individual LLM calls — the prompt, the completion, the
-            latency, the token count. It is a per-call, application-scoped log.
-            SigRank aggregates token telemetry across an operator&apos;s entire
-            session — across tools, across platforms — and computes a single
-            cascade efficiency score that is comparable globally. Tracing tells
-            you what happened; scoring tells you how good the operator is.
-          </p>
-        </div>
-      </section>
-
-      {/* Privacy */}
-      <section className="flex flex-col gap-4">
-        <h2 className="font-mono text-base font-bold text-text-primary">
-          Token counts only — never content
-        </h2>
-        <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Langfuse&apos;s traces can include full prompt and completion content —
-          that is the point of observability, you need to see what the model
-          received and returned. SigRank is privacy-preserving by design: it
-          reads only the four token integers (input, output, cache-read,
-          cache-write) and never touches prompt content. Your sessions stay on
-          your machine; only the signed token counts leave it. That makes SigRank
-          safe to run in any environment, including ones where logging content is
-          a compliance risk.
-        </p>
-      </section>
-
-      {/* FAQ */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
           Frequently asked questions
@@ -274,57 +257,36 @@ export default function VsLangfusePage() {
         </dl>
       </section>
 
-      {/* CTA */}
       <section className="flex flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-6">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          Trace with Langfuse. Compete on SigRank.
+          Sources and as-of date
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
-          Langfuse shows you what your app&apos;s LLM calls did. SigRank scores
-          the operator behind them and ranks them globally. Install the CLI,
-          submit a signed snapshot, and get a rank that measures the operator,
-          not the trace.
+          Competitor facts were read from the sources below on 2026-11-11 (UTC); check them for anything newer. Field numbers come from the public SigRank analyst MCP on the same date.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <a
-            href="/score"
-            className="rounded-lg border border-bg-border bg-bg-elevated px-4 py-2 font-mono text-xs uppercase tracking-wide text-text-primary transition-colors hover:border-gold"
-          >
-            Calculate your Υ Yield
-          </a>
-          <Link
-            href="/hall"
-            className="rounded-lg border border-bg-border bg-bg-elevated px-4 py-2 font-mono text-xs uppercase tracking-wide text-text-primary transition-colors hover:border-gold"
-          >
-            See the Hall of Signal
-          </Link>
-        </div>
+        <ul className="flex list-disc flex-col gap-1 pl-5 font-sans text-sm text-text-secondary">
+          {SOURCES.map((s) => (
+            <li key={s.href}>
+              <a
+                href={s.href}
+                rel="noopener noreferrer"
+                className="text-gold underline underline-offset-2"
+              >
+                {s.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
-          <Link
-            href="/methodology"
-            className="text-gold underline underline-offset-2"
-          >
-            Methodology
-          </Link>
+          <Link href="/vs/braintrust" className="text-gold underline underline-offset-2">SigRank vs Braintrust</Link>
           {" · "}
-          <Link
-            href="/tools/yield-calculator"
-            className="text-gold underline underline-offset-2"
-          >
-            Yield Calculator
-          </Link>
+          <Link href="/vs/langchain" className="text-gold underline underline-offset-2">SigRank vs LangChain</Link>
           {" · "}
-          <Link
-            href="/guides/how-to-measure-ai-coding-efficiency"
-            className="text-gold underline underline-offset-2"
-          >
-            Measure AI Coding Efficiency
-          </Link>
+          <Link href="/methodology" className="text-gold underline underline-offset-2">Methodology</Link>
         </p>
       </section>
     </div>
