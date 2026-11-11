@@ -47,7 +47,7 @@ const TOOLS: Tool[] = [
       "Platform-neutral: works across Claude, ChatGPT, Gemini, Copilot, Cursor, and 15+ platforms",
       "Privacy-preserving: on-device scanning, token counts only, ed25519-signed submissions",
       "Live leaderboard with 7d/30d/90d/all-time windows and head-to-head comparison",
-      "Bundles ccusage, tokscale, and token-dashboard — one install, full telemetry stack",
+      "Lists ccusage and tokscale as npm dependencies — one install, full telemetry stack",
     ],
     cons: [
       "Newer ecosystem — leaderboard sample still growing",
@@ -509,7 +509,7 @@ export default function AICodingEfficiencyToolsPage() {
           that scores the cascade and ranks you against every other operator.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          SigRank bundles ccusage, tokscale, and token-dashboard, so you get the
+          SigRank lists ccusage and tokscale as npm dependencies, so you get the
           raw counts <em>and</em> the efficiency scoring in one install:{" "}
           <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-xs text-gold">
             npm install -g sigrank

@@ -27,8 +27,8 @@ export const revalidate = 86400;
 const COMPARISONS = [
   {
     href: "/vs/ccusage",
-    title: "SigRank vs ccusage — Sensor to Instrument Panel",
-    desc: "ccusage reads Claude Code token logs. SigRank bundles ccusage and adds cascade scoring, leaderboards, operator profiles, and MCP integration.",
+    title: "SigRank vs ccusage — Spend Ledger vs Efficiency Ranking",
+    desc: "ccusage reports what your coding agents cost from local logs. SigRank ranks how efficiently you drive them. When to use each, and how to run both.",
   },
   {
     href: "/vs/vals-ai",
@@ -301,7 +301,7 @@ export default function VsIndex() {
           {
             question: "How does SigRank compare to ccusage?",
             answer:
-              "ccusage reads Claude Code token logs and shows usage stats. SigRank bundles ccusage's data and adds cascade scoring (Yield), a public leaderboard, operator profiles, class tiers, and MCP integration. ccusage tells you how much you spent; SigRank tells you how well you spent it.",
+              "ccusage reads Claude Code token logs and shows usage stats. The SigRank CLI lists ccusage as an npm dependency; SigRank compares reuse-to-fresh-input patterns (Υ Yield and related metrics) across operators on a public board. ccusage tells you how much you spent; SigRank tells you how well you spent it.",
           },
           {
             question: "How does SigRank compare to LMSYS Arena?",

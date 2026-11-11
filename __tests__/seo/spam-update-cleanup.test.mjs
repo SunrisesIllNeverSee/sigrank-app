@@ -179,7 +179,9 @@ test("googlebot noindex never applies to core pages, /user profiles or utility p
 });
 
 test("googleOnlyRobots keeps the generic robots indexable and noindexes googlebot only", () => {
+  // The two rebuilt /vs pages are Google-indexable: no googlebot override at all.
   assert.equal(googleOnlyRobots("/vs/ccusage"), undefined);
+  assert.equal(googleOnlyRobots("/vs/langfuse"), undefined);
   assert.deepEqual(googleOnlyRobots("/vs/cursor"), {
     index: true,
     follow: true,
@@ -216,6 +218,7 @@ test("noindex-for-Google pages stay in the sitemap/llms manifest classes unchang
   // Established comparisons and kept pages remain promoted (sitemap + llms.txt).
   for (const p of [
     "/vs/ccusage",
+    "/vs/langfuse",
     "/alternatives/ccusage-alternatives",
     "/alternatives/token-tracking-tools",
     "/guides/how-to-measure-ai-coding-efficiency",
