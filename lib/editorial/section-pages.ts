@@ -96,8 +96,6 @@ export const SECTION_PAGES = {
   ],
   evaluation: [
     { label: "AI Agent Evaluation", href: "/ai-agent-evaluation" },
-    { label: "AI Benchmarking", href: "/ai-benchmarking" },
-    { label: "AI Coding Metrics", href: "/ai-coding-metrics" },
     { label: "AI Compliance Standards and Operator Evaluation", href: "/ai-compliance-standards" },
     { label: "AI Evaluation", href: "/ai-evaluation" },
     { label: "AI Evaluation Frameworks", href: "/ai-evaluation-frameworks" },
@@ -127,8 +125,6 @@ export const SECTION_PAGES = {
     { label: "Upsilon (Υ)", href: "/upsilon" },
     { label: "Token Telemetry", href: "/token-telemetry" },
     { label: "Token Cascade", href: "/token-cascade" },
-    { label: "Cascade Analysis", href: "/cascade-analysis" },
-    { label: "Operator Performance", href: "/operator-performance" },
     { label: "Privacy-Preserving Telemetry", href: "/privacy-preserving-ai-telemetry" },
   ],
 } as const;

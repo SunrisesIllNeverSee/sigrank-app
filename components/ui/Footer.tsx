@@ -153,16 +153,13 @@ const FOOTER_COLUMNS: {
     heading: "Topics",
     links: [
       { href: "/upsilon", label: "Upsilon Measurement Engine" },
-      { href: "/ai-benchmarking", label: "AI Benchmarking" },
-      { href: "/ai-coding-metrics", label: "AI Coding Metrics" },
       { href: "/ai-operator-scoring", label: "AI Operator Scoring" },
       { href: "/standard", label: "TTEOP Standard" },
       {
         href: "/standard/open-vs-proprietary",
         label: "Open vs Proprietary",
       },
-      { href: "/operator-performance", label: "Operator Performance" },
-      { href: "/cascade-analysis", label: "Cascade Analysis" },
+      { href: "/token-cascade", label: "Token Cascade" },
     ],
   },
   {

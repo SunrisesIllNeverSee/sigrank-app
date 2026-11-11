@@ -6,7 +6,7 @@
  * directed by operators. SigRank measures the operator directing the agent.
  * Links into /ai-evaluation, /methodology, /vs/braintrust, /vs/langfuse.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";

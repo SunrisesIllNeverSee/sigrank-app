@@ -12,6 +12,7 @@
  */
 
 import type { Metadata } from "next";
+import { googleOnlyRobots } from "@/lib/seo/search-index-policy";
 
 /** Canonical production origin (no trailing slash).
  *  Env-configurable so the same codebase can deploy to signalaf.com or
@@ -73,6 +74,7 @@ export function withOG(opts: {
   const { title, description, path, ogImage, article, titleAbsolute } = opts;
   const image = ogImage ?? OG_IMAGE;
   const url = path ? `${SITE_ORIGIN}${path}` : SITE_ORIGIN;
+  const robots = googleOnlyRobots(path);
   const base = {
     title,
     description,
@@ -84,6 +86,8 @@ export function withOG(opts: {
     title: titleAbsolute ? { absolute: titleAbsolute } : title,
     description,
     alternates: path ? { canonical: path } : undefined,
+    // Google-only noindex for templated pages (see lib/seo/search-index-policy.ts).
+    ...(robots ? { robots } : {}),
     openGraph: article
       ? {
           ...base,

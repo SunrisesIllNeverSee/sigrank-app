@@ -71,10 +71,6 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/fieldhub": "CORE", // primary-nav "Field" since the redesign; `fieldhub-page` flag fails open on page + nav (404 only on an explicit off) — promoted 2026-10-22 search closeout
   "/platforms": "SUPPORTED",
   "/standard/open-vs-proprietary": "SUPPORTED",
-  "/ai-coding-metrics": "SUPPORTED",
-  "/operator-performance": "SUPPORTED",
-  "/ai-benchmarking": "SUPPORTED",
-  "/cascade-analysis": "SUPPORTED",
   "/privacy-preserving-ai-telemetry": "SUPPORTED",
   "/docs/integrations/vercel": "SUPPORTED",
   "/exchange": "SUPPORTED",
@@ -297,7 +293,11 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/user": "REDIRECT", // 307 → /user/the-field
   "/ai-operator-benchmark": "REDIRECT", // 308 → /ai-operator-scoring
   "/token-efficiency": "REDIRECT", // 308 → /metrics/yield-cascade
-  "/ai-coding-analytics": "REDIRECT", // 308 → /ai-coding-metrics
+  "/ai-coding-analytics": "REDIRECT", // 308 → /ai-operator-scoring
+  "/ai-coding-metrics": "REDIRECT", // 308 → /ai-operator-scoring (2026-11 consolidation)
+  "/operator-performance": "REDIRECT", // 308 → /ai-operator-scoring
+  "/ai-benchmarking": "REDIRECT", // 308 → /ai-operator-scoring
+  "/cascade-analysis": "REDIRECT", // 308 → /token-cascade
 };
 
 /** Classes that are candidates for sitemap promotion. */
@@ -315,4 +315,95 @@ export function isSitemapPromoted(path: string): boolean {
 /** All routes in a class (deterministic order for tests/audits). */
 export function routesInClass(cls: RouteClass): string[] {
   return Object.keys(ROUTE_CLASSES).filter((p) => ROUTE_CLASSES[p] === cls).sort();
+}
+
+// ── Google-only noindex (2026-11 spam-update cleanup) ─────────────────────
+//
+// Templated comparison / alternatives / guides pages and the persona
+// "best X" blog posts stay live, stay in sitemap.xml and llms.txt, and stay
+// indexable by Bing and AI crawlers. Only Google is told not to index them:
+// Next emits <meta name="robots" content="index, follow"> plus
+// <meta name="googlebot" content="noindex, follow">. robots.txt is untouched
+// and no X-Robots-Tag header is used (that would hit every bot).
+//
+// DELIBERATE: these googlebot-noindex URLs stay in sitemap.xml and llms.txt
+// because Bing and AI crawlers (OAI-SearchBot, PerplexityBot, Bingbot) use
+// them. Google Search Console will therefore report "Submitted URL marked
+// 'noindex'" for them; that is expected, not a bug.
+//
+// Hubs (/vs, /alternatives, /guides, /blog) and the pages listed in the
+// KEEP sets stay fully indexable. /user/* profiles are governed by
+// lib/seo/indexing-policy.ts and never match here.
+
+/** /alternatives/<x> pages that stay Google-indexable. */
+export const GOOGLE_INDEX_KEEP_ALTERNATIVES: ReadonlySet<string> = new Set([
+  "/alternatives/ccusage-alternatives",
+  "/alternatives/token-tracking-tools",
+]);
+
+/** /guides/<x> pages that stay Google-indexable. */
+export const GOOGLE_INDEX_KEEP_GUIDES: ReadonlySet<string> = new Set([
+  "/guides/how-to-measure-ai-coding-efficiency",
+]);
+
+/** Blog posts hidden from Google: the "best X" listicles plus the AI-answer post. */
+export const GOOGLE_NOINDEX_BLOG_PREFIX = "/blog/best-";
+export const GOOGLE_NOINDEX_BLOG_EXACT: ReadonlySet<string> = new Set([
+  "/blog/how-to-answer-best-ai-user",
+]);
+
+function isChildOf(path: string, hub: string): boolean {
+  if (!path.startsWith(hub + "/")) return false;
+  const rest = path.slice(hub.length + 1);
+  return rest.length > 0 && !rest.includes("/");
+}
+
+/** Should Google (only) be told not to index this page? */
+export function isGoogleOnlyNoindex(path: string): boolean {
+  if (isChildOf(path, "/vs")) return true;
+  if (isChildOf(path, "/alternatives")) return !GOOGLE_INDEX_KEEP_ALTERNATIVES.has(path);
+  if (isChildOf(path, "/guides")) return !GOOGLE_INDEX_KEEP_GUIDES.has(path);
+  if (GOOGLE_NOINDEX_BLOG_EXACT.has(path)) return true;
+  return isChildOf(path, "/blog") && path.startsWith(GOOGLE_NOINDEX_BLOG_PREFIX);
+}
+
+/** `robots` metadata for a path: generic robots stays indexable, googlebot is noindex. */
+export function googleOnlyRobots(path: string | undefined) {
+  if (!path || !isGoogleOnlyNoindex(path)) return undefined;
+  return {
+    index: true,
+    follow: true,
+    googleBot: { index: false, follow: true },
+  };
+}
+
+// ── FAQPage structured data: /faq only ────────────────────────────────────
+
+function hasFaqType(t: unknown): boolean {
+  return t === "FAQPage" || (Array.isArray(t) && t.includes("FAQPage"));
+}
+
+/**
+ * Remove FAQPage JSON-LD (visible FAQ text on pages is unaffected). Handles
+ * `@type: "FAQPage"`, `@type: ["FAQPage", ...]`, and FAQPage nodes nested in
+ * an `@graph` array (an emptied `@graph` object is dropped entirely).
+ */
+export function dropFaqPageSchema<T extends object>(items: T[]): T[] {
+  const out: T[] = [];
+  for (const o of items) {
+    const node = o as { "@type"?: unknown; "@graph"?: unknown };
+    if (hasFaqType(node["@type"])) continue;
+    if (Array.isArray(node["@graph"])) {
+      const graph = (node["@graph"] as unknown[]).filter(
+        (g) => !(g && typeof g === "object" && hasFaqType((g as { "@type"?: unknown })["@type"])),
+      );
+      if (graph.length === 0) continue;
+      if (graph.length !== node["@graph"].length) {
+        out.push({ ...o, "@graph": graph } as T);
+        continue;
+      }
+    }
+    out.push(o);
+  }
+  return out;
 }

@@ -6,7 +6,7 @@
  * Positions SigRank as governed operator evaluation with provenance. Links
  * into /methodology, /standard, /science, /ai-evaluation-frameworks.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";

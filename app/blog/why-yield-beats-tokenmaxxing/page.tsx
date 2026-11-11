@@ -16,7 +16,6 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
@@ -76,7 +75,6 @@ export default function WhyYieldBeatsTokenmaxxingPage() {
   return (
     <BlogWorkspaceFrame>
       <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <CitationMeta title={"Why Yield Beats Tokenmaxxing"} description={"Tokenmaxxing is the practice of maximizing raw token count. Yield (Υ) proves it wrong — efficiency, not volume, defines a top AI operator."} date={"2026-07-07"} slug={"/blog/why-yield-beats-tokenmaxxing"} />
       <JsonLd
         data={[
           articleJsonLd(),

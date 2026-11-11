@@ -216,7 +216,30 @@ const nextConfig: NextConfig = {
       // /privacy-preserving-ai-telemetry is now a real page (NS-02.05 privacy portal)
       {
         source: "/ai-coding-analytics",
-        destination: "/ai-coding-metrics",
+        destination: "/ai-operator-scoring",
+        permanent: true,
+      },
+      // 2026-11 spam-update consolidation: measured near-duplicates fold into
+      // one page each (308). Unique content from the retired keyword pages was
+      // carried into /ai-operator-scoring.
+      {
+        source: "/ai-benchmarking",
+        destination: "/ai-operator-scoring",
+        permanent: true,
+      },
+      {
+        source: "/ai-coding-metrics",
+        destination: "/ai-operator-scoring",
+        permanent: true,
+      },
+      {
+        source: "/operator-performance",
+        destination: "/ai-operator-scoring",
+        permanent: true,
+      },
+      {
+        source: "/cascade-analysis",
+        destination: "/token-cascade",
         permanent: true,
       },
     ];

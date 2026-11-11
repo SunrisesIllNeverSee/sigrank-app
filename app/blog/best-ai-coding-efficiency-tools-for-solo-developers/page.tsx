@@ -17,7 +17,6 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
@@ -91,16 +90,6 @@ export default function BestAiCodingEfficiencyToolsForSoloDevelopersPage() {
   return (
     <BlogWorkspaceFrame>
       <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <CitationMeta
-        title={
-          "Best AI Coding Efficiency Tools for Solo Developers (2026)"
-        }
-        description={
-          "The best AI coding efficiency tools for solo developers in 2026. Why raw token counts aren't enough — and the metrics that actually measure your AI efficiency. 4 tools reviewed."
-        }
-        date={"2026-08-17"}
-        slug={"/blog/best-ai-coding-efficiency-tools-for-solo-developers"}
-      />
       <JsonLd
         data={[
           articleJsonLd(),

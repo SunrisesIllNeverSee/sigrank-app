@@ -5,9 +5,9 @@
  * Targets the production evaluation stack — model, output, safety, operator
  * layers — and recommends the best tool for each. Positions SigRank as the
  * best operator evaluation tool for production. Links into /alternatives,
- * /ai-evaluation-tools, /ai-benchmarking, and /methodology.
+ * /ai-evaluation-tools, /ai-operator-scoring, and /methodology.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";
@@ -36,9 +36,9 @@ const RELATED = [
     desc: "The four categories of AI evaluation tools: model, output, safety, operator. SigRank is the only operator evaluation tool.",
   },
   {
-    href: "/ai-benchmarking",
-    title: "AI Benchmarking — Beyond Model Leaderboards",
-    desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement to model-only benchmarking in a production stack.",
+    href: "/ai-operator-scoring",
+    title: "AI Operator Evaluation with Token Telemetry",
+    desc: "Model benchmarks rank models. Operator evaluation ranks the operators driving them. The complement to model-only benchmarking in a production stack.",
   },
   {
     href: "/methodology",

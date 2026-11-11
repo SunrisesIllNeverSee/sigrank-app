@@ -5,7 +5,7 @@
  * the privacy argument for token counts over prompt content, and links out
  * to the metric pages, the cascade-tracking guide, and the yield calculator.
  *
- * JSON-LD: breadcrumb() + faqPage().
+ * JSON-LD: breadcrumb() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";

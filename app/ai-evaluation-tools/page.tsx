@@ -6,7 +6,7 @@
  * safety, operator) and positions SigRank as the only operator evaluation
  * tool. Links into /alternatives, /vs, /ai-evaluation, and /tools.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";

@@ -327,20 +327,6 @@ export default async function HomePage() {
           </Link>
           {" · "}
           <Link
-            href="/ai-benchmarking"
-            className="text-gold underline underline-offset-2"
-          >
-            AI Benchmarking
-          </Link>
-          {" · "}
-          <Link
-            href="/ai-coding-metrics"
-            className="text-gold underline underline-offset-2"
-          >
-            AI Coding Metrics
-          </Link>
-          {" · "}
-          <Link
             href="/research"
             className="text-gold underline underline-offset-2"
           >
@@ -362,17 +348,10 @@ export default async function HomePage() {
           </Link>
           {" · "}
           <Link
-            href="/operator-performance"
+            href="/token-cascade"
             className="text-gold underline underline-offset-2"
           >
-            Operator Performance
-          </Link>
-          {" · "}
-          <Link
-            href="/cascade-analysis"
-            className="text-gold underline underline-offset-2"
-          >
-            Cascade Analysis
+            Token Cascade
           </Link>
           {" · "}
           <Link

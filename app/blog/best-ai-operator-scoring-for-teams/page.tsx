@@ -15,7 +15,6 @@ import Link from "next/link";
 import { withOG, fitTitle, AUTHOR_NAME } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { articleJsonLd, breadcrumb, faqPage } from "@/lib/jsonld";
 
@@ -91,14 +90,6 @@ export default function BestAiOperatorScoringForTeamsPage() {
   return (
     <BlogWorkspaceFrame>
       <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <CitationMeta
-        title={"Best AI Operator Scoring for Teams (2026)"}
-        description={
-          "The best AI operator scoring tool for teams in 2026. Why adoption metrics and time tracking don't score operators — and the token metrics that do. 4 tools reviewed."
-        }
-        date={"2026-08-17"}
-        slug={"/blog/best-ai-operator-scoring-for-teams"}
-      />
       <JsonLd
         data={[
           postJsonLd(),

@@ -15,9 +15,22 @@
  */
 
 import "server-only";
+import { dropFaqPageSchema } from "@/lib/seo/search-index-policy";
 
-export function JsonLd({ data }: { data: object | object[] }) {
-  const items = Array.isArray(data) ? data : [data];
+/**
+ * FAQPage structured data is emitted on /faq only (2026-11 spam-update
+ * cleanup). Every other page keeps its visible FAQ text; its faqPage() schema
+ * object is dropped here, centrally. /faq opts in with `allowFaqPage`.
+ */
+export function JsonLd({
+  data,
+  allowFaqPage = false,
+}: {
+  data: object | object[];
+  allowFaqPage?: boolean;
+}) {
+  const all = Array.isArray(data) ? data : [data];
+  const items = allowFaqPage ? all : dropFaqPageSchema(all);
   return (
     <>
       {items.map((obj, i) => (

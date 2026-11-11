@@ -18,7 +18,6 @@ import type { Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { withOG, fitTitle, AUTHOR_NAME } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { CitationMeta } from "@/components/seo/CitationMeta";
 import { breadcrumb, articleJsonLd } from "@/lib/jsonld";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 
@@ -245,13 +244,6 @@ export default async function BlogPost({
       pageSections={markdownSectionIndex(content)}
     >
       <article className="article-shell px-4 py-8 md:py-12">
-      <CitationMeta
-        title={title}
-        description={description}
-        date={date}
-        slug={`/blog/${slug}`}
-        doi={frontmatter.doi}
-      />
       <JsonLd
         data={[
           articleLd,

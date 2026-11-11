@@ -512,10 +512,10 @@ export default function AIBenchmarkingToolsPage() {
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
           <Link
-            href="/ai-benchmarking"
+            href="/ai-operator-scoring"
             className="text-gold underline underline-offset-2"
           >
-            AI Benchmarking
+            AI Operator Scoring
           </Link>
           {" · "}
           <Link

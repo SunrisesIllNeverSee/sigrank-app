@@ -157,6 +157,7 @@ export default function FaqPage() {
     >
     <div className="ws-doc mx-auto flex max-w-5xl flex-col gap-8 py-2">
       <JsonLd
+        allowFaqPage
         data={[
           breadcrumb([{ name: "FAQ", path: "/faq" }]),
           faqPage(ALL_FAQS),

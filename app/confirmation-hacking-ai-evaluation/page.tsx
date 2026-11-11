@@ -6,7 +6,7 @@
  * already believe. SigRank avoids it with content-free telemetry. Links into
  * /methodology, /science, /ai-evaluation, /ai-evaluation-frameworks.
  *
- * JSON-LD: breadcrumb() + definedTerm() + faqPage().
+ * JSON-LD: breadcrumb() + definedTerm() + faqPage() (dropped by JsonLd; FAQPage schema is /faq-only).
  */
 
 import type { Metadata } from "next";
