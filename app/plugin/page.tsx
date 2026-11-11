@@ -8,6 +8,20 @@ export const metadata: Metadata = withOG({
   path: "/plugin",
 });
 
+const ANALYST_MCP_URL = "https://analyst.signalaf.com/api/plugins/sigrank/mcp";
+
+const ADMIN_TOOLS = [
+  { name: "get_leaderboard", summary: "Reads the public board for 7d, 30d, 90d or all time.", access: "Read-only" },
+  { name: "get_operator", summary: "Reads one public operator profile by codename.", access: "Read-only" },
+  { name: "compare_operators", summary: "Compares two public operators over a common window.", access: "Read-only" },
+  { name: "get_field_stats", summary: "Reads distributions and field size for the public board.", access: "Read-only" },
+  {
+    name: "report_beta_bug",
+    summary: "Emails a bug report to hello@signalaf.com, only when the user explicitly asks to send it.",
+    access: "Sends email",
+  },
+] as const;
+
 export default function PluginPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
@@ -67,6 +81,68 @@ export default function PluginPage() {
         <Link className="text-gold underline underline-offset-4" href="/board/30d">
           Open the 30-day board
         </Link>
+      </section>
+
+      <section id="it-admins" className="mt-10 scroll-mt-20 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
+        <h2 className="font-mono text-xl font-bold text-text-primary">For IT admins</h2>
+        <p>
+          <strong className="text-text-primary">Authentication: none.</strong> The connector is public
+          and read-only for analysis. There are no accounts, API keys, OAuth or SSO settings to configure.
+        </p>
+        <p>
+          <strong className="text-text-primary">Server URL</strong> (Streamable HTTP):
+        </p>
+        <pre className="overflow-x-auto rounded border border-border-base bg-surface p-3 font-mono text-xs text-text-primary">
+          {ANALYST_MCP_URL}
+        </pre>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left text-xs">
+            <thead>
+              <tr className="border-b border-border-base font-mono text-text-primary">
+                <th className="py-2 pr-4 font-semibold">Tool</th>
+                <th className="py-2 pr-4 font-semibold">What it does</th>
+                <th className="py-2 font-semibold">Access</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ADMIN_TOOLS.map(tool => (
+                <tr key={tool.name} className="border-b border-border-base align-top">
+                  <td className="py-2 pr-4 font-mono text-text-primary">{tool.name}</td>
+                  <td className="py-2 pr-4">{tool.summary}</td>
+                  <td className="py-2">{tool.access}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong className="text-text-primary">Data handling.</strong> The server receives only tool
+          arguments: codenames, time windows, board views and filters, and, for a bug report, the
+          report text and an optional reply email. It does not receive prompts, conversation content or
+          account identity. Lookups are not stored in a SignalAF database. A short diagnostic log line
+          (method, tool name, client name and user agent, but no arguments) is written only when a
+          request stalls or times out, and our hosting provider keeps standard request logs under its
+          own retention. Rate-limit counters keyed by IP address expire within about an hour. Bug
+          reports are kept while the issue is open and for up to 90 days after it closes, as set out in
+          the privacy policy.
+        </p>
+        <p>
+          <strong className="text-text-primary">Network.</strong> The connector needs outbound HTTPS
+          to <span className="font-mono">analyst.signalaf.com</span> only. Add it to your allowlist if
+          your organization restricts domains.
+        </p>
+        <p>
+          <strong className="text-text-primary">Disabling.</strong> Admins can turn the connector off
+          for the whole organization in Claude&apos;s connector settings, like any other connector.
+        </p>
+        <p>
+          <strong className="text-text-primary">Contact.</strong>{" "}
+          <a className="text-gold underline underline-offset-4" href="mailto:hello@signalaf.com">hello@signalaf.com</a>
+          {" · "}
+          <Link className="text-gold underline underline-offset-4" href="/privacy">Privacy policy</Link>
+          {" · "}
+          <Link className="text-gold underline underline-offset-4" href="/terms">Terms</Link>
+        </p>
       </section>
 
       <section className="mt-10 space-y-4 font-sans text-sm leading-relaxed text-text-secondary">
