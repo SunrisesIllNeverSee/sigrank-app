@@ -17,7 +17,6 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
@@ -88,14 +87,6 @@ export default function BestAiCodingMetricsForEngineeringManagersPage() {
   return (
     <BlogWorkspaceFrame>
       <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <CitationMeta
-        title={"Best AI Coding Metrics for Engineering Managers (2026)"}
-        description={
-          "The best AI coding metrics for engineering managers in 2026. Why acceptance rate and hours fail for team-level AI efficiency — and the token metrics that replace them. 4 tools reviewed."
-        }
-        date={"2026-08-17"}
-        slug={"/blog/best-ai-coding-metrics-for-engineering-managers"}
-      />
       <JsonLd
         data={[
           articleJsonLd(),
@@ -488,10 +479,10 @@ export default function BestAiCodingMetricsForEngineeringManagersPage() {
           </Link>
           {" · "}
           <Link
-            href="/ai-coding-metrics"
+            href="/ai-operator-scoring"
             className="text-gold underline underline-offset-2"
           >
-            AI Coding Metrics
+            AI Operator Scoring
           </Link>
           {" · "}
           <Link

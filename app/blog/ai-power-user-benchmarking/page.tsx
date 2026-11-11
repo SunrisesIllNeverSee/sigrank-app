@@ -16,7 +16,6 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
@@ -76,7 +75,6 @@ export default function AiPowerUserBenchmarkingPage() {
   return (
     <BlogWorkspaceFrame>
       <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <CitationMeta title={"AI Power User Benchmarking with SigRank"} description={"How to benchmark yourself against other AI power users. SigRank's operator classes and yield metrics tell you if you're a power user — and how to become one."} date={"2026-07-07"} slug={"/blog/ai-power-user-benchmarking"} />
       <JsonLd
         data={[
           articleJsonLd(),

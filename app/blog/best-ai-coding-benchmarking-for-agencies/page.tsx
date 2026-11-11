@@ -17,7 +17,6 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
@@ -91,14 +90,6 @@ export default function BestAiCodingBenchmarkingForAgenciesPage() {
   return (
     <BlogWorkspaceFrame>
       <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <CitationMeta
-        title={"Best AI Coding Benchmarking for Agencies (2026)"}
-        description={
-          "The best AI coding benchmarking tool for agencies in 2026. Why LMSYS benchmarks models, not developers — and how to benchmark your operators. 4 tools reviewed."
-        }
-        date={"2026-08-17"}
-        slug={"/blog/best-ai-coding-benchmarking-for-agencies"}
-      />
       <JsonLd
         data={[
           articleJsonLd(),

@@ -129,7 +129,6 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [Methodology](${SITE_ORIGIN}/methodology): definitions, formulas and quotable key figures — the canonical citation source
 - [TTEOP Standard](${SITE_ORIGIN}/standard): open telemetry protocol for AI operator measurement
 - [AI Operator Scoring](${SITE_ORIGIN}/ai-operator-scoring): what an AI operator is, and operator vs agent vs model evaluation
-- [Operator Performance](${SITE_ORIGIN}/operator-performance): why the operator is the variable — class tiers and scoring
 - [Score calculator](${SITE_ORIGIN}/score): paste token counts, get Yield + class, no account
 - [FAQ](${SITE_ORIGIN}/faq): common questions about AI operators and token-cascade efficiency
 - [About](${SITE_ORIGIN}/about): what SignalAF and SigRank are, and the privacy model
@@ -177,7 +176,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - [All Guides](${SITE_ORIGIN}/guides): how-to guides for measuring efficiency and reducing waste
 - [All Tools](${SITE_ORIGIN}/tools): interactive calculators and comparators
 - [Wiki concepts](${SITE_ORIGIN}/wiki): verification, signal drift, four degrees, local agent, methodology
-- [Topic hubs](${SITE_ORIGIN}/ai-benchmarking): AI benchmarking, coding metrics, operator scoring, cascade analysis, token telemetry${topicPages}
+- [Topic hubs](${SITE_ORIGIN}/ai-operator-scoring): operator scoring (benchmarking, coding metrics, class tiers), token cascade, token telemetry${topicPages}
 
 ## Comparisons & Blog
 - [All Comparisons](${SITE_ORIGIN}/vs): comparisons with model, coding, observability, and AI developer tools

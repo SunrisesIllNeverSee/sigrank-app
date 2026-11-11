@@ -3,7 +3,7 @@
  * Evaluation"
  *
  * Frames model evaluation as necessary but not sufficient. SigRank is the
- * complementary operator layer. Links into /ai-benchmarking, /vs/lmsys-arena,
+ * complementary operator layer. Links into /ai-operator-scoring, /vs/lmsys-arena,
  * /methodology, /ai-evaluation.
  *
  * JSON-LD: breadcrumb() + definedTerm() + faqPage().
@@ -25,7 +25,7 @@ export const metadata: Metadata = withOG({
 
 const RELATED = [
   {
-    href: "/ai-benchmarking",
+    href: "/ai-operator-scoring",
     title: "AI Benchmarking — Beyond Model Leaderboards",
     desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement to model-only benchmarking.",
   },

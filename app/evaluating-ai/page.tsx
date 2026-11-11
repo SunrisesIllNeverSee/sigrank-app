@@ -4,7 +4,7 @@
  *
  * Uses the car/driver analogy: evaluating AI without evaluating the operator
  * is like evaluating a car without evaluating the driver. Links into
- * /ai-evaluation, /ai-benchmarking, /methodology, and the blog post.
+ * /ai-evaluation, /ai-operator-scoring, /methodology, and the blog post.
  *
  * JSON-LD: breadcrumb() + definedTerm() + faqPage().
  */
@@ -30,7 +30,7 @@ const RELATED = [
     desc: "The four-layer model of AI evaluation: model, output, safety, operator. The operator layer is the missing piece of evaluating AI.",
   },
   {
-    href: "/ai-benchmarking",
+    href: "/ai-operator-scoring",
     title: "AI Benchmarking — Beyond Model Leaderboards",
     desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement that evaluating AI has been missing.",
   },

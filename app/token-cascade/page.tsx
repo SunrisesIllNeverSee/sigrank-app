@@ -5,7 +5,7 @@
  * Definitional page targeting the exact search term "token cascade". Explains
  * what a token cascade is, the four pillars, how it differs from raw token
  * consumption, and why cascade architecture (not volume) determines AI coding
- * efficiency. Links into /token-telemetry, /cascade-analysis, /metrics/yield-cascade,
+ * efficiency. Links into /token-telemetry, /metrics/yield-cascade,
  * and the comparison pages for token-tracking tools.
  *
  * JSON-LD: breadcrumb() + faqPage() + definedTerm().
@@ -57,11 +57,6 @@ const RELATED = [
     href: "/token-telemetry",
     title: "Token Telemetry",
     desc: "How the four token pillars are captured on-device from real coding sessions — the privacy-preserving data layer that makes the cascade visible.",
-  },
-  {
-    href: "/cascade-analysis",
-    title: "Cascade Analysis",
-    desc: "The diagnostic patterns: how to read your cascade, spot compounding vs burning, and turn the four pillars into action.",
   },
   {
     href: "/metrics/yield-cascade",

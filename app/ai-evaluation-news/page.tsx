@@ -3,7 +3,7 @@
  *
  * Covers the shift from model benchmarks to operator evaluation: trends,
  * milestones, what to watch. Links into /blog, /ai-evaluation,
- * /ai-benchmarking, /science.
+ * /ai-operator-scoring, /science.
  *
  * JSON-LD: breadcrumb() + definedTerm() + faqPage().
  */
@@ -34,7 +34,7 @@ const RELATED = [
     desc: "The four-layer model of AI evaluation: model, output, safety, operator. The framework behind the shift from model-only to operator evaluation.",
   },
   {
-    href: "/ai-benchmarking",
+    href: "/ai-operator-scoring",
     title: "AI Benchmarking — Beyond Model Leaderboards",
     desc: "Model benchmarks are saturating. Operator benchmarks are emerging. The trend from model-only to operator benchmarking.",
   },

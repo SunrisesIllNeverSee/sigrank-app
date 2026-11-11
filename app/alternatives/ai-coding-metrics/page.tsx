@@ -440,10 +440,10 @@ export default function AICodingMetricsPage() {
         <p className="font-sans text-sm text-text-muted">
           Related:{" "}
           <Link
-            href="/ai-coding-metrics"
+            href="/ai-operator-scoring"
             className="text-gold underline underline-offset-2"
           >
-            AI Coding Metrics
+            AI Operator Scoring
           </Link>
           {" · "}
           <Link

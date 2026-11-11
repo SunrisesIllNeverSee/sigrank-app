@@ -332,13 +332,6 @@ export default function AboutPage() {
           </Link>
           {" · "}
           <Link
-            href="/operator-performance"
-            className="text-gold underline underline-offset-2"
-          >
-            Operator Performance
-          </Link>
-          {" · "}
-          <Link
             href="/methodology"
             className="text-gold underline underline-offset-2"
           >

@@ -17,7 +17,6 @@ import { withOG } from "@/lib/seo";
 import { SITE_ORIGIN } from "@/lib/seo";
 import { WaveHero } from "@/components/ui/WaveHero";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { CitationMeta } from "@/components/seo/CitationMeta";
 import { BlogWorkspaceFrame } from "@/components/blog/BlogWorkspaceFrame";
 import { breadcrumb, faqPage, personAuthor } from "@/lib/jsonld";
 
@@ -88,14 +87,6 @@ export default function BestTokenTrackingForClaudeCodePowerUsersPage() {
   return (
     <BlogWorkspaceFrame>
       <div className="mx-auto flex max-w-3xl flex-col gap-8 py-2">
-      <CitationMeta
-        title={"Best Token Tracking for Claude Code Power Users (2026)"}
-        description={
-          "The best token tracking for Claude Code power users in 2026. Why /cost isn't enough for power users — and the metrics that show if your cascade is compounding. 4 tools reviewed."
-        }
-        date={"2026-08-17"}
-        slug={"/blog/best-token-tracking-for-claude-code-power-users"}
-      />
       <JsonLd
         data={[
           articleJsonLd(),

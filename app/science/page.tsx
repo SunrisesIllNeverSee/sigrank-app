@@ -452,17 +452,17 @@ export default function SciencePage() {
         <p className="font-sans text-sm text-text-muted">
           Learn more:{" "}
           <Link
-            href="/ai-benchmarking"
+            href="/ai-operator-scoring"
             className="text-gold underline underline-offset-2"
           >
-            AI Benchmarking
+            AI Operator Scoring
           </Link>
           {" · "}
           <Link
-            href="/cascade-analysis"
+            href="/token-cascade"
             className="text-gold underline underline-offset-2"
           >
-            Cascade Analysis
+            Token Cascade
           </Link>
           {" · "}
           <Link

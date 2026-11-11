@@ -4,7 +4,7 @@
  *
  * Topic hub for the AI-evaluation category. Frames AI evaluation as four
  * layers (model, output, safety, operator), positions SigRank as the
- * operator layer, and links into /ai-benchmarking, /methodology, the LMSYS
+ * operator layer, and links into /ai-operator-scoring, /methodology, the LMSYS
  * comparison, and the yield-cascade metric page.
  *
  * JSON-LD: breadcrumb() + definedTerm() + faqPage().
@@ -26,7 +26,7 @@ export const metadata: Metadata = withOG({
 
 const RELATED = [
   {
-    href: "/ai-benchmarking",
+    href: "/ai-operator-scoring",
     title: "AI Benchmarking — Beyond Model Leaderboards",
     desc: "Model benchmarks rank models. Operator benchmarks rank the operators driving them. The complement to model-only benchmarking that AI evaluation has been missing.",
   },

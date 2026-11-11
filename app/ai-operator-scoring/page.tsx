@@ -5,7 +5,9 @@
  * Topic hub for the ai-operator-scoring category. Explains what operator
  * scoring is, how it differs from model benchmarking and time tracking,
  * the SigRank scoring system, privacy preservation, and links to
- * /operator-performance, /methodology, /science, and /metrics/yield-cascade.
+ * /methodology, /science, and /metrics/yield-cascade. Also carries the content
+ * consolidated from the retired /operator-performance, /ai-coding-metrics and
+ * /ai-benchmarking pages (308-redirected here).
  *
  * JSON-LD: breadcrumb() + faqPage().
  */
@@ -24,11 +26,96 @@ export const metadata: Metadata = withOG({
   path: "/ai-operator-scoring",
 });
 
+const TIERS = [
+  {
+    name: "IGNITER",
+    desc: "The entry tier. Operators here are lighting the first sparks - high input, low cache reuse, output still finding its footing. Everyone starts here.",
+  },
+  {
+    name: "BEARER",
+    desc: "Quiet accumulation. Token flow is growing but the cascade hasn't compounded yet.",
+  },
+  {
+    name: "REFINER",
+    desc: "Practicing with purpose. Cache reuse is growing, yield is rising but not yet compounding.",
+  },
+  {
+    name: "SEEKER",
+    desc: "Active exploration. The operator is learning to reuse context and reduce fresh input.",
+  },
+  {
+    name: "BASE",
+    desc: "The center of the field. Mid-tier operators with consistent, balanced token flow.",
+  },
+  {
+    name: "POWER",
+    desc: "Above center. The cascade is taking shape - cache hit rate is healthy, output is dense, yield is climbing.",
+  },
+  {
+    name: "ARCH",
+    desc: "System builders. Coherent operators with consistent output and deep context reuse.",
+  },
+  {
+    name: "ARCH+",
+    desc: "The deepest field experience. Sustained high-volume cascade across all dimensions.",
+  },
+];
+
+const METRICS = [
+  {
+    href: "/metrics/yield-cascade",
+    name: "Yield (Υ)",
+    formula: "cache_read × output / input²",
+    desc: "The headline metric. Measures the architecture of the cascade — whether signal is compounding or tokens are burning. The single number that captures operator efficiency.",
+    priority: "Start here",
+  },
+  {
+    href: "/metrics/compression-ratio",
+    name: "Compression Ratio",
+    formula: "output / input",
+    desc: "How much you get back per token you put in. A blunt but useful ratio — high compression means the model is doing more with your input than parroting it.",
+    priority: "Pair with yield",
+  },
+  {
+    href: "/metrics/signal-to-noise-ratio",
+    name: "Signal-to-Noise Ratio (SNR)",
+    formula: "output / (input + output)",
+    desc: "Output share of fresh conversational traffic. High SNR means most of your fresh traffic is model output, not input.",
+    priority: "Quality lens",
+  },
+  {
+    href: "/metrics/cache-hit-rate",
+    name: "Cache Hit Rate",
+    formula: "cache_read / (cache_read + cache_write)",
+    desc: "How well you reuse cached context. A high hit rate means you are reading from cache — free tokens — rather than writing new context you may never reuse.",
+    priority: "Efficiency lens",
+  },
+  {
+    href: "/metrics/leverage",
+    name: "Leverage",
+    formula: "cache_read / input",
+    desc: "How much cached context amplifies your fresh input. High leverage means a small input is riding on a large cached foundation — the compounding effect.",
+    priority: "Compounding lens",
+  },
+  {
+    href: "/metrics/velocity",
+    name: "Velocity",
+    formula: "output / input",
+    desc: "Output tokens per fresh input token. The output-efficiency metric — useful, but it measures output ratio, not cascade efficiency. High output per input without cache reuse is still wasteful.",
+    priority: "Secondary",
+  },
+];
+
 const RELATED = [
   {
-    href: "/operator-performance",
-    title: "Operator Performance — Scoring the Operator",
-    desc: "The companion hub: why the operator is the variable, how SigRank scores operators, and the class tiers from IGNITER to ARCH+.",
+    href: "/alternatives/ai-benchmarking-tools",
+    title: "AI Benchmarking Tools — Alternatives",
+    desc: "The landscape of AI benchmarking and measurement tools: LMSYS Arena, WakaTime, Cursor metrics, Copilot, ccusage — and where SigRank fits.",
+  },
+  {
+    href: "/guides/how-to-measure-ai-coding-efficiency",
+    title: "How to Measure AI Coding Efficiency",
+    desc: "The step-by-step guide to computing the metrics from your token telemetry and reading the results.",
   },
   {
     href: "/methodology",
@@ -205,6 +292,14 @@ export default function AIOperatorScoringPage() {
           and time window — nothing more. Conflating token-cascade efficiency
           with any of these is a category error.
         </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Model effects are not always held constant across operators. Someone
+          using a model with better prompt caching may show higher cache-read
+          counts independent of their own skill. Task complexity, domain
+          familiarity, and workflow structure all influence the cascade shape.
+          Use operator performance metrics as a signal worth investigating, not
+          a verdict on the person.
+        </p>
       </section>
 
       {/* ── CTA: get your operator score ── */}
@@ -323,6 +418,16 @@ export default function AIOperatorScoringPage() {
           operating the AI under the stated metric and time window?&rdquo;
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          There is a second problem. Model benchmarks rely on synthetic test
+          suites or human preference votes — not on real coding telemetry. A
+          test suite tells you the model can solve a curated problem in a
+          controlled harness. A preference vote tells you a human liked one
+          response better than another. Neither tells you anything about how
+          efficiently a real developer drives the model through a real coding
+          session over a real week. That gap is where operator time, money, and
+          signal are actually won or lost.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The two are complements. A model benchmark helps you choose a model.
           Operator scoring helps you measure whether you are driving the model
           you chose well. Most developers have never had the second measurement.
@@ -403,6 +508,234 @@ export default function AIOperatorScoringPage() {
           scale.
         </p>
       </section>
+
+      {/* ── The operator is the variable ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          The operator is the variable
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Two operators sit down with the same model — the same Claude, the
+          same ChatGPT, the same Gemini — on the same platform, for the same
+          session length. One walks away with a token cascade that compounds:
+          small fresh input riding a large cached foundation into dense output.
+          The other walks away with a cascade that burns: high input, low cache
+          reuse, thin output. Same model. Same clock. Wildly different results.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The difference is not the model. The difference is the operator — how
+          they structure their prompts, how they reuse context, how they manage
+          the cascade across turns. The model is a constant. The operator is the
+          variable. SigRank is built to measure that variable.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          This is the inversion that makes SigRank a different category from
+          model leaderboards. LMSYS Arena ranks which model humans prefer.
+          SigRank ranks which operator drives their model best — highest-ranked
+          under the stated metric and time window. The question is not
+          &ldquo;which AI is smarter?&rdquo; — it is &ldquo;who ranks highest
+          at operating the AI they have?&rdquo;
+        </p>
+      </section>
+
+
+      {/* ── Operator benchmarking vs. model benchmarking ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Operator benchmarking vs. model benchmarking
+        </h2>
+        <div className="overflow-hidden rounded-lg border border-bg-border bg-bg-surface">
+          <table className="w-full text-left font-sans text-sm">
+            <thead className="border-b border-bg-border bg-bg-elevated">
+              <tr>
+                <th className="px-4 py-3 font-mono text-xs uppercase tracking-wider text-text-muted">
+                  Dimension
+                </th>
+                <th className="px-4 py-3 font-mono text-xs uppercase tracking-wider text-text-muted">
+                  Model benchmark
+                </th>
+                <th className="px-4 py-3 font-mono text-xs uppercase tracking-wider text-text-muted">
+                  Operator benchmark
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-bg-border-subtle">
+              <tr>
+                <td className="px-4 py-3 font-semibold text-text-primary">
+                  Question
+                </td>
+                <td className="px-4 py-3 text-text-secondary">
+                  Which AI is best?
+                </td>
+                <td className="px-4 py-3 text-text-secondary">
+                  Who uses the AI best?
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-semibold text-text-primary">
+                  Ranks
+                </td>
+                <td className="px-4 py-3 text-text-secondary">Models</td>
+                <td className="px-4 py-3 text-text-secondary">
+                  Humans (operators)
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-semibold text-text-primary">
+                  Data
+                </td>
+                <td className="px-4 py-3 text-text-secondary">
+                  Test suites / preference votes
+                </td>
+                <td className="px-4 py-3 text-text-secondary">
+                  Real token telemetry
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-semibold text-text-primary">
+                  Setting
+                </td>
+                <td className="px-4 py-3 text-text-secondary">
+                  Controlled harness
+                </td>
+                <td className="px-4 py-3 text-text-secondary">
+                  Live coding sessions
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-semibold text-text-primary">
+                  Example
+                </td>
+                <td className="px-4 py-3 text-text-secondary">
+                  LMSYS Chatbot Arena
+                </td>
+                <td className="px-4 py-3 text-text-secondary">SigRank Index</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          The two categories are complements, not competitors. A model benchmark
+          helps you choose a model. An operator benchmark helps you measure
+          whether you are driving the model you chose well. Most developers have
+          never had the second one. That is the gap SigRank fills.
+        </p>
+      </section>
+
+
+      {/* ── Class tiers ── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Class tiers explained
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Every operator is assigned a class tier from the scoring ruleset.
+          Tiers run from low to high — they describe where an operator is in the
+          compounding journey, not a fixed label.
+        </p>
+        <div className="flex flex-col gap-3">
+          {TIERS.map((t, i) => (
+            <div
+              key={t.name}
+              className="rounded-lg border border-bg-border bg-bg-surface p-5"
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs text-text-muted">
+                  {i + 1}
+                </span>
+                <h3 className="font-mono text-sm font-bold text-gold">
+                  {t.name}
+                </h3>
+              </div>
+              <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+                {t.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+
+      {/* ── Metric cards ── */}
+      <section className="flex flex-col gap-4">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          The six metrics
+        </h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {METRICS.map((m) => (
+            <Link
+              key={m.href}
+              href={m.href}
+              className="group rounded-lg border border-bg-border bg-bg-surface p-5 transition-colors hover:border-bg-border-subtle hover:bg-bg-elevated"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-mono text-sm font-bold text-text-primary group-hover:text-gold">
+                  {m.name}
+                </h3>
+                <span className="font-mono text-xs text-text-muted">
+                  {m.priority}
+                </span>
+              </div>
+              <code className="mt-2 block rounded bg-bg-elevated px-2 py-1 font-mono text-xs text-gold">
+                {m.formula}
+              </code>
+              <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
+                {m.desc}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── How they relate ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          How they relate
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          <strong className="text-text-primary">Yield</strong> is the composite.
+          It multiplies cache reuse (cache_read) by output and divides by the
+          square of input. That means yield rises when you reuse cache, when you
+          produce more output, and when you send less fresh input — all at once.
+          It is the one number that rewards the full compounding architecture.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          <strong className="text-text-primary">Compression ratio</strong> is
+          the output-over-input slice of yield — it ignores cache entirely. It
+          tells you whether the model is doing more with your input than echoing
+          it, but it cannot see whether you are compounding.
+          <strong className="text-text-primary">
+            {" "}
+            Cache hit rate
+          </strong> and <strong className="text-text-primary">
+            leverage
+          </strong>{" "}
+          are the cache slices — they tell you how well you reuse context but
+          say nothing about output.{" "}
+          <strong className="text-text-primary">SNR</strong> is the quality lens
+          on output. <strong className="text-text-primary">Velocity</strong> is
+          the time lens — orthogonal to efficiency, useful for throughput
+          comparisons but not for ranking.
+        </p>
+      </section>
+
+      {/* ── Which to prioritize ── */}
+      <section className="flex flex-col gap-3">
+        <h2 className="font-mono text-base font-bold text-text-primary">
+          Which to prioritize
+        </h2>
+        <p className="font-sans text-sm leading-relaxed text-text-secondary">
+          Start with yield. It is the headline metric and the one the
+          leaderboard ranks by. If your yield is low, open the diagnostic
+          lenses: check compression ratio to see if your output is too thin
+          relative to input, check cache hit rate to see if you are failing to
+          reuse context, check leverage to see if your cached foundation is too
+          small. SNR tells you whether the output you do produce is dense with
+          signal. Velocity is a secondary metric — track it for throughput, but
+          do not optimize for it at the expense of yield.
+        </p>
+      </section>
+
 
       {/* ── Related ── */}
       <section className="flex flex-col gap-4">

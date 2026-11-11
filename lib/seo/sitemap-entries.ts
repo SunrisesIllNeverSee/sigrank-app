@@ -415,17 +415,14 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
 
   // Topic hub pages — category intent
   { path: "/token-telemetry", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/ai-coding-metrics", priority: 0.6, changeFrequency: "monthly" },
-  // lastModified = last material content change (3540d050, 2026-09-07 content refresh)
-  { path: "/operator-performance", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-07T23:35:51Z") },
-  { path: "/ai-benchmarking", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/cascade-analysis", priority: 0.6, changeFrequency: "monthly" },
+  // /ai-coding-metrics, /operator-performance, /ai-benchmarking → 308 to /ai-operator-scoring;
+  // /cascade-analysis → 308 to /token-cascade (2026-11 spam-update consolidation). Never sitemap members.
   { path: "/token-cascade", priority: 0.7, changeFrequency: "monthly" },
   { path: "/ai-operator-scoring", priority: 0.6, changeFrequency: "monthly", lastModified: new Date("2026-09-07T23:35:51Z") },
   // /ai-operator-benchmark removed from sitemap — 308-redirects to /ai-operator-scoring (P8)
   // /token-efficiency removed from sitemap — 308-redirects to /metrics/yield-cascade (P8)
   { path: "/privacy-preserving-ai-telemetry", priority: 0.8, changeFrequency: "monthly" },
-  // /ai-coding-analytics removed from sitemap — 308-redirects to /ai-coding-metrics (P8)
+  // /ai-coding-analytics removed from sitemap — 308-redirects to /ai-operator-scoring (P8)
 
   // AI evaluation topic pages — from content brief (2026-09-15)
   { path: "/ai-evaluation", priority: 0.8, changeFrequency: "monthly" },

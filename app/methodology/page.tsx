@@ -589,13 +589,6 @@ export default async function MethodologyPage() {
         <p className="font-sans text-sm text-text-muted">
           Learn more:{" "}
           <Link
-            href="/ai-coding-metrics"
-            className="text-gold underline underline-offset-2"
-          >
-            AI Coding Metrics
-          </Link>
-          {" · "}
-          <Link
             href="/ai-operator-scoring"
             className="text-gold underline underline-offset-2"
           >
