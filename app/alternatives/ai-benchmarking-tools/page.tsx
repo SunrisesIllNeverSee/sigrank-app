@@ -482,7 +482,7 @@ export default function AIBenchmarkingToolsPage() {
           the best model, then operate it efficiently.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
-          SigRank is free and lists ccusage and tokscale as npm dependencies:{" "}
+          SigRank is free and bundles ccusage, tokscale, and token-dashboard:{" "}
           <code className="rounded bg-bg-elevated px-1.5 py-0.5 font-mono text-xs text-gold">
             npm install -g sigrank
           </code>

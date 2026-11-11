@@ -61,6 +61,11 @@ const COMPARE_ROWS: { feature: string; viberank: string; sigrank: string }[] = [
     viberank: "Spend tiers from Spark ($0+) to Hypernova ($250K+)",
     sigrank: "Class tiers and archetypes computed from the snapshot",
   },
+  {
+    feature: "Bundled tools (ccusage, tokscale, token-dashboard)",
+    viberank: "No",
+    sigrank: "Yes",
+  },
 ];
 
 const FAQS: { question: string; answer: string }[] = [

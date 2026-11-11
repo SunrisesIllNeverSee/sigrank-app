@@ -33,7 +33,7 @@ const COMPARE_ROWS: { feature: string; other: string; sigrank: string }[] = [
     feature: "Data read",
     other: "Local usage data from 19 listed agent CLIs",
     sigrank:
-      "Local usage via the SigRank CLI (lists ccusage as a dependency); four token pillars",
+      "Local usage via the SigRank CLI (bundles ccusage, tokscale and token-dashboard); four token pillars",
   },
   {
     feature: "Cost in dollars",
@@ -274,9 +274,9 @@ export default function VsCcusagePage() {
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           You do not need to change how you use ccusage. The SigRank CLI is its
-          own npm package (sigrank 1.0.49 as of 2026-11-11), and it lists
-          ccusage and tokscale among its dependencies, so the log-reading layer
-          is shared rather than replaced:
+          own npm package (sigrank 1.0.49 as of 2026-11-11), and it bundles
+          ccusage, tokscale and token-dashboard, so the log-reading layer is
+          shared rather than replaced:
         </p>
         <div className="rounded-lg border border-bg-border bg-bg-surface p-5">
           <pre className="overflow-x-auto font-mono text-xs leading-relaxed text-text-secondary">
