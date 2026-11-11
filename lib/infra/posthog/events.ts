@@ -96,6 +96,11 @@ export const track = {
   }) => {
     if (on()) posthog.capture("payment_succeeded", { ...props, ...baseProps() });
   },
+  // Fires when a visitor clicks through to the official ChatGPT directory listing
+  // ("SigRank | SignalAF Analyst") from the /plugin page.
+  chatgptListingClicked: (extra: { source: string }) => {
+    if (on()) posthog.capture("chatgpt_listing_click", { ...extra, ...baseProps() });
+  },
   // Fires when the contact form is successfully submitted.
   contactSubmitted: (extra: {
     topic: string;
