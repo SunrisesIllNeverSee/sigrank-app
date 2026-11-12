@@ -200,6 +200,17 @@ export default function CcusageAlternativesPage() {
           replacing it.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
+          Only need to see this session&rsquo;s numbers or your plan limits? See{" "}
+          <Link href="/claude-code-usage" className="text-gold underline underline-offset-2">
+            how to check Claude Code usage
+          </Link>{" "}
+          or{" "}
+          <Link href="/codex-usage" className="text-gold underline underline-offset-2">
+            Codex usage
+          </Link>
+          .
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
           Here are the five best ccusage alternatives in 2026.
         </p>
       </section>

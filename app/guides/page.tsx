@@ -26,6 +26,16 @@ export const revalidate = 86400;
 
 const GUIDES = [
   {
+    href: "/claude-code-usage",
+    title: "Claude Code Usage: Check It, Know Your Limits",
+    desc: "How to check Claude Code usage with /usage, how the 5-hour and weekly limits work, and what the cost figure means. Checked against Anthropic docs.",
+  },
+  {
+    href: "/codex-usage",
+    title: "Codex Usage: Check It, Know Your Limits",
+    desc: "How to check Codex usage with /status and the usage dashboard, the limits on each plan, and the credit rates. Checked against OpenAI docs.",
+  },
+  {
     href: "/guides/how-to-measure-ai-coding-efficiency",
     title: "How to Measure AI Coding Efficiency",
     desc: "Measure your AI coding efficiency using the four token pillars and the Υ Yield metric with ccusage and sigrank. A privacy-preserving, on-device workflow.",

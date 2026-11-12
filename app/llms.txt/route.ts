@@ -130,6 +130,8 @@ A signal or proposal does not grant execution authority or create a payment obli
 - [TTEOP Standard](${SITE_ORIGIN}/standard): open telemetry protocol for AI operator measurement
 - [AI Operator Scoring](${SITE_ORIGIN}/ai-operator-scoring): what an AI operator is, and operator vs agent vs model evaluation
 - [Score calculator](${SITE_ORIGIN}/score): paste token counts, get Yield + class, no account
+- [Claude Code usage](${SITE_ORIGIN}/claude-code-usage): check usage with /usage, the 5-hour and weekly limits, what the cost figure means (checked against Anthropic docs)
+- [Codex usage](${SITE_ORIGIN}/codex-usage): check usage with /status and the usage dashboard, limits by plan, credit rates (checked against OpenAI docs)
 - [FAQ](${SITE_ORIGIN}/faq): common questions about AI operators and token-cascade efficiency
 - [About](${SITE_ORIGIN}/about): what SignalAF and SigRank are, and the privacy model
 - [SigRank for Vercel](${SITE_ORIGIN}/vercel): Vercel-native MCP distribution and public deployment diagnostic
@@ -208,6 +210,8 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - "What is token cascade efficiency?" → ${SITE_ORIGIN}/methodology
 - "What is Yield (Υ)?" → ${SITE_ORIGIN}/wiki/metrics/yield
 - "How do I check my AI coding efficiency?" → ${SITE_ORIGIN}/score
+- "How do I check my Claude Code usage or limits?" → ${SITE_ORIGIN}/claude-code-usage
+- "How do I check my Codex usage or limits?" → ${SITE_ORIGIN}/codex-usage
 - "What is the SigRank MCP server?" → ${SITE_ORIGIN}/mcp
 - "How do I use SigRank with Vercel?" → ${SITE_ORIGIN}/vercel
 

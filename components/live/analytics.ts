@@ -43,9 +43,13 @@ export const liveTrack = {
   },
   /** A SigRank CLI command copied from the You row or the Rank me sheet
    *  (funnel step: score_viewed → cli_command_copied → enroll/submit). */
-  cliCommandCopied: (extra: { command: string; surface: "you_row" | "rank_me" }) => {
+  cliCommandCopied: (extra: { command: string; surface: "you_row" | "rank_me" | "usage_page"; tool?: string }) => {
     if (on())
       posthog.capture("cli_command_copied", { ...extra, ...baseProps() });
+  },
+  /** A /claude-code-usage or /codex-usage page viewed (usage pages batch). */
+  usagePageViewed: (extra: { tool: "claude-code" | "codex" }) => {
+    if (on()) posthog.capture("usage_page_viewed", { ...extra, ...baseProps() });
   },
   /** Signed-out homepage strip shown (Ploy plan §9.1). */
   bannerViewed: () => {

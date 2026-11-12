@@ -44,6 +44,8 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/token-cascade": "CORE",
   "/pricing": "CORE",
   "/ai-operator-scoring": "CORE",
+  "/claude-code-usage": "CORE", // usage pages batch (Nov 2026): claude code usage/cost/limits
+  "/codex-usage": "CORE", // usage pages batch (Nov 2026): codex usage/limits/cost
 
   // ── Board windows (emitted via BOARD_WINDOWS, classified here) ──────────
   "/board/all": "CORE",

@@ -4,6 +4,8 @@
 export const SECTION_PAGES = {
   guides: [
     { label: "All Guides", href: "/guides" },
+    { label: "Claude Code Usage", href: "/claude-code-usage" },
+    { label: "Codex Usage", href: "/codex-usage" },
     { label: "Cache Write Convergence", href: "/guides/cache-write-convergence" },
     { label: "AI Coding Benchmarks", href: "/guides/how-to-benchmark-ai-coding-workflow" },
     { label: "How to Compare AI Operators", href: "/guides/how-to-compare-ai-operators" },

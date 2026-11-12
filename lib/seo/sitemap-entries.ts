@@ -63,6 +63,8 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
   { path: "/sigrank", priority: 0.8, changeFrequency: "daily" },
   // /board/all is emitted once via BOARD_WINDOWS below — do not re-add here.
   { path: "/score", priority: 0.9, changeFrequency: "daily" },
+  { path: "/claude-code-usage", priority: 0.8, changeFrequency: "weekly", lastModified: new Date("2026-11-12T00:00:00Z") },
+  { path: "/codex-usage", priority: 0.8, changeFrequency: "weekly", lastModified: new Date("2026-11-12T00:00:00Z") },
   { path: "/hall", priority: 0.8, changeFrequency: "daily" },
   { path: "/hall/badges", priority: 0.6, changeFrequency: "weekly" },
   { path: "/fieldhub", priority: 0.8, changeFrequency: "daily" },
