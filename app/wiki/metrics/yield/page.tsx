@@ -17,7 +17,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Signal-to-Noise Ratio (SNR)", href: "/wiki/metrics/snr" },
   { label: "Composition", href: "/wiki/measurement/composition" },
   { label: "Architecture (mos2es.com)", href: "https://mos2es.com/architecture" },
-  { label: "30-Day Pilot (mos2es.org)", href: "https://mos2es.org/pilot" },
+  { label: "30-Day Pilot (mos2es.com)", href: "https://mos2es.com/products" },
 ];
 
 export default function YieldPage() {

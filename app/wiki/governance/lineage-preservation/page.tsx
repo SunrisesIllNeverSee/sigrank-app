@@ -16,7 +16,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Lineage (System Tests)", href: "/wiki/tests/lineage" },
   { label: "Conservation Law of Commitment", href: "/wiki/ct/conservation" },
   { label: "Governance vs Alignment (mos2es.com)", href: "https://mos2es.com/governance-vs-alignment" },
-  { label: "Execution-Layer Governance (mos2es.org)", href: "https://mos2es.org/execution-governance" },
+  { label: "Execution-Layer Governance (mos2es.com)", href: "https://mos2es.com/concepts/governance-enforcement" },
 ];
 
 export default function LineagePreservationPage() {

@@ -15,7 +15,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Re-grounding", href: "/wiki/governance/re-grounding" },
   { label: "Execution-Layer Governance", href: "/wiki/governance/execution-layer-governance" },
   { label: "Governance vs Alignment (mos2es.com)", href: "https://mos2es.com/governance-vs-alignment" },
-  { label: "Execution-Layer Governance (mos2es.org)", href: "https://mos2es.org/execution-governance" },
+  { label: "Execution-Layer Governance (mos2es.com)", href: "https://mos2es.com/concepts/governance-enforcement" },
 ];
 
 export default function AbstentionPage() {

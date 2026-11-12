@@ -15,7 +15,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Recursive Self-Evaluation Test", href: "/wiki/tests/recursive-self-evaluation" },
   { label: "Test-Retest Reliability", href: "/wiki/validation/test-retest" },
   { label: "Architecture (mos2es.com)", href: "https://mos2es.com/architecture" },
-  { label: "System Testing (mos2es.org)", href: "https://mos2es.org/system-testing" },
+  { label: "System Testing (mos2es.com)", href: "https://mos2es.com/research" },
 ];
 
 export default function VerifiabilityTestPage() {

@@ -18,9 +18,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage, alternativesItemList } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "cc usage Alternatives: Token Tracking & Analysis Tools",
+  title: "ccusage Alternatives: Token Tracking & Analysis Tools",
   description:
-    "The 5 best cc usage alternatives in 2026. Compare SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale on scoring, leaderboards, and MCP integration.",
+    "The 5 best ccusage alternatives in 2026. Compare SigRank, Token Dashboard, manual ccusage + scripts, and Tokscale on scoring, leaderboards, and MCP integration.",
   path: "/alternatives/ccusage-alternatives",
 });
 
@@ -170,7 +170,7 @@ export default function CcusageAlternativesPage() {
 
       <WaveHero
         eyebrow="◈ Alternatives"
-        title="cc usage Alternatives for Token Tracking & Analysis"
+        title="ccusage Alternatives for Token Tracking & Analysis"
         subtitle={
           <>
             ccusage is great for reading token usage. These five alternatives
@@ -186,7 +186,7 @@ export default function CcusageAlternativesPage() {
       {/* Intro */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          What cc usage does well — and where it stops
+          What ccusage does well — and where it stops
         </h2>
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           <strong className="text-text-primary">ccusage</strong> (often
@@ -198,6 +198,17 @@ export default function CcusageAlternativesPage() {
           expose an MCP interface for agents. If you want any of those, you need
           an alternative — and the best one bundles ccusage rather than
           replacing it.
+        </p>
+        <p className="font-sans text-sm leading-relaxed text-text-muted">
+          Only need to see this session&rsquo;s numbers or your plan limits? See{" "}
+          <Link href="/claude-code-usage" className="text-gold underline underline-offset-2">
+            how to check Claude Code usage
+          </Link>{" "}
+          or{" "}
+          <Link href="/codex-usage" className="text-gold underline underline-offset-2">
+            Codex usage
+          </Link>
+          .
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
           Here are the five best ccusage alternatives in 2026.
@@ -499,7 +510,7 @@ export default function CcusageAlternativesPage() {
           baseline assessment using the same content-free telemetry.
         </p>
         <a
-          href="https://mos2es.org/baseline-assessment"
+          href="https://mos2es.com/products"
           className="mt-4 inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
         >
           Explore the baseline assessment →

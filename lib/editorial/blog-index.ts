@@ -109,7 +109,7 @@ const STATIC_POSTS: PostSummary[] = [
   },
   {
     slug: "why-yield-beats-tokenmaxxing",
-    title: "Why Yield Beats Tokenmaxxing",
+    title: "Tokenmaxxing, Measured",
     description: "Tokenmaxxing is the practice of maximizing raw token count. Yield (Υ) proves it wrong — efficiency, not volume, defines a top AI operator.",
     date: "2026-07-07",
     tags: [],

@@ -743,3 +743,10 @@ main:has(.lbw-root) {
   max-width: none;
   padding: 0;
 }
+
+/* Signed-out-only content (Ploy plan §9.1, owner 2026-11-12). AUTH_HINT in
+ * app/layout.tsx sets html[data-auth="in"] before first paint when a Supabase
+ * session cookie exists, so signed-in visitors never see a flash. */
+html[data-auth="in"] .signed-out-only {
+  display: none;
+}

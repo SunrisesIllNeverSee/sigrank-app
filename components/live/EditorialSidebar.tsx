@@ -297,7 +297,11 @@ export function EditorialNav({
       <nav className="ws-tree-list" aria-label="Editorial sections">
         {TOPICS.map(item => {
           const selected = item.id === topic;
-          const entries = selected && documents ? documents : PAGES[item.id];
+          /* owner 2026-11-12: only the current section lists its pages. Every
+             other section is one link to its index page. Listing every
+             section's pages on every page put ~160 identical links on each
+             editorial page, so search engines couldn't tell which mattered. */
+          const entries = selected ? (documents ?? PAGES[item.id]) : [];
           const listed = entries.some(entry => entry.href === pathname);
           const activeLabel = pathname.split("/").filter(Boolean).at(-1)?.replace(/-/g, " ") ?? "Current page";
           const pages = selected && !listed
@@ -312,7 +316,7 @@ export function EditorialNav({
               <summary className={"ws-tree-row" + (selected ? " active" : "")}>
                 <Link href={item.href} className="ws-tree-title"
                   aria-current={pathname === item.href ? "page" : undefined}>{item.label}</Link>
-                <span className="ws-tree-toggle" aria-hidden="true" />
+                {selected && <span className="ws-tree-toggle" aria-hidden="true" />}
               </summary>
               <div className="ws-topic-documents">
                 {pages.map(entry => {

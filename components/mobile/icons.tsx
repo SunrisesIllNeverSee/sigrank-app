@@ -22,6 +22,11 @@ export const IconCompare = () => (
     <path d="M3.5 7h14M14 3.5 17.5 7 14 10.5M18.5 15h-14M8 11.5 4.5 15 8 18.5" />
   </svg>
 );
+export const IconRankMe = () => (
+  <svg {...base}>
+    <path d="M4 6.5 8 10l-4 3.5M10.5 15.5h7.5" />
+  </svg>
+);
 export const IconProfile = () => (
   <svg {...base}>
     <circle cx="11" cy="7.5" r="3.6" />

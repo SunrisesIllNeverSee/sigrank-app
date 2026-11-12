@@ -22,8 +22,8 @@ import {
   type ReadResourceCallback,
   type PromptCallback,
 } from "@modelcontextprotocol/server";
-import { PostHog } from "posthog-node";
-import { instrument } from "@posthog/mcp";
+import { instrumentMcp } from "@/lib/mcp/analytics";
+import { posthogMcp } from "@/lib/mcp/posthog";
 import { TOOLS, NAME_BEARING_TOOLS, callTool } from "@/lib/mcp/tools";
 import { UNTRUSTED_TEXT_NOTICE } from "@/lib/mcp/untrusted";
 import { RESOURCES, readResource } from "@/lib/mcp/resources";
@@ -36,28 +36,8 @@ import {
 import type { NextRequest } from "next/server";
 import { SIGRANK_STANDARD_VERSION } from "@/lib/mcp/standard";
 
-// Module-scope PostHog client for MCP analytics — created once, flushed per invocation.
-// Guards against a missing token: analytics is additive and must never break the server.
-// Reads the SAME env vars as the existing PostHog integration (lib/infra/posthog/*),
-// including the Vercel PostHog integration fallbacks.
-const _phToken = process.env.POSTHOG_KEY
-  || process.env.POSTHOG_PROJECT_TOKEN
-  || process.env.NEXT_PUBLIC_POSTHOG_KEY
-  || process.env.NEXT_PUBLIC_sigrank_POSTHOG_PROJECT_TOKEN
-  || process.env.sigrank_POSTHOG_PROJECT_TOKEN;
-const _phHost = process.env.NEXT_PUBLIC_POSTHOG_HOST
-  || process.env.POSTHOG_HOST
-  || process.env.NEXT_PUBLIC_sigrank_POSTHOG_HOST
-  || "https://us.i.posthog.com";
-export const posthogMcp: PostHog | null = _phToken
-  ? new PostHog(_phToken, {
-      host: _phHost,
-      flushAt: 1,
-      flushInterval: 0,
-      requestTimeout: 5000,
-      enableExceptionAutocapture: true,
-    })
-  : null;
+// MCP analytics client: shared with the Analyst plugin server (lib/mcp/posthog.ts).
+export { posthogMcp };
 
 /**
  * Create a SignalAF MCP server with all tools, resources, and prompts registered.
@@ -88,16 +68,10 @@ export function createSigrankServer(req?: NextRequest): McpServer {
     },
   );
 
-  if (posthogMcp) {
-    // Disable exception autocapture for MCP tool errors. Tool handlers return
-    // isError: true for legitimate user errors (invalid_arguments,
-    // operator_not_found) — these are expected application-level errors, not
-    // bugs. Without this flag, @posthog/mcp captures every isError response
-    // as a $exception event, polluting PostHog error tracking with user errors.
-    // Tool errors are still captured as $mcp_tool_call events with isError: true
-    // in the properties, which is the correct way to track them as data.
-    instrument(server, posthogMcp, { enableExceptionAutocapture: false });
-  }
+  // PostHog MCP analytics with the shared SigRank options (lib/mcp/analytics):
+  // no exception autocapture for expected isError results, no parameters
+  // injected into tool schemas, and surface/traffic labels on every event.
+  instrumentMcp(server, posthogMcp);
 
   // ── Register all 16 SigRank tools ──────────────────────────────────────
   // Each tool's handler delegates to the existing callTool dispatcher,

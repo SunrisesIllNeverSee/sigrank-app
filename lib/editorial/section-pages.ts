@@ -4,6 +4,8 @@
 export const SECTION_PAGES = {
   guides: [
     { label: "All Guides", href: "/guides" },
+    { label: "Claude Code Usage", href: "/claude-code-usage" },
+    { label: "Codex Usage", href: "/codex-usage" },
     { label: "Cache Write Convergence", href: "/guides/cache-write-convergence" },
     { label: "AI Coding Benchmarks", href: "/guides/how-to-benchmark-ai-coding-workflow" },
     { label: "How to Compare AI Operators", href: "/guides/how-to-compare-ai-operators" },
@@ -87,7 +89,7 @@ export const SECTION_PAGES = {
     { label: "Best AI Coding Metrics Tools (2026)", href: "/alternatives/ai-coding-metrics" },
     { label: "Best AI Coding ROI Tools (2026)", href: "/alternatives/ai-coding-roi-tools" },
     { label: "Best AI Operator Ranking Tools (2026)", href: "/alternatives/ai-operator-ranking-tools" },
-    { label: "cc usage Alternatives: Token Tracking & Analysis Tools", href: "/alternatives/ccusage-alternatives" },
+    { label: "ccusage Alternatives: Token Tracking & Analysis Tools", href: "/alternatives/ccusage-alternatives" },
     { label: "Best Claude Code Usage Tracking Tools (2026)", href: "/alternatives/claude-code-usage-tools" },
     { label: "Best Cursor AI Metrics Tools (2026)", href: "/alternatives/cursor-ai-metrics-tools" },
     { label: "Best MCP Tools for AI Developers (2026)", href: "/alternatives/mcp-ai-developer-tools" },

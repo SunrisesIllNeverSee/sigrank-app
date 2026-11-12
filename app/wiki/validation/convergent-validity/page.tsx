@@ -15,7 +15,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Test-Retest Reliability", href: "/wiki/validation/test-retest" },
   { label: "Operator Separability", href: "/wiki/validation/operator-separability" },
   { label: "Architecture (mos2es.com)", href: "https://mos2es.com/architecture" },
-  { label: "30-Day Pilot (mos2es.org)", href: "https://mos2es.org/pilot" },
+  { label: "30-Day Pilot (mos2es.com)", href: "https://mos2es.com/products" },
 ];
 
 export default function ConvergentValidityPage() {

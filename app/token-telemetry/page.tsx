@@ -434,7 +434,7 @@ export default function TokenTelemetryPage() {
           baseline report.
         </p>
         <a
-          href="https://mos2es.org/baseline-assessment"
+          href="https://mos2es.com/products"
           className="mt-4 inline-flex items-center gap-2 rounded-lg border border-bg-border-subtle bg-bg-elevated px-5 py-2.5 font-mono text-sm font-bold text-text-primary transition-colors hover:border-gold hover:text-gold"
         >
           Explore the baseline assessment →

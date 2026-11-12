@@ -17,7 +17,7 @@ import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFram
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
 export const metadata: Metadata = withOG({
-  title: "Cache Hit Rate \u2014 Prompt Cache Reuse for AI Coding",
+  title: "Prompt Caching: What Your Cache Hit Rate Says About You",
   description:
     "Cache hit rate measures how well you reuse cached context in AI coding. Learn why it is the highest-leverage metric for token-cascade efficiency and how to improve your reuse.",
   path: "/metrics/cache-hit-rate",
@@ -31,8 +31,8 @@ export default function CacheHitRatePage() {
         <WaveHero
           eyebrow="SIGRANK METRIC"
           terminalText="CACHE HIT RATE"
-          title="Cache Hit Rate"
-          subtitle={<>Reuse of prior context.</>}
+          title="Prompt Caching and Cache Hit Rate"
+          subtitle={<>How much of your prompt-cached context you actually reuse.</>}
         />
       }
       current="/metrics/cache-hit-rate"

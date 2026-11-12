@@ -63,7 +63,7 @@ const ALTS = [
   {
     href: "/alternatives/ai-operator-ranking-tools",
     title: "Best AI Operator Ranking Tools (2026)",
-    desc: "The 6 best AI operator ranking tools in 2026. SigRank, LMSYS, BigCode, Hugging Face Open LLM Leaderboard, Chatbot Arena, and SigArena — which ranks operators, not models.",
+    desc: "The 5 best AI operator ranking tools in 2026. SigRank, LMSYS, BigCode, Hugging Face Open LLM Leaderboard and Chatbot Arena — and which one ranks operators, not models.",
   },
   {
     href: "/alternatives/token-cost-tracking-tools",

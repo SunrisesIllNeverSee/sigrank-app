@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { withOG } from "@/lib/seo";
-import BoardWindowPage from "./board/[window]/page";
+import { renderBoardWindow } from "./board/[window]/board-window";
 
 export const revalidate = 3600;
 
@@ -17,6 +17,6 @@ export const metadata: Metadata = withOG({
   },
 });
 
-export default function HomePage() {
-  return <BoardWindowPage params={Promise.resolve({ window: "all" })} />;
+export default async function HomePage() {
+  return renderBoardWindow("all", { home: true });
 }

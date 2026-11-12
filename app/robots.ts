@@ -22,6 +22,18 @@ import { SITE_ORIGIN } from "@/lib/seo";
 const ALLOW = ["/", "/api/exchange/signals"];
 const DISALLOW = ["/api/", "/auth/", "/internal/"];
 
+// Owner 2026-11-12 (Ploy crawl finding): OAI-SearchBot spent ~47% of its
+// fetches on /vs pages, including these 12 editor/IDE and LLM-ops pages that
+// are HOLD + noindex since 2026-11-11, and never reached the blog posts.
+// Keep it off them so its crawl goes to the pages we want cited. Users and
+// every other crawler still reach them. Each path must stay HOLD in
+// lib/seo/search-index-policy.ts (tested).
+export const OAI_SEARCH_HELD_VS = [
+  "/vs/copilot", "/vs/braintrust", "/vs/langchain", "/vs/aider",
+  "/vs/cline", "/vs/continue", "/vs/roo-code", "/vs/windsurf",
+  "/vs/zed", "/vs/tabnine", "/vs/amazon-q", "/vs/sourcegraph-cody",
+];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
@@ -29,7 +41,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "OAI-SearchBot",
         allow: ALLOW,
-        disallow: DISALLOW,
+        disallow: [...DISALLOW, ...OAI_SEARCH_HELD_VS],
       },
       {
         userAgent: "Claude-SearchBot",

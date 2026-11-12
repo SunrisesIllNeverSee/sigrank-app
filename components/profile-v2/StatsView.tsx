@@ -130,10 +130,6 @@ function histMetric(h: HistoryPoint, k: MetricKey): number | null {
 
 const rowTotal = (r: LeaderboardRow): number =>
   r.telemetry.fresh_input + r.telemetry.output + r.telemetry.cache_read + r.telemetry.cache_create;
-const rowCompression = (r: LeaderboardRow): number | null => {
-  const i = r.telemetry.fresh_input, cr = r.telemetry.cache_read;
-  return i + cr > 0 ? cr / (i + cr) : null;
-};
 const rowPerDay = (r: LeaderboardRow): number | null =>
   r.operator.account_age_days > 0 ? rowTotal(r) / r.operator.account_age_days : null;
 
@@ -240,11 +236,8 @@ export function StatsView({
   const levMed = med(levField);
   const perDayField = fieldVals(rowPerDay);
   const perDayMed = med(perDayField);
-  const compField = fieldVals(rowCompression);
-  const compMed = med(compField);
   const costField = fieldVals((r) => r.snapshot.cascade?.costPerMillion);
   const costMed = med(costField);
-  const myCompression = i + cr > 0 ? cr / (i + cr) : null;
   const perDay = total / age;
   const msgsPerSnap = history.length > 0 ? operator.total_messages_lifetime / history.length : null;
 
@@ -260,10 +253,6 @@ export function StatsView({
       formula: `total ÷ ${age} days`, rank: rankOf(perDay, perDayField),
       med: perDayMed != null ? compact(perDayMed) : "—",
       vs: pctVs(perDay, perDayMed), good: true },
-    { label: "Compression Ratio", value: myCompression != null ? num(myCompression, 3) : "—",
-      formula: "cache_read ÷ (input + cache_read)", rank: rankOf(myCompression, compField),
-      med: compMed != null ? num(compMed, 3) : "—",
-      vs: myCompression != null ? pctVs(myCompression, compMed) : null, good: true },
     { label: "Cost per 1M", value: c ? money(c.costPerMillion) : "—",
       formula: "total_cost ÷ total × 1M", rank: rankOf(c?.costPerMillion ?? null, costField, false), // lowest $/1M wins
       med: costMed != null ? money(costMed) : "—",

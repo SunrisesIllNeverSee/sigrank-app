@@ -15,7 +15,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Alignment vs Governance", href: "/wiki/governance/alignment-vs-governance" },
   { label: "Lineage Preservation", href: "/wiki/governance/lineage-preservation" },
   { label: "Persistent Governing State (mos2es.com)", href: "https://mos2es.com/concepts/persistent-governing-state" },
-  { label: "Execution-Layer Governance (mos2es.org)", href: "https://mos2es.org/execution-governance" },
+  { label: "Execution-Layer Governance (mos2es.com)", href: "https://mos2es.com/concepts/governance-enforcement" },
 ];
 
 export default function PersistentGoverningStatePage() {

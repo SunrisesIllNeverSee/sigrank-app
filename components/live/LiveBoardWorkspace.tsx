@@ -84,6 +84,7 @@ import { BoardHead, BoardRow, type ColMode, type ViewMode } from "./rows";
 import { MobileChrome } from "../mobile/MobileChrome";
 import { BoardCards } from "../board-mobile/BoardCards";
 import { BoardFilterSheet, BoardMobileBar } from "../board-mobile/BoardMobileBar";
+import { YouRow } from "./RankMe";
 import { usePhone } from "../board-mobile/usePhone";
 import {
   OperatorDock,
@@ -169,6 +170,10 @@ export interface LiveBoardWorkspaceProps {
   stageFooter?: ReactNode;
   /** Newest blog/article post for Wire / Notes (server-resolved, no extra request). */
   newestPost?: { slug: string; title: string } | null;
+  /** Page H1 override ({a}<em>{b}</em>) so the homepage and /board/all differ. */
+  heading?: { a: string; b: string };
+  /** Homepage only: show the archive disclosure to signed-out visitors. */
+  isHome?: boolean;
 }
 
 /** Field-hydration lifecycle reported by the mount (live-board-mount.tsx). */
@@ -628,6 +633,8 @@ export function LiveBoardWorkspace({
   fieldStatus,
   stageFooter,
   newestPost,
+  heading,
+  isHome = false,
 }: LiveBoardWorkspaceProps) {
   /* ---------- theme switch (LB-20) — ?theme= > lbw-theme localStorage >
      "green"; state lives on .lbw-root's data-theme (the site's own
@@ -1381,6 +1388,19 @@ export function LiveBoardWorkspace({
   /* account chip — prop override wins (demo); else real session state:
      loading → neutral, signed out → sign-in affordance, unlinked → claim,
      linked → name + live rank (current_rank.global via session.ts). */
+  /* Ploy plan §9.1: clear a stale data-auth hint (cookie present but no
+     session) so the signed-out strip shows; log one banner view per mount. */
+  const bannerRef = useRef<HTMLDivElement | null>(null);
+  const bannerLogged = useRef(false);
+  useEffect(() => {
+    if (!isHome || !session.loaded || session.signedIn || account) return;
+    document.documentElement.removeAttribute("data-auth");
+    if (!bannerLogged.current && bannerRef.current) {
+      bannerLogged.current = true;
+      liveTrack.bannerViewed();
+    }
+  }, [isHome, session.loaded, session.signedIn, account]);
+
   const acct = useMemo(() => {
     if (account)
       return {
@@ -1873,14 +1893,33 @@ export function LiveBoardWorkspace({
               <div className="stitle">
                 <div className="stitle-main">
                   <h1 className="pagetitle">
-                    {COPY.heroTitleA}
-                    <em>{COPY.heroTitleB}</em>
+                    {heading?.a ?? COPY.heroTitleA}
+                    <em>{heading?.b ?? COPY.heroTitleB}</em>
                   </h1>
                 </div>
                 {/* owner 2026-10-21: site-wide search at the right end of the title
                     row (navigates); the board table filter stays in the filter bar */}
                 <GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" />
               </div>
+              {/* owner 2026-11-12 + Ploy plan §9.1: homepage-only strip for
+                  signed-out visitors. It is in the server HTML (crawlers and
+                  first paint get it); the AUTH_HINT script in app/layout.tsx
+                  hides .signed-out-only before paint when a session cookie
+                  exists, and it unmounts once the session check says signed in. */}
+              {isHome && (acct.mode === "loading" || acct.mode === "out") && (
+                <div className="board-disclosure signed-out-only" ref={bannerRef}>
+                  <p className="bd-lead">
+                    Operators ranked by how efficiently they use tokens, not how many.
+                  </p>
+                  <p className="bd-sub">
+                    Where would you place in the July 2026 field of 1,642? Run{" "}
+                    <code>npx sigrank</code> to see your Yield.{" "}
+                    <Link href="/board/history" onClick={() => liveTrack.bannerCtaClicked({ target: "archive" })}>
+                      See the archive →
+                    </Link>
+                  </p>
+                </div>
+              )}
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
                 <div className="board-filter-controls" role="group" aria-label="Leaderboard filters">
@@ -2096,6 +2135,7 @@ export function LiveBoardWorkspace({
                         colMode={colMode}
                         viewMode={viewMode}
                         ownCodename={session.codename}
+                        showYou={acct.mode === "out"}
                       />
                       <div className="bm-more">
                         {ordered.length === 0 ? (
@@ -2140,6 +2180,8 @@ export function LiveBoardWorkspace({
                         />
                       </thead>
                       <tbody>
+                        {/* Ghost "You" row for signed-out visitors, above #1 on page 1 */}
+                        {acct.mode === "out" && pageStart === 0 && <YouRow />}
                         {pageRows.map(([o, i], d) => (
                           <BoardRow
                             key={`${i}-${o.codename}`}

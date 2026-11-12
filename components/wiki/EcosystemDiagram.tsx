@@ -2,7 +2,7 @@
  * components/wiki/EcosystemDiagram.tsx — the three-property ecosystem diagram.
  *
  * Shows the progression:
- *   mos2es.org (commercial) → mos2es.com (architecture) → signalaf.com/wiki (evidence)
+ *   mos2es.com/products (commercial) → mos2es.com (architecture) → signalaf.com/wiki (evidence)
  *
  * Placed on the wiki hub and individual wiki pages to show how the three
  * properties connect. Server component.
@@ -22,10 +22,10 @@ export function EcosystemDiagram() {
       </p>
       <div className="flex flex-col gap-3 font-mono text-xs">
         <Link
-          href="https://mos2es.org"
+          href="https://mos2es.com/products"
           className="flex flex-col gap-1 rounded-md border border-bg-border bg-bg-base p-3 transition-colors hover:border-gold/30"
         >
-          <span className="font-bold text-text-primary">UPSILON / mos2es.org</span>
+          <span className="font-bold text-text-primary">UPSILON / mos2es.com</span>
           <span className="text-text-muted">Commercial Application</span>
           <span className="text-text-dim">What can I do with this?</span>
         </Link>
@@ -34,14 +34,14 @@ export function EcosystemDiagram() {
         </div>
         <div className="flex gap-3">
           <Link
-            href="https://mos2es.org"
+            href="https://mos2es.com"
             className="flex-1 rounded-md border border-bg-border bg-bg-base p-2 text-center text-text-muted transition-colors hover:border-gold/30"
           >
             Operator / System Measurement
           </Link>
           <span className="flex items-center text-text-dim">↔</span>
           <Link
-            href="https://mos2es.org/system-testing"
+            href="https://mos2es.com/research"
             className="flex-1 rounded-md border border-bg-border bg-bg-base p-2 text-center text-text-muted transition-colors hover:border-gold/30"
           >
             System Governance Testing

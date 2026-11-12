@@ -469,7 +469,7 @@ test("llms.txt advertises topic pages only through the sitemap manifest", async 
 });
 
 test("board Dataset JSON-LD never stamps render time as dateModified", async () => {
-  const board = await source("app/board/[window]/page.tsx");
+  const board = await source("app/board/[window]/board-window.tsx");
   assert.doesNotMatch(board, /sigrankDataset\(\{\s*updated:\s*new Date\(/);
   assert.match(board, /sigrankDataset\(\{\s*updated:\s*SIGRANK_DATASET_PUBLISHED\s*\}\)/);
 });
@@ -510,8 +510,14 @@ test("llms-full.txt gates its Ask-AI list through the sitemap manifest", async (
 
 test("named AI crawler groups share the default allow/disallow lists", async () => {
   const robots = await source("app/robots.ts");
+  const policySrc = await source("lib/seo/search-index-policy.ts");
   assert.doesNotMatch(robots, /disallow: \["\/api\/", "\/auth\/"\]/);
-  assert.equal((robots.match(/disallow: DISALLOW/g) ?? []).length, 11);
+  assert.equal((robots.match(/disallow: DISALLOW/g) ?? []).length, 10);
+  // OAI-SearchBot: base list plus the 12 held /vs pages (owner 2026-11-12).
+  assert.match(robots, /userAgent: "OAI-SearchBot",\s*allow: ALLOW,\s*disallow: \[\.\.\.DISALLOW, \.\.\.OAI_SEARCH_HELD_VS\]/);
+  const held = [...robots.matchAll(/"(\/vs\/[a-z0-9-]+)"/g)].map((m) => m[1]);
+  assert.equal(held.length, 12);
+  for (const p of held) assert.match(policySrc, new RegExp(`"${p}": "HOLD"`), `${p} must stay HOLD`);
   // ALLOW/DISALLOW must stay identical to the literal `*` group.
   assert.match(robots, /const ALLOW = \["\/", "\/api\/exchange\/signals"\];/);
   assert.match(robots, /const DISALLOW = \["\/api\/", "\/auth\/", "\/internal\/"\];/);

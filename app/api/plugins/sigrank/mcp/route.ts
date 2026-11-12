@@ -1,7 +1,8 @@
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { createMcpHandler } from "@modelcontextprotocol/server";
 import { allowedOrigin } from "@/lib/mcp/protocol";
 import { createPluginServer } from "@/lib/mcp/plugin/server";
+import { posthogMcp } from "@/lib/mcp/posthog";
 import { mcpRateLimitResponse } from "@/lib/mcp/route-limit";
 import { sanitizeUntrusted } from "@/lib/mcp/untrusted";
 import contracts from "@/lib/mcp/plugin/contracts.json";
@@ -16,6 +17,11 @@ const STALL_LOG_MS = 10_000;
 const handler = createMcpHandler(({ requestInfo }) => createPluginServer(requestInfo ?? new Request("https://signalaf.com/api/plugins/sigrank/mcp")));
 
 const TIMED_OUT = Symbol("timed-out");
+
+// Send queued MCP analytics once the response (including a stream) has finished.
+function flushAnalytics(): void {
+  if (posthogMcp) after(() => posthogMcp?.flush().catch(() => {}));
+}
 
 function withTimeout<T>(work: Promise<T>, ms: number): Promise<T | typeof TIMED_OUT> {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -50,6 +56,7 @@ function rpcError(status: number, message: string): Response {
 
 export async function POST(req: NextRequest) {
   if (!allowedOrigin(req)) return new Response("Forbidden", { status: 403 });
+  flushAnalytics();
   const limited = await mcpRateLimitResponse(req, "plugin");
   if (limited) return limited;
 
@@ -110,10 +117,12 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   if (!allowedOrigin(req)) return new Response("Forbidden", { status: 403 });
+  flushAnalytics();
   return handler.fetch(req);
 }
 
 export async function DELETE(req: NextRequest) {
   if (!allowedOrigin(req)) return new Response("Forbidden", { status: 403 });
+  flushAnalytics();
   return handler.fetch(req);
 }

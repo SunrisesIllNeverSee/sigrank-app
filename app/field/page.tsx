@@ -597,7 +597,7 @@ export default async function FieldPage() {
           Showing 20 of {ghost_ranks.length} ghost-rank operators.
         </p>
         <Link
-          href="/login"
+          href="/signup"
           className="self-start rounded-md border border-gold bg-bg-surface px-5 py-2.5 font-sans text-sm font-bold text-gold transition-colors hover:bg-gold hover:text-bg-primary"
         >
           Sign up to get on the board →

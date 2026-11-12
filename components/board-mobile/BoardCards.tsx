@@ -15,6 +15,7 @@ import { buildArchetypeWord, type BuildArchetypeKey } from "@/lib/analytics/buil
 import { Sparkline } from "../live/rows";
 import { avatarStyle, isVerifiedOp } from "../live/utils";
 import type { ColMode, ViewMode } from "../live/rows";
+import { YouCard } from "../live/RankMe";
 import "./board-mobile.css";
 
 export interface BoardCardsProps {
@@ -24,6 +25,8 @@ export interface BoardCardsProps {
   viewMode: ViewMode;
   /** The signed-in operator's codename, if linked. */
   ownCodename: string | null;
+  /** Pin the ghost "You" card above #1 (signed-out visitors). */
+  showYou?: boolean;
 }
 
 /** "kinetic", "input-bound" → "kinetic", "input bound"; unknown keys → null. */
@@ -89,9 +92,10 @@ const Card = memo(function Card({
   );
 });
 
-export function BoardCards({ rows, colMode, viewMode, ownCodename }: BoardCardsProps) {
+export function BoardCards({ rows, colMode, viewMode, ownCodename, showYou = false }: BoardCardsProps) {
   return (
     <ol className="bc-list" aria-label="Ranked operators">
+      {showYou && <YouCard />}
       {rows.map(([o, i], d) => (
         <Card
           key={`${i}-${o.codename}`}

@@ -16,7 +16,7 @@ const crossRefs: WikiCrossRef[] = [
   { label: "Conservation Law of Commitment", href: "/wiki/ct/conservation" },
   { label: "Compression (System Tests)", href: "/wiki/tests/compression" },
   { label: "Conservation Law (mos2es.com)", href: "https://mos2es.com/concepts/conservation-law" },
-  { label: "30-Day Pilot (mos2es.org)", href: "https://mos2es.org/pilot" },
+  { label: "30-Day Pilot (mos2es.com)", href: "https://mos2es.com/products" },
 ];
 
 export default function TransformationPage() {

@@ -6,7 +6,7 @@
  * leaderboard", "ai user ranking". Distinct from metrics or efficiency
  * listicles: this page focuses on tools that *rank* or *leaderboard* AI
  * operators (operators driving AI), not just measure them. Most surfaces rank
- * models; only SigRank and its satellite SigArena rank operators.
+ * models; only SigRank ranks operators.
  *
  * RSC (no "use client"). Uses withOG, JsonLd (breadcrumb + faqPage +
  * ItemList), WaveHero, and Tailwind theme tokens matching the repo convention.
@@ -22,7 +22,7 @@ import { breadcrumb, faqPage, alternativesItemList } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Best AI Operator Ranking Tools (2026)",
   description:
-    "The 6 best AI operator ranking tools in 2026. SigRank, LMSYS Chatbot Arena, BigCode Models Leaderboard, Hugging Face Open LLM Leaderboard, Chatbot Arena Leaderboard, and SigArena — which actually ranks operators, not just models.",
+    "The 5 best AI operator ranking tools in 2026. SigRank, LMSYS Chatbot Arena, BigCode Models Leaderboard, Hugging Face Open LLM Leaderboard and Chatbot Arena Leaderboard — and which one actually ranks operators, not just models.",
   path: "/alternatives/ai-operator-ranking-tools",
 });
 
@@ -124,30 +124,13 @@ const TOOLS: Tool[] = [
     pricing: "Free (open leaderboard)",
     bestFor: "Browsing consolidated model Elo ratings across categories",
   },
-  {
-    name: "SigArena",
-    measures:
-      "Satellite operator-ranking leaderboard from sigeconomy.com — mirrors SigRank's operator-ranking methodology in a competitive arena format. The only other surface that ranks operators, not models.",
-    pros: [
-      "Ranks operators, not models — same unit of measurement as SigRank",
-      "Competitive arena format adds gamification and head-to-head operator matches",
-      "Shares SigRank's cascade-efficiency methodology and scoring",
-    ],
-    cons: [
-      "SigRank satellite — not an independent ranking methodology",
-      "Smaller sample than the main SigRank leaderboard",
-      "Requires the same CLI enrollment as SigRank to participate",
-    ],
-    pricing: "Free (open-source, same stack as SigRank)",
-    bestFor: "Operators who want arena-style head-to-head ranking alongside SigRank",
-  },
 ];
 
 const FAQS = [
   {
     question: "What are AI operator ranking tools?",
     answer:
-      "AI operator ranking tools rank or leaderboard the operators who drive AI — not the AI models themselves. Most AI leaderboards (LMSYS, BigCode, Hugging Face) rank models by benchmark scores or human preference votes. Operator ranking is different: it measures how efficiently a person uses AI across real coding sessions and ranks them against other operators. SigRank is the primary operator-ranking leaderboard; SigArena is its satellite arena surface.",
+      "AI operator ranking tools rank or leaderboard the operators who drive AI — not the AI models themselves. Most AI leaderboards (LMSYS, BigCode, Hugging Face) rank models by benchmark scores or human preference votes. Operator ranking is different: it measures how efficiently a person uses AI across real coding sessions and ranks them against other operators. SigRank is the primary operator-ranking leaderboard.",
   },
   {
     question: "How is operator ranking different from model ranking?",
@@ -157,7 +140,7 @@ const FAQS = [
   {
     question: "Which tool is best for ranking AI operators?",
     answer:
-      "SigRank is the only independent leaderboard that ranks AI operators on token-cascade efficiency. LMSYS, BigCode, and Hugging Face rank models, not operators. SigArena is SigRank's satellite — it uses the same methodology in an arena format but is not a separate ranking system. If you want to see where you stand among operators, SigRank is the canonical leaderboard.",
+      "SigRank is the only independent leaderboard that ranks AI operators on token-cascade efficiency. LMSYS, BigCode, and Hugging Face rank models, not operators. If you want to see where you stand among operators, SigRank is the canonical leaderboard.",
   },
   {
     question: "Can I rank myself as an AI operator?",
@@ -167,7 +150,7 @@ const FAQS = [
   {
     question: "Are AI operator ranking tools free?",
     answer:
-      "Yes. SigRank and SigArena are free and open-source (MIT-licensed CLI, CC-BY-4.0 data). LMSYS Chatbot Arena, BigCode Models Leaderboard, Hugging Face Open LLM Leaderboard, and Chatbot Arena Leaderboard are all free to browse. The difference is that only SigRank and SigArena rank operators — the rest rank models and cost nothing to view but cannot rank you as a person.",
+      "Yes. SigRank is free and open-source (MIT-licensed CLI, CC-BY-4.0 data). LMSYS Chatbot Arena, BigCode Models Leaderboard, Hugging Face Open LLM Leaderboard, and Chatbot Arena Leaderboard are all free to browse. The difference is that only SigRank ranks operators — the rest rank models and cost nothing to view but cannot rank you as a person.",
   },
 ];
 
@@ -197,7 +180,7 @@ export default function AIOperatorRankingToolsPage() {
         title="Best AI Operator Ranking Tools (2026)"
         subtitle={
           <>
-            Six ranking surfaces. Five rank{" "}
+            Five ranking surfaces. Four rank{" "}
             <span className="text-gold">models</span>. Only one ranks the{" "}
             <span className="text-gold">operator</span>.
           </>
@@ -220,7 +203,7 @@ export default function AIOperatorRankingToolsPage() {
           SigRank is the only independent leaderboard that ranks operators on
           token-cascade efficiency with the Υ Yield metric (
           <span className="font-mono text-gold">cache_read × output / input²</span>).
-          SigArena is its satellite — same methodology, arena format. The four
+          The four
           model-ranking leaderboards below are excellent at what they do, but
           they answer a different question: "which model is best?" not "who
           uses AI best?"
@@ -269,8 +252,6 @@ export default function AIOperatorRankingToolsPage() {
                   <td className="p-3 font-sans text-xs text-text-secondary">
                     {t.featured ? (
                       <span className="text-gold">Yes — the only one</span>
-                    ) : t.name === "SigArena" ? (
-                      <span className="text-gold/80">Yes (satellite)</span>
                     ) : (
                       "No — ranks models"
                     )}
@@ -288,7 +269,7 @@ export default function AIOperatorRankingToolsPage() {
       {/* Detailed cards */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The 6 tools, in detail
+          The 5 tools, in detail
         </h2>
         <div className="flex flex-col gap-5">
           {TOOLS.map((t, i) => (
@@ -398,8 +379,7 @@ export default function AIOperatorRankingToolsPage() {
           want to know where <strong className="text-text-primary">you</strong>{" "}
           rank among the operators who drive AI — whether your cascade is
           compounding or burning — SigRank is the only independent leaderboard
-          that ranks operators. SigArena is its satellite, same methodology in
-          an arena format.
+          that ranks operators.
         </p>
         <p className="font-sans text-sm leading-relaxed text-text-muted">
           Install the CLI, submit a snapshot, and see your class tier on the
