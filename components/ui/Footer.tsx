@@ -2,9 +2,10 @@ import React from "react";
 import Link from "next/link";
 
 /**
- * Footer link categories — SEO content discoverability (2026-07-07).
- * Each category links to the pages built in the SEO expansion.
- * Kept compact: 3-4 links per column, small text, hover to primary.
+ * Footer link columns. Owner 2026-11-12: the site-wide link directory "was
+ * never supposed to be on every page". The footer keeps a short set of core
+ * pages; full section lists live on their hub pages (/blog, /guides, /wiki,
+ * /vs, /alternatives, /tools, /metrics) and in the sitemap.
  */
 const FOOTER_COLUMNS: {
   heading: string;
@@ -12,175 +13,50 @@ const FOOTER_COLUMNS: {
   links: { href: string; label: string }[];
 }[] = [
   {
-    heading: "Analysis",
+    heading: "Board",
+    headingHref: "/",
     links: [
-      { href: "/research", label: "State of the Index" },
-      { href: "/fieldhub", label: "Field Hub" },
+      { href: "/board/all", label: "All-Time Leaderboard" },
+      { href: "/hall", label: "Hall of Signal" },
+      { href: "/compare", label: "Compare Operators" },
+    ],
+  },
+  {
+    heading: "Research",
+    headingHref: "/research",
+    links: [
       { href: "/field", label: "Field Analysis" },
       { href: "/blog/volume-isnt-yield", label: "Volume Isn't Yield" },
-      { href: "/blog/the-human-in-the-loop-is-unmeasured", label: "The Human in the Loop" },
-      { href: "/blog/sigrank-dashboards", label: "Interactive Dashboards" },
-      { href: "/blog/the-tool-is-the-person", label: "The Tool Is the Person" },
-      { href: "/blog/token-cascade-vs-raw-token-consumption", label: "Token Yield vs Token Count" },
-      { href: "/blog/why-yield-beats-tokenmaxxing", label: "Tokenmaxxing, Measured" },
-      { href: "/blog/how-sigrank-measures-operator-efficiency", label: "How SigRank Measures" },
-      { href: "/blog/ai-power-user-benchmarking", label: "AI Power User Benchmarking" },
+      { href: "/blog/the-operator-explains-95-percent-of-the-difference", label: "The Operator Explains 95%" },
+      { href: "/methodology", label: "Methodology" },
+      { href: "/blog", label: "Blog" },
     ],
   },
   {
-    heading: "Metrics",
-    headingHref: "/metrics",
+    heading: "Your score",
+    headingHref: "/score",
     links: [
-      { href: "/metrics/yield-cascade", label: "Yield (Υ)" },
-      { href: "/metrics/leverage", label: "Leverage" },
-      { href: "/metrics/velocity", label: "Velocity" },
-      { href: "/metrics/signal-to-noise-ratio", label: "Signal-to-Noise Ratio" },
-      { href: "/metrics/efficiency", label: "10xDEV" },
-      { href: "/metrics/cache-hit-rate", label: "Cache Hit Rate" },
-      { href: "/metrics/compression-ratio", label: "Compression Ratio (word era)" },
+      { href: "/claude-code-usage", label: "Claude Code Usage" },
+      { href: "/codex-usage", label: "Codex Usage" },
+      { href: "/mcp", label: "CLI & MCP" },
+      { href: "/guides", label: "Guides" },
     ],
   },
   {
-    heading: "Guides",
-    headingHref: "/guides",
+    heading: "Standard",
+    headingHref: "/standard",
     links: [
-      {
-        href: "/guides/how-to-measure-ai-coding-efficiency",
-        label: "Measure AI Coding Efficiency",
-      },
-      {
-        href: "/guides/how-to-improve-your-yield",
-        label: "Improve Your Yield",
-      },
-      {
-        href: "/guides/how-to-reduce-token-waste",
-        label: "Reduce Token Waste",
-      },
-      { href: "/guides/how-to-read-your-cascade", label: "Read Your Cascade" },
-    ],
-  },
-  {
-    heading: "Tools",
-    headingHref: "/tools",
-    links: [
-      { href: "/tools/yield-calculator", label: "Yield Calculator" },
-      { href: "/tools/cascade-comparator", label: "Cascade Comparator" },
-      { href: "/tools/operator-class-checker", label: "Class Checker" },
-      {
-        href: "/tools/token-waste-calculator",
-        label: "Token Waste Calculator",
-      },
-    ],
-  },
-  {
-    heading: "Compare",
-    headingHref: "/vs",
-    links: [
-      { href: "/vs/ccusage", label: "vs ccusage" },
-      { href: "/vs/vals-ai", label: "vs VALS AI" },
-      { href: "/vs/lmsys-arena", label: "vs LMSYS Arena" },
-      { href: "/vs/cursor", label: "vs Cursor" },
-      { href: "/vs/braintrust", label: "vs Braintrust" },
-      { href: "/vs/langchain", label: "vs LangChain" },
-      { href: "/vs/langfuse", label: "vs Langfuse" },
-      { href: "/vs/tokscale", label: "vs Tokscale" },
-      { href: "/vs/mytokentracker", label: "vs mytokentracker" },
-      { href: "/vs/clawdboard", label: "vs clawdboard" },
-      { href: "/vs/tokenrank", label: "vs TokenRank" },
-      { href: "/vs/tokentracker", label: "vs Token Tracker" },
-      { href: "/vs/costhawk", label: "vs CostHawk" },
-      { href: "/vs/ccrank", label: "vs ccrank" },
-    ],
-  },
-  {
-    heading: "Platforms",
-    headingHref: "/platforms",
-    links: [
-      { href: "/platforms", label: "All supported platforms" },
-      { href: "/platforms", label: "Claude Code" },
-      { href: "/platforms", label: "Codex CLI" },
-      { href: "/platforms", label: "Gemini CLI" },
-      { href: "/platforms", label: "Copilot CLI" },
-      { href: "/platforms", label: "OpenCode" },
-      { href: "/platforms", label: "Goose" },
-      { href: "/platforms", label: "Hermes Agent" },
-      { href: "/platforms", label: "OMP (Oh My Pi)" },
-      { href: "/platforms", label: "Devin" },
-    ],
-  },
-  {
-    heading: "Explore",
-    links: [
-      { href: "/hall", label: "Best AI Users — Hall of Signal" },
-      { href: "/score", label: "Benchmark Your AI Usage" },
-      { href: "/score/paste", label: "Paste Your Stats" },
-      { href: "/live", label: "Live Board" },
-      { href: "/exchange/signals", label: "Exchange Signals" },
-      { href: "/share/mcp", label: "Share via MCP" },
-      { href: "/research", label: "AI Power User Statistics" },
-      { href: "/vs/lmsys-arena", label: "Human vs Model Performance" },
-      { href: "/privacy", label: "Privacy-Preserving AI Measurement" },
-      {
-        href: "/alternatives/ai-coding-metrics",
-        label: "AI Coding Metrics Tools",
-      },
-      {
-        href: "/alternatives/ccusage-alternatives",
-        label: "ccusage Alternatives",
-      },
-      {
-        href: "/alternatives/ai-benchmarking-tools",
-        label: "AI Benchmarking Tools",
-      },
-      {
-        href: "/alternatives/token-tracking-tools",
-        label: "Token Tracking Tools",
-      },
-    ],
-  },
-  {
-    heading: "Boards",
-    headingHref: "/board/all",
-    links: [
-      { href: "/board/7d", label: "7-Day Board" },
-      { href: "/board/30d", label: "30-Day Board" },
-      { href: "/board/90d", label: "90-Day Board" },
-      { href: "/board/all", label: "All-Time Board" },
-      { href: "/user/the-field", label: "The Field" },
-    ],
-  },
-  {
-    heading: "Topics",
-    links: [
-      { href: "/upsilon", label: "Upsilon Measurement Engine" },
-      { href: "/ai-operator-scoring", label: "AI Operator Scoring" },
-      { href: "/standard", label: "TTEOP Standard" },
-      {
-        href: "/standard/open-vs-proprietary",
-        label: "Open vs Proprietary",
-      },
-      { href: "/token-cascade", label: "Token Cascade" },
+      { href: "/standard/open-vs-proprietary", label: "Open vs Proprietary" },
+      { href: "/upsilon", label: "Upsilon" },
     ],
   },
   {
     heading: "Ecosystem",
     links: [
-      {
-        href: "https://mos2es.com/products",
-        label: "MO§ES™ Enterprise →",
-      },
-      {
-        href: "https://mos2es.com",
-        label: "Governance Framework →",
-      },
-      {
-        href: "https://signomy.xyz",
-        label: "Signomy City-State →",
-      },
-      {
-        href: "https://aquaidp.xyz",
-        label: "AQUA Application Hub →",
-      },
+      { href: "https://mos2es.com/products", label: "MO§ES™ Enterprise →" },
+      { href: "https://mos2es.com", label: "Governance Framework →" },
+      { href: "https://signomy.xyz", label: "Signomy City-State →" },
+      { href: "https://aquaidp.xyz", label: "AQUA Application Hub →" },
     ],
   },
 ];
@@ -193,8 +69,7 @@ const FOOTER_COLUMNS: {
  * tagline, so it read as two footers. Merged into a single bar: brand + nav on top,
  * one thin legal/privacy line below — no duplicate SIGRANK, no competing taglines.
  *
- * SEO link columns added 2026-07-07 — makes the 34 new content pages discoverable
- * from every page on the site (internal linking is a top SEO ranking factor).
+ * Link columns trimmed 2026-11-12 (owner): core pages only, not a site directory.
  */
 export function Footer() {
   return (
@@ -214,8 +89,8 @@ export function Footer() {
           </code>
         </div>
 
-        {/* SEO link columns */}
-        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-4 lg:grid-cols-10">
+        {/* Core link columns */}
+        <div className="grid grid-cols-2 gap-6 border-t border-bg-border pt-6 sm:grid-cols-4 lg:grid-cols-5">
           {FOOTER_COLUMNS.map((col) => (
             <div key={col.heading} className="flex flex-col gap-2">
               {col.headingHref ? (

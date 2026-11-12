@@ -12,6 +12,7 @@ import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { FieldEvidence } from "@/components/compare/FieldEvidence";
 
 export const metadata: Metadata = withOG({
   title: "SigRank vs Token Tracker \u2014 Efficiency vs Tracking",
@@ -362,6 +363,7 @@ npx sigrank submit   # sign + publish to leaderboard`}
           </Link>
         </p>
       </section>
+      <FieldEvidence tool="tokentracker" />
     </div>
   );
 }

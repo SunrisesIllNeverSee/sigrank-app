@@ -21,6 +21,7 @@ import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { FieldEvidence } from "@/components/compare/FieldEvidence";
 
 export const metadata: Metadata = withOG({
   title: "SigRank vs ccrank — Derived Ratios vs an Evaluation Framework",
@@ -366,6 +367,7 @@ sigrank submit      # reads logs, scores, signs, publishes`}
           </Link>
         </p>
       </section>
+      <FieldEvidence tool="ccrank" />
     </div>
   );
 }

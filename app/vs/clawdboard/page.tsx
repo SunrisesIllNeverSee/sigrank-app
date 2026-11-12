@@ -15,6 +15,7 @@ import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { FieldEvidence } from "@/components/compare/FieldEvidence";
 
 const READ_ON = "11 November 2026";
 const SIGRANK_READ_ON = "11 November 2026";
@@ -529,6 +530,7 @@ npx sigrank submit             # publish a signed snapshot`}
           </Link>
         </p>
       </section>
+      <FieldEvidence tool="clawdboard" />
     </div>
   );
 }

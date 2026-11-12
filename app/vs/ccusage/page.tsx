@@ -15,6 +15,7 @@ import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumb, faqPage, comparisonArticle } from "@/lib/jsonld";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { FieldEvidence } from "@/components/compare/FieldEvidence";
 
 export const metadata: Metadata = withOG({
   title: "SigRank vs ccusage — Spend Ledger vs Efficiency Ranking",
@@ -474,6 +475,7 @@ npx sigrank submit           # publish a signed snapshot`}
           </Link>
         </p>
       </section>
+      <FieldEvidence tool="ccusage" alreadyUsing />
     </div>
   );
 }
