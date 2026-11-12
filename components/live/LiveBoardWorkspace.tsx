@@ -1388,6 +1388,19 @@ export function LiveBoardWorkspace({
   /* account chip — prop override wins (demo); else real session state:
      loading → neutral, signed out → sign-in affordance, unlinked → claim,
      linked → name + live rank (current_rank.global via session.ts). */
+  /* Ploy plan §9.1: clear a stale data-auth hint (cookie present but no
+     session) so the signed-out strip shows; log one banner view per mount. */
+  const bannerRef = useRef<HTMLDivElement | null>(null);
+  const bannerLogged = useRef(false);
+  useEffect(() => {
+    if (!isHome || !session.loaded || session.signedIn || account) return;
+    document.documentElement.removeAttribute("data-auth");
+    if (!bannerLogged.current && bannerRef.current) {
+      bannerLogged.current = true;
+      liveTrack.bannerViewed();
+    }
+  }, [isHome, session.loaded, session.signedIn, account]);
+
   const acct = useMemo(() => {
     if (account)
       return {
@@ -1888,16 +1901,24 @@ export function LiveBoardWorkspace({
                     row (navigates); the board table filter stays in the filter bar */}
                 <GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" />
               </div>
-              {/* owner 2026-11-12: the archive disclosure shows only on the
-                  homepage, only to signed-out visitors (never during SSR's
-                  "loading" state, so signed-in users see no flash). */}
-              {isHome && acct.mode === "out" && (
-              <p className="board-disclosure">
-                Live scores come from operators&rsquo; own token counts. They&rsquo;re
-                measured against the Field Archive: 1,642 operators from public token
-                data, frozen July 31, 2026.{" "}
-                <Link href="/board/history">See the archive →</Link>
-              </p>
+              {/* owner 2026-11-12 + Ploy plan §9.1: homepage-only strip for
+                  signed-out visitors. It is in the server HTML (crawlers and
+                  first paint get it); the AUTH_HINT script in app/layout.tsx
+                  hides .signed-out-only before paint when a session cookie
+                  exists, and it unmounts once the session check says signed in. */}
+              {isHome && (acct.mode === "loading" || acct.mode === "out") && (
+                <div className="board-disclosure signed-out-only" ref={bannerRef}>
+                  <p className="bd-lead">
+                    Operators ranked by how efficiently they use tokens, not how many.
+                  </p>
+                  <p className="bd-sub">
+                    Where would you place in the July 2026 field of 1,642? Run{" "}
+                    <code>npx sigrank</code> to see your Yield.{" "}
+                    <Link href="/board/history" onClick={() => liveTrack.bannerCtaClicked({ target: "archive" })}>
+                      See the archive →
+                    </Link>
+                  </p>
+                </div>
               )}
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">

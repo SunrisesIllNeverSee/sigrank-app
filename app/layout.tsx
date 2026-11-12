@@ -57,6 +57,13 @@ export const viewport: Viewport = {
 // No-flash theme init: applies the saved theme before the body content paints.
 // Runs synchronously as the first child of <body>. data-theme="terminal" is the
 // SSR default so dark renders correctly before this runs.
+// Ploy plan §9.1 (owner 2026-11-12): signed-out-only homepage strip. The
+// @supabase/ssr browser client keeps the session in sb-<ref>-auth-token
+// cookies (readable by JS). If one is present, mark <html data-auth="in">
+// before first paint so .signed-out-only content never flashes for
+// signed-in visitors. The board clears the mark once the session check
+// says signed out (stale cookie). Content stays in the server HTML.
+const AUTH_HINT = `(function(){try{if(/(?:^|; )sb-[^=]+-auth-token(?:\\.\\d+)?=/.test(document.cookie)){document.documentElement.setAttribute('data-auth','in');}}catch(e){}})();`;
 const THEME_INIT = `(function(){try{var t=localStorage.getItem('sigrank-theme');if(t){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();`;
 
 export default function RootLayout({
@@ -93,6 +100,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-bg-base text-text-primary">
         <JsonLd data={[org, website()]} />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+        <script dangerouslySetInnerHTML={{ __html: AUTH_HINT }} />
         <PostHogProvider>
           <ThemeCycleShortcut />
           <Nav />

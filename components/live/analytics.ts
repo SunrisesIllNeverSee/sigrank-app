@@ -47,4 +47,12 @@ export const liveTrack = {
     if (on())
       posthog.capture("cli_command_copied", { ...extra, ...baseProps() });
   },
+  /** Signed-out homepage strip shown (Ploy plan §9.1). */
+  bannerViewed: () => {
+    if (on()) posthog.capture("banner_viewed", { surface: "home_signed_out", ...baseProps() });
+  },
+  /** A link in the signed-out homepage strip clicked. */
+  bannerCtaClicked: (extra: { target: "archive" }) => {
+    if (on()) posthog.capture("banner_cta_clicked", { surface: "home_signed_out", ...extra, ...baseProps() });
+  },
 };
