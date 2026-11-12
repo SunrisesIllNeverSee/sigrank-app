@@ -172,6 +172,8 @@ export interface LiveBoardWorkspaceProps {
   newestPost?: { slug: string; title: string } | null;
   /** Page H1 override ({a}<em>{b}</em>) so the homepage and /board/all differ. */
   heading?: { a: string; b: string };
+  /** Homepage only: show the archive disclosure to signed-out visitors. */
+  isHome?: boolean;
 }
 
 /** Field-hydration lifecycle reported by the mount (live-board-mount.tsx). */
@@ -632,6 +634,7 @@ export function LiveBoardWorkspace({
   stageFooter,
   newestPost,
   heading,
+  isHome = false,
 }: LiveBoardWorkspaceProps) {
   /* ---------- theme switch (LB-20) — ?theme= > lbw-theme localStorage >
      "green"; state lives on .lbw-root's data-theme (the site's own
@@ -1885,14 +1888,17 @@ export function LiveBoardWorkspace({
                     row (navigates); the board table filter stays in the filter bar */}
                 <GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" />
               </div>
-              {/* owner 2026-11-11 (banner option A): the site DemoBanner does not
-                  render on board pages, so the archive disclosure lives here. */}
+              {/* owner 2026-11-12: the archive disclosure shows only on the
+                  homepage, only to signed-out visitors (never during SSR's
+                  "loading" state, so signed-in users see no flash). */}
+              {isHome && acct.mode === "out" && (
               <p className="board-disclosure">
                 Live scores come from operators&rsquo; own token counts. They&rsquo;re
                 measured against the Field Archive: 1,642 operators from public token
                 data, frozen July 31, 2026.{" "}
                 <Link href="/board/history">See the archive →</Link>
               </p>
+              )}
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
                 <div className="board-filter-controls" role="group" aria-label="Leaderboard filters">

@@ -76,6 +76,7 @@ interface LiveBoardMountProps {
   newestPost?: { slug: string; title: string } | null;
   /** Page H1 override ({a}<em>{b}</em>); default is the global board title. */
   heading?: { a: string; b: string };
+  isHome?: boolean;
 }
 
 /** Append only rows whose codename isn't already loaded (StrictMode-safe). */
@@ -95,6 +96,7 @@ export function LiveBoardMount({
   stageFooter,
   newestPost,
   heading,
+  isHome,
 }: LiveBoardMountProps) {
   /* ---------- ?v=legacy review flag (post-mount; keeps the page static) -- */
   const [legacyOn, setLegacyOn] = useState(false);
@@ -187,6 +189,7 @@ export function LiveBoardMount({
       stageFooter={stageFooter}
       newestPost={newestPost}
       heading={heading}
+      isHome={isHome}
     />
   );
 }

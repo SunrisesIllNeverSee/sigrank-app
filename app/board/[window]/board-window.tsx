@@ -272,6 +272,7 @@ export async function renderBoardWindow(slug: string, { home = false }: { home?:
         initial={initial}
         windowSlug={win.slug}
         heading={home ? HOME_HEADING : win.slug === "all" ? ALL_TIME_HEADING : undefined}
+        isHome={home}
         newestPost={newestPost}
         stageFooter={
           <FaqSection faqs={boardFaqs} id="board-faq" variant="workspace" collapsed />

@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
 import { NavNpxCTA } from "@/components/ui/NavNpxCTA";
-import { DemoBanner } from "@/components/ui/DemoBanner";
 import { Footer } from "@/components/ui/Footer";
 import { ThemeCycleShortcut } from "@/components/ui/ThemeCycleShortcut";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -97,7 +96,6 @@ export default function RootLayout({
         <PostHogProvider>
           <ThemeCycleShortcut />
           <Nav />
-          <DemoBanner />
           <main className="mx-auto w-full max-w-[1600px] px-4 py-8">{children}</main>
           <Footer />
           <NavNpxCTA />
