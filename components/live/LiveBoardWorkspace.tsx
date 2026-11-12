@@ -1885,6 +1885,14 @@ export function LiveBoardWorkspace({
                     row (navigates); the board table filter stays in the filter bar */}
                 <GlobalSearch label="SigRank search — operators and pages" placeholder="SIGRANK SEARCH" />
               </div>
+              {/* owner 2026-11-11 (banner option A): the site DemoBanner does not
+                  render on board pages, so the archive disclosure lives here. */}
+              <p className="board-disclosure">
+                Live scores come from operators&rsquo; own token counts. They&rsquo;re
+                measured against the Field Archive: 1,642 operators from public token
+                data, frozen July 31, 2026.{" "}
+                <Link href="/board/history">See the archive →</Link>
+              </p>
               {/* filter bar — breaks at leaderboard edge */}
               <div className="fbar">
                 <div className="board-filter-controls" role="group" aria-label="Leaderboard filters">

@@ -2,13 +2,27 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 /**
- * Dismissible demo-data banner. Client component (local dismiss state).
+ * True on the board surfaces ("/" and "/board/<window>", not /board/history).
+ * Those pages hide the site chrome (globals.css, body:has(.lbw-root)) and show
+ * the same disclosure inside the board, so the banner must not render there:
+ * a display:none copy would be hidden text in the page HTML.
+ */
+function isBoardPath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  if (pathname === "/") return true;
+  return /^\/board\/[^/]+\/?$/.test(pathname) && !pathname.startsWith("/board/history");
+}
+
+/**
+ * Dismissible archive-disclosure banner. Client component (local dismiss state).
  */
 export function DemoBanner() {
+  const pathname = usePathname();
   const [dismissed, setDismissed] = useState(false);
-  if (dismissed) return null;
+  if (dismissed || isBoardPath(pathname)) return null;
 
   return (
     <div className="flex w-full items-center justify-center gap-3 border-b border-bg-border bg-bg-elevated px-4 py-2 text-center">
