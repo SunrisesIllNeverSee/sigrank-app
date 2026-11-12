@@ -116,10 +116,11 @@ export function AccountMenu() {
 
   return (
     <div ref={rootRef} className="relative flex items-center gap-3">
-      {/* Get ranked — primary conversion CTA (logged-out only; hidden once signed in). */}
+      {/* Get ranked — primary conversion CTA (logged-out only; hidden once signed in).
+          Points at /signup (owner 2026-11-11: signup and login are separate pages). */}
       {loaded && !operator && (
         <Link
-          href="/login"
+          href="/signup"
           className="rounded-md px-3 py-1.5 font-sans text-sm font-semibold transition-colors"
           style={{ background: "rgb(var(--nav-text))", color: "rgb(var(--nav-accent))" }}
         >
