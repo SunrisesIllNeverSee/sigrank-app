@@ -20,11 +20,8 @@ import {
   getSupabaseServer,
   getSupabaseService,
 } from "@/lib/infra/supabase/server";
-import { SORT_DEFAULT } from "@/lib/constants";
-import { filterToWindow } from "@/lib/board/windows";
 import { classToTierId, DISPLAY_METRICS, DISPLAY_RAW, REWARDS } from "@/lib/identity/canon-ids";
 import type { SignalClass } from "@/components/sigrank/types";
-import { tierOf } from "@/components/sigrank/types";
 import {
   MOCK_CLASS_DISTRIBUTION,
   MOCK_COUNTRIES,
@@ -44,7 +41,16 @@ import type {
   LeaderboardRow,
   WeeklyPoint,
 } from "@/lib/board/types";
-import { includesBoardMode, resolveWorkflowMode, type WorkflowMode } from "@/lib/board/workflow-mode";
+import { resolveWorkflowMode, type WorkflowMode } from "@/lib/board/workflow-mode";
+import {
+  boardSelectionArgs,
+  canUseDbSelection,
+  isBoardEligible,
+  resolvedModeForSnapshot,
+  selectLegacy,
+} from "@/lib/board/selection";
+import { assembleLeaderboard } from "@/lib/board/assemble";
+export type { LeaderboardRowWithPlatforms } from "@/lib/board/assemble";
 import {
   type BoardParams,
   type DbMetricSnapshot,
@@ -52,8 +58,6 @@ import {
   type HistoryParams,
   applySnapshotRollups,
   asDb,
-  latestPerOperator,
-  latestPerOperatorPlatform,
   mapOperator,
   mapSnapshot,
   num,
@@ -161,19 +165,41 @@ async function computeClaimedRanks(
       .limit(10_000);
     const claimedIds = (claimedData ?? []).map((r: { operator_id: string }) => r.operator_id);
     if (claimedIds.length === 0) return out;
-    const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
-      sb,
-      (s) =>
-        s
-          .from("metric_snapshots")
-          .select(SNAPSHOT_COLUMNS)
-          .in("operator_id", claimedIds)
-          .order("snapshot_date", { ascending: false }),
-      "metric_snapshots (claimedRanks)",
-    );
-    const eligible = (asDb<DbMetricSnapshot[]>(allSnaps) ?? []).filter(isBoardEligible);
-    const latest = operatorTotalCollapse(eligible, "all_time").byOperator;
-    const ranked = [...latest.values()]
+    let latest: Map<string, DbMetricSnapshot> | DbMetricSnapshot[];
+    if (dbSelectionEnabled()) {
+      // BOARD_DB_SELECTION=1: the database returns each claimed operator's
+      // chosen all_time row (== operatorTotalCollapse(eligible, "all_time")).
+      latest = await fetchAllPaginated<DbMetricSnapshot>(
+        sb,
+        (s) =>
+          s
+            .rpc("board_pick_snapshots", {
+              p_level: "operator",
+              p_prefer_window: "all_time",
+              p_window_filter: false,
+              p_max_age_days: null,
+              p_operator_ids: claimedIds,
+            })
+            .select(SNAPSHOT_COLUMNS)
+            .order("snapshot_date", { ascending: false })
+            .order("metric_snapshot_id", { ascending: false }),
+        "board_pick_snapshots (claimedRanks)",
+      );
+    } else {
+      const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
+        sb,
+        (s) =>
+          s
+            .from("metric_snapshots")
+            .select(SNAPSHOT_COLUMNS)
+            .in("operator_id", claimedIds)
+            .order("snapshot_date", { ascending: false }),
+        "metric_snapshots (claimedRanks)",
+      );
+      const eligible = (asDb<DbMetricSnapshot[]>(allSnaps) ?? []).filter(isBoardEligible);
+      latest = operatorTotalCollapse(eligible, "all_time").byOperator;
+    }
+    const ranked = (Array.isArray(latest) ? latest : [...latest.values()])
       .map((s) => {
         const snap = mapSnapshot(s);
         const y =
@@ -219,20 +245,6 @@ interface DbRankHistory {
   percentile: number | null;
 }
 
-/**
- * A LeaderboardRow carrying the operator's distinct submitted-platform SET — only
- * populated on the `operatorTotal` board path (BOARD redesign, 2026-06-27), where a
- * single total row stands in for an operator who may have run claude + codex + multi.
- * The UI badges this set ("claude·codex·multi"). It's a structural superset of
- * LeaderboardRow (the base interface lives in lib/data/types.ts, which this layer
- * does not own), so a `LeaderboardRowWithPlatforms[]` is assignable to a
- * `LeaderboardRow[]` and the optional field is read back via to-entry's local cast.
- */
-export interface LeaderboardRowWithPlatforms extends LeaderboardRow {
-  /** Distinct platforms the operator submitted, e.g. ['claude','codex','multi']. */
-  platforms?: string[];
-}
-
 /** All columns of metric_snapshots the mapper reads (single source for selects). */
 export const SNAPSHOT_COLUMNS =
   "metric_snapshot_id, operator_id, snapshot_date, window_type, platform, source_submission_id, window_start, window_end, workflow_mode, workflow_evidence_url, workflow_mode_version, mode_assessed_at, compression_ratio, prompt_complexity, cross_thread, " +
@@ -244,28 +256,6 @@ export const SNAPSHOT_COLUMNS =
   // on every submission); the operators rollup columns are unmaintained, so
   // the row builder backfills them from the chosen snapshot.
   "account_age_days, total_messages";
-
-/** The All board's row rule (mirrors compute_board_ranks, migration 0028): input
- *  and output present and positive. Profile / share-card / rank picks use this same
- *  rule so they land on the row the board shows. Workflow mode is a VIEW filter
- *  (includesBoardMode), never an eligibility filter: owner 2026-10-21, the profile
- *  skipped a newer all_time row that resolved to no workflow and fell back to an
- *  older one (holocard Υ 661 vs board Υ 15.5K). */
-function isBoardEligible(s: DbMetricSnapshot): boolean {
-  return s.input_tokens != null && s.input_tokens > 0 &&
-    s.output_tokens != null && s.output_tokens > 0;
-}
-
-function resolvedModeForSnapshot(s: DbMetricSnapshot) {
-  if (s.input_tokens == null || s.output_tokens == null ||
-      s.cache_creation_tokens == null || s.cache_read_tokens == null ||
-      s.input_tokens <= 0 || s.output_tokens <= 0) return null;
-  return resolveWorkflowMode({
-    inputTokens: num(s.input_tokens), outputTokens: num(s.output_tokens),
-    cacheWriteTokens: num(s.cache_creation_tokens), cacheReadTokens: num(s.cache_read_tokens),
-    assessment: s.workflow_mode, evidenceUrl: s.workflow_evidence_url,
-  });
-}
 
 /** Escape LIKE metacharacters so URL-supplied codenames can't wildcard-match
  *  (e.g. `/user/%25` or a `_` segment resolving the first matching operator). */
@@ -296,8 +286,194 @@ export const OPERATOR_COLUMNS =
 // Facade functions.
 // ───────────────────────────────────────────────────────────────────────────
 
-/** Global / filtered leaderboard. */
-export async function getLeaderboard(
+/**
+ * BOARD_DB_SELECTION=1 turns on the database-side row selection (egress fix,
+ * 2026-11-14). Default OFF: it needs migration 0059
+ * (supabase/migrations/20261114180000_0059_board_selection.sql), which the
+ * owner must approve and apply first. With the flag off nothing changes.
+ */
+function dbSelectionEnabled(): boolean {
+  return process.env.BOARD_DB_SELECTION === "1";
+}
+
+/** Rows per `.in()` request: 100 uuids ≈ 4 KB of URL, well under proxy limits. */
+const IN_CHUNK = 100;
+
+function chunked<T>(items: readonly T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
+  return out;
+}
+
+/** Legacy path: pull EVERY metric_snapshots row, pick in JS. Unchanged logic. */
+async function leaderboardLegacy(
+  sb: SupabaseClient,
+  params: BoardParams,
+): Promise<LeaderboardRow[]> {
+  // Live path: read latest metric_snapshots, join operators + rank_history.
+  // We sort/filter/re-rank in JS so the live board is shape- and order-
+  // identical to filterMockBoard (the schema-parity contract).
+  // Paginated — PostgREST caps unbounded selects at 1000 rows (silent truncation).
+  //
+  // DB-side window filter (egress optimization 2026-07-31): when windowFilter
+  // is true and a window is specified, push the window_type filter to PostgREST
+  // so we only fetch rows for that window (e.g. 87 rows for 30d vs 2,413 total).
+  // The JS-side filterToWindow is still applied for the recency/buffer check.
+  const useDbWindowFilter = params.windowFilter && !!params.window;
+  const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
+    sb,
+    (s) => {
+      let q = s
+        .from("metric_snapshots")
+        .select(SNAPSHOT_COLUMNS)
+        .order("snapshot_date", { ascending: false });
+      if (useDbWindowFilter) {
+        q = q.eq("window_type", params.window!);
+      }
+      return q;
+    },
+    "metric_snapshots (getLeaderboard)",
+  );
+  // DB empty/unreachable → honest empty. Mock fixtures are ONLY for the
+  // unconfigured (!sb) demo path — a configured database must never show
+  // fixture operators as live data.
+  if (allSnaps.length === 0) return [];
+  // Window narrowing, ghost-row guard (null/zero input or output tokens —
+  // mirrors compute_board_ranks, migration 0028), the mode filter and the
+  // collapse ladder (allSnapshots / operatorTotal / perPlatform / latest per
+  // operator) all live in selectLegacy (lib/board/selection.ts). preferWindow
+  // (2026-09-27) makes same-date ties deterministic.
+  const { snapRows, platformsByOperator } = selectLegacy(allSnaps, params);
+  // Honest empty: a connected DB whose requested window has zero rows returns an
+  // empty board (NOT fabricated mock seeds). Mock is only for the !sb demo path.
+  if (snapRows.length === 0) return [];
+
+  const opIds = new Set(snapRows.map((s) => s.operator_id));
+  const opData = await fetchAllPaginated<DbOperator>(
+    sb,
+    (s) => s.from("operators_public").select(OPERATOR_COLUMNS).order("operator_id"),
+    "operators_public (getLeaderboard)",
+  );
+  const opById = new Map<string, DbOperator>(
+    opData.filter((o) => opIds.has(o.operator_id)).map((o) => [o.operator_id, o]),
+  );
+
+  // Latest rank_history per operator for percentile (global_rank is recomputed
+  // from the filtered view below, mirroring the mock re-ranking).
+  const rankData = await fetchAllPaginated<DbRankHistory>(
+    sb,
+    (s) =>
+      s
+        .from("rank_history")
+        .select("operator_id, snapshot_date, global_rank, percentile")
+        .order("snapshot_date", { ascending: false }),
+    "rank_history (getLeaderboard)",
+  );
+  const pctById = new Map<string, number>();
+  for (const r of rankData) {
+    if (!pctById.has(r.operator_id))
+      pctById.set(r.operator_id, num(r.percentile));
+  }
+  return assembleLeaderboard(snapRows, platformsByOperator, opById, pctById, params);
+}
+
+/**
+ * DB-selection path (BOARD_DB_SELECTION=1): the database returns only the rows
+ * the page keeps (board_pick_snapshots), the platform sets
+ * (board_operator_platforms) and the latest rank per operator
+ * (rank_history_latest). Same rule as selectLegacy — proven by
+ * __tests__/board/board-selection-parity.test.ts and
+ * scripts/verify-board-selection.mjs. Requires migration 0059.
+ */
+async function leaderboardFromDb(
+  sb: SupabaseClient,
+  params: BoardParams,
+): Promise<LeaderboardRow[]> {
+  const args = boardSelectionArgs(params);
+  // claimedOnly: the claimed operators are a small, known set. Fetch them first
+  // (full operator rows — they are needed anyway) and restrict the snapshot
+  // selection to them; the unclaimed ~1,600 operators never leave the database.
+  let claimedOps: DbOperator[] | null = null;
+  let restrictIds: string[] | null = null;
+  if (params.claimedOnly) {
+    claimedOps = await fetchAllPaginated<DbOperator>(
+      sb,
+      (s) =>
+        s.from("operators_public").select(OPERATOR_COLUMNS).eq("claimed", true).order("operator_id"),
+      "operators_public claimed (getLeaderboard)",
+    );
+    if (claimedOps.length === 0) return [];
+    restrictIds = claimedOps.map((o) => o.operator_id);
+  }
+  const rpcArgs = { ...args, p_operator_ids: restrictIds };
+  const snapRows = await fetchAllPaginated<DbMetricSnapshot>(
+    sb,
+    (s) =>
+      s
+        .rpc("board_pick_snapshots", rpcArgs)
+        .select(SNAPSHOT_COLUMNS)
+        .order("snapshot_date", { ascending: false })
+        .order("metric_snapshot_id", { ascending: false }),
+    "board_pick_snapshots (getLeaderboard)",
+  );
+  if (snapRows.length === 0) return [];
+
+  let platformsByOperator: Map<string, string[]> | null = null;
+  if (params.operatorTotal) {
+    const { p_level: _level, ...platArgs } = rpcArgs;
+    void _level;
+    const platRows = await fetchAllPaginated<{ operator_id: string; platforms: string[] }>(
+      sb,
+      (s) => s.rpc("board_operator_platforms", platArgs).order("operator_id"),
+      "board_operator_platforms (getLeaderboard)",
+    );
+    platformsByOperator = new Map(platRows.map((r) => [r.operator_id, r.platforms]));
+  }
+
+  const opIds = [...new Set(snapRows.map((s) => s.operator_id))];
+  let opById: Map<string, DbOperator>;
+  if (claimedOps) {
+    opById = new Map(claimedOps.map((o) => [o.operator_id, o]));
+  } else {
+    const pages = await Promise.all(
+      chunked(opIds, IN_CHUNK).map(async (ids) => {
+        const { data, error } = await sb
+          .from("operators_public")
+          .select(OPERATOR_COLUMNS)
+          .in("operator_id", ids);
+        if (error) throw error;
+        return (data ?? []) as unknown as DbOperator[];
+      }),
+    );
+    opById = new Map(pages.flat().map((o) => [o.operator_id, o]));
+  }
+
+  // claimedOnly recomputes percentile over the displayed set, so rank_history
+  // is only read when it will actually be used.
+  const pctById = new Map<string, number>();
+  if (!params.claimedOnly) {
+    const pages = await Promise.all(
+      chunked(opIds, IN_CHUNK).map(async (ids) => {
+        const { data, error } = await sb
+          .from("rank_history_latest")
+          .select("operator_id, snapshot_date, global_rank, percentile")
+          .in("operator_id", ids);
+        if (error) throw error;
+        return (data ?? []) as unknown as DbRankHistory[];
+      }),
+    );
+    for (const r of pages.flat()) pctById.set(r.operator_id, num(r.percentile));
+  }
+  return assembleLeaderboard(snapRows, platformsByOperator, opById, pctById, params);
+}
+
+/**
+ * Live-board read that THROWS when the database cannot be read (402 egress
+ * block, outage, timeout). Not-configured / no-rows still resolve normally.
+ * The shared cache wraps this so a failure is never cached (a thrown value is
+ * not stored by unstable_cache).
+ */
+export async function fetchLeaderboardOrThrow(
   params: BoardParams = {},
 ): Promise<LeaderboardRow[]> {
   const sb = getSupabaseServer();
@@ -306,212 +482,40 @@ export async function getLeaderboard(
     if (params.mode) return [];
     return filterMockBoard(params);
   }
+  return dbSelectionEnabled() && canUseDbSelection(params)
+    ? leaderboardFromDb(sb, params)
+    : leaderboardLegacy(sb, params);
+}
+
+/** Leaderboard rows plus whether the live read was unavailable. */
+export interface LeaderboardResult {
+  rows: LeaderboardRow[];
+  /** True when the live database could not be read (so `rows` is empty because
+   *  of an outage, not because the window is genuinely empty). Added
+   *  2026-11-14 for the Supabase egress block. */
+  unavailable: boolean;
+}
+
+export async function getLeaderboardResult(
+  params: BoardParams = {},
+): Promise<LeaderboardResult> {
   try {
-    // Live path: read latest metric_snapshots, join operators + rank_history.
-    // We sort/filter/re-rank in JS so the live board is shape- and order-
-    // identical to filterMockBoard (the schema-parity contract).
-    // Paginated — PostgREST caps unbounded selects at 1000 rows (silent truncation).
-    //
-    // DB-side window filter (egress optimization 2026-07-31): when windowFilter
-    // is true and a window is specified, push the window_type filter to PostgREST
-    // so we only fetch rows for that window (e.g. 87 rows for 30d vs 2,413 total).
-    // This cuts Supabase egress ~60× for the 7d/30d/90d board pages. The JS-side
-    // filterToWindow is still applied for the recency/buffer check (age-based),
-    // but the DB filter eliminates the bulk of the data transfer.
-    const useDbWindowFilter = params.windowFilter && !!params.window;
-    const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
-      sb,
-      (s) => {
-        let q = s
-          .from("metric_snapshots")
-          .select(SNAPSHOT_COLUMNS)
-          .order("snapshot_date", { ascending: false });
-        if (useDbWindowFilter) {
-          q = q.eq("window_type", params.window!);
-        }
-        return q;
-      },
-      "metric_snapshots (getLeaderboard)",
-    );
-    // DB empty/unreachable → honest empty. Mock fixtures are ONLY for the
-    // unconfigured (!sb) demo path — a configured database must never show
-    // fixture operators as live data.
-    if (allSnaps.length === 0) return [];
-    // 730: narrow to the window (exact window_type + buffer) BEFORE dedupe so each
-    // operator's latest snapshot WITHIN the window wins — but ONLY when the caller
-    // opts in (the /board route). Legacy callers (metric pages, /api/v1/leaderboard,
-    // home/transmitters/hall) keep their pre-730 full-field behaviour.
-    // When useDbWindowFilter is true, allSnaps is already window-scoped from the DB,
-    // so filterToWindow's window_type match is a no-op — only the recency/buffer
-    // check (age-based) does additional filtering.
-    const windowed =
-      params.windowFilter && params.window
-        ? filterToWindow(allSnaps, params.window)
-        : allSnaps;
-    // Ghost-row guard: drop snapshots with null/zero input or output tokens.
-    // Yield = (cache_read × output) / input² — null/zero input or output makes
-    // yield uncomputable, so these rows render as empty "—" rows on the board.
-    // This mirrors the compute_board_ranks RPC filter (migration 0028):
-    //   WHERE input_tokens IS NOT NULL AND input_tokens > 0
-    //     AND output_tokens IS NOT NULL AND output_tokens > 0
-    // Codex-gap operators (cache_creation = 0) are NOT filtered here — the
-    // existing cascade layer nulls their yield intentionally, and they still
-    // show on the board. Only null/zero input/output rows are dropped.
-    const yieldable = windowed.filter(isBoardEligible);
-    if (yieldable.length === 0 && (params.windowFilter || params.strictLive || params.mode)) return [];
-    const modeBySnapshot = new Map<string, WorkflowMode | null>();
-    const boardCandidates = params.mode
-      ? yieldable.filter((s) => {
-          const mode = resolvedModeForSnapshot(s);
-          if (s.metric_snapshot_id) modeBySnapshot.set(s.metric_snapshot_id, mode);
-          return includesBoardMode(params.mode!, mode);
-        })
-      : yieldable;
-    // Collapse ladder (precedence top→bottom):
-    //   allSnapshots  — keep EVERY (operator, platform, window) point ("off" board).
-    //   operatorTotal — ONE total row per operator: the operator's 'multi' snapshot
-    //                   (which already SUMS every platform) when present, else their
-    //                   latest single-platform row. The clean default board.
-    //   perPlatform   — one row per (operator, platform) (FIX H per-platform view).
-    //   else          — latest snapshot per operator (legacy behaviour).
-    // operatorTotal also yields the distinct platform SET per operator so the UI can
-    // badge "claude·codex·multi" on the single total row.
-    // preferWindow (2026-09-27): uploads stamp every window_type with the same
-    // snapshot_date, so "latest" alone is ambiguous among same-date ties —
-    // without it /board/all rendered a 7d row (the DB returned it first) while
-    // the profile landed on 90d. Passing the board's own window makes the pick
-    // deterministic AND semantically right: 'all_time' shows lifetime stats.
-    let platformsByOperator: Map<string, string[]> | null = null;
-    let snapRows: DbMetricSnapshot[];
-    if (params.allSnapshots) {
-      snapRows = boardCandidates;
-    } else if (params.operatorTotal) {
-      const collapsed = operatorTotalCollapse(boardCandidates, params.window);
-      platformsByOperator = collapsed.platformsByOperator;
-      snapRows = [...collapsed.byOperator.values()];
-    } else if (params.perPlatform) {
-      snapRows = [
-        ...latestPerOperatorPlatform(boardCandidates, params.window).values(),
-      ];
-    } else {
-      snapRows = [...latestPerOperator(boardCandidates, params.window).values()];
-    }
-    // Honest empty: a connected DB whose requested window has zero rows returns an
-    // empty board (NOT fabricated mock seeds). Mock is only for the !sb demo path.
-    if (snapRows.length === 0) return [];
-
-    const opIds = new Set(snapRows.map((s) => s.operator_id));
-    const opData = await fetchAllPaginated<DbOperator>(
-      sb,
-      (s) => s.from("operators_public").select(OPERATOR_COLUMNS).order("operator_id"),
-      "operators_public (getLeaderboard)",
-    );
-    const opById = new Map<string, DbOperator>(
-      opData.filter((o) => opIds.has(o.operator_id)).map((o) => [o.operator_id, o]),
-    );
-
-    // Latest rank_history per operator for percentile (global_rank is recomputed
-    // from the filtered view below, mirroring the mock re-ranking).
-    // Paginated — PostgREST caps unbounded selects at 1000 rows (silent truncation).
-    const rankData = await fetchAllPaginated<DbRankHistory>(
-      sb,
-      (s) =>
-        s
-          .from("rank_history")
-          .select("operator_id, snapshot_date, global_rank, percentile")
-          .order("snapshot_date", { ascending: false }),
-      "rank_history (getLeaderboard)",
-    );
-    const pctById = new Map<string, number>();
-    for (const r of rankData) {
-      if (!pctById.has(r.operator_id))
-        pctById.set(r.operator_id, num(r.percentile));
-    }
-
-    let rows: LeaderboardRowWithPlatforms[] = [];
-    for (const snap of snapRows) {
-      const op = opById.get(snap.operator_id);
-      if (!op) continue;
-      // operatorTotal: the distinct platforms this operator submitted (for the UI
-      // multi-platform badge). Only attached on the operatorTotal path; other paths
-      // leave `platforms` undefined (the per-row platform column is the source there).
-      const platforms = platformsByOperator?.get(snap.operator_id);
-      rows.push({
-        operator: applySnapshotRollups(mapOperator(op), snap),
-        snapshot: mapSnapshot(snap),
-        source_submission_id: snap.source_submission_id ?? null,
-        window_start: snap.window_start ?? null,
-        window_end: snap.window_end ?? null,
-        workflow_mode: params.mode
-          ? modeBySnapshot.get(snap.metric_snapshot_id ?? "") ?? null
-          : snap.workflow_mode ?? null,
-        workflow_evidence_url: snap.workflow_evidence_url ?? null,
-        workflow_mode_version: snap.workflow_mode_version ??
-          (params.mode && modeBySnapshot.get(snap.metric_snapshot_id ?? "") === "hitl" ? "hcm-v1" : null),
-        mode_assessed_at: snap.mode_assessed_at ?? null,
-        global_rank: 0, // recomputed after sort
-        percentile: pctById.get(snap.operator_id) ?? 0,
-        telemetry: telemetryFromSnapshot(snap),
-        window_type: snap.window_type ?? null,
-        platform: snap.platform ?? op.primary_domain ?? null,
-        snapshot_date: snap.snapshot_date ?? null,
-        ...(platforms && platforms.length > 0 ? { platforms } : {}),
-      });
-    }
-    // Honest empty (mirrors the snapRows guard above): if operators didn't
-    // resolve for the windowed snapshots (e.g. RLS divergence on an anon-key
-    // deploy), the board is empty rather than fabricated mock seeds.
-    if (rows.length === 0) return [];
-
-    // Apply the same filter → sort → re-rank → limit pipeline as the mock path.
-    // Filter on the row's platform (snapshot.platform, falling back to
-    // primary_domain) — NOT operator.primary_domain alone. This way operators
-    // who submitted on codex/multi/pi appear under those platform filters even
-    // if their primary_domain is "claude" or "other".
-    // claimedOnly (2026-09-27): drop unclaimed operators before re-rank so
-    // global_rank is contiguous over the displayed set (claimed ops only) —
-    // the same basis the profile rank uses. Applied with the other display
-    // filters so the rank column matches what the reader sees.
-    if (params.claimedOnly) rows = rows.filter((r) => r.operator.claimed);
-    if (params.platform && params.platform !== "all") {
-      rows = rows.filter(
-        (r) =>
-          (r.platform ?? r.operator.primary_domain)?.toLowerCase() ===
-          params.platform!.toLowerCase(),
-      );
-    }
-    if (params.classScope && params.classScope !== "all") {
-      const scope = params.classScope!.toLowerCase();
-      rows = rows.filter(
-        (r) =>
-          tierOf(r.snapshot.class_tier).toLowerCase() === scope,
-      );
-    }
-    const sort = params.sort ?? SORT_DEFAULT;
-    rows.sort((a, b) => sortValue(b, sort) - sortValue(a, sort));
-    rows = rows.map((r, i) => ({ ...r, global_rank: i + 1 }));
-    // claimedOnly: derive percentile over the same displayed set so the p-chip
-    // agrees with the rank column (rank_history's percentile counts a wider
-    // population — every op with a 30d snapshot — and disagrees).
-    if (params.claimedOnly) {
-      const n = rows.length;
-      rows = rows.map((r) => ({
-        ...r,
-        percentile:
-          n > 1
-            ? Math.round(((n - r.global_rank) / (n - 1)) * 100 * 100) / 100
-            : 100,
-      }));
-    }
-    if (params.limit && params.limit > 0) rows = rows.slice(0, params.limit);
-    return rows;
+    return { rows: await fetchLeaderboardOrThrow(params), unavailable: false };
   } catch (error) {
     if (params.strictLive) throw error;
     // A live read that failed is "unavailable", not "demo" — an empty board
     // beats fixture rows presented as live.
     console.warn("getLeaderboard failed:", error);
-    return [];
+    return { rows: [], unavailable: true };
   }
+}
+
+/** Global / filtered leaderboard. Rows only; use getLeaderboardResult to tell an
+ *  outage from a genuinely empty window. */
+export async function getLeaderboard(
+  params: BoardParams = {},
+): Promise<LeaderboardRow[]> {
+  return (await getLeaderboardResult(params)).rows;
 }
 
 /**
