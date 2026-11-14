@@ -165,27 +165,33 @@ async function computeClaimedRanks(
       .limit(10_000);
     const claimedIds = (claimedData ?? []).map((r: { operator_id: string }) => r.operator_id);
     if (claimedIds.length === 0) return out;
-    let latest: Map<string, DbMetricSnapshot> | DbMetricSnapshot[];
+    let latest: Map<string, DbMetricSnapshot> | DbMetricSnapshot[] | null = null;
     if (dbSelectionEnabled()) {
       // BOARD_DB_SELECTION=1: the database returns each claimed operator's
       // chosen all_time row (== operatorTotalCollapse(eligible, "all_time")).
-      latest = await fetchAllPaginated<DbMetricSnapshot>(
-        sb,
-        (s) =>
-          s
-            .rpc("board_pick_snapshots", {
-              p_level: "operator",
-              p_prefer_window: "all_time",
-              p_window_filter: false,
-              p_max_age_days: null,
-              p_operator_ids: claimedIds,
-            })
-            .select(SNAPSHOT_COLUMNS)
-            .order("snapshot_date", { ascending: false })
-            .order("metric_snapshot_id", { ascending: false }),
-        "board_pick_snapshots (claimedRanks)",
-      );
-    } else {
+      try {
+        latest = await fetchAllPaginated<DbMetricSnapshot>(
+          sb,
+          (s) =>
+            s
+              .rpc("board_pick_snapshots", {
+                p_level: "operator",
+                p_prefer_window: "all_time",
+                p_window_filter: false,
+                p_max_age_days: null,
+                p_operator_ids: claimedIds,
+              })
+              .select(SNAPSHOT_COLUMNS)
+              .order("snapshot_date", { ascending: false })
+              .order("metric_snapshot_id", { ascending: false }),
+          "board_pick_snapshots (claimedRanks)",
+        );
+      } catch (error) {
+        console.warn("computeClaimedRanks: DB selection failed, using legacy path:", error);
+        latest = null;
+      }
+    }
+    if (!latest) {
       const allSnaps = await fetchAllPaginated<DbMetricSnapshot>(
         sb,
         (s) =>
@@ -298,6 +304,23 @@ function dbSelectionEnabled(): boolean {
 
 /** Rows per `.in()` request: 100 uuids ≈ 4 KB of URL, well under proxy limits. */
 const IN_CHUNK = 100;
+
+/** Run `fn` over `items` with at most `limit` in flight; results keep input order. */
+async function mapLimit<T, R>(items: readonly T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let next = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await fn(items[i]);
+    }
+  });
+  await Promise.all(workers);
+  return out;
+}
+
+/** Max concurrent `.in()` chunk requests. */
+const IN_CONCURRENCY = 4;
 
 function chunked<T>(items: readonly T[], size: number): T[][] {
   const out: T[][] = [];
@@ -435,15 +458,16 @@ async function leaderboardFromDb(
   if (claimedOps) {
     opById = new Map(claimedOps.map((o) => [o.operator_id, o]));
   } else {
-    const pages = await Promise.all(
-      chunked(opIds, IN_CHUNK).map(async (ids) => {
+    const pages = await mapLimit(
+      chunked(opIds, IN_CHUNK), IN_CONCURRENCY,
+      async (ids) => {
         const { data, error } = await sb
           .from("operators_public")
           .select(OPERATOR_COLUMNS)
           .in("operator_id", ids);
         if (error) throw error;
         return (data ?? []) as unknown as DbOperator[];
-      }),
+      },
     );
     opById = new Map(pages.flat().map((o) => [o.operator_id, o]));
   }
@@ -452,15 +476,16 @@ async function leaderboardFromDb(
   // is only read when it will actually be used.
   const pctById = new Map<string, number>();
   if (!params.claimedOnly) {
-    const pages = await Promise.all(
-      chunked(opIds, IN_CHUNK).map(async (ids) => {
+    const pages = await mapLimit(
+      chunked(opIds, IN_CHUNK), IN_CONCURRENCY,
+      async (ids) => {
         const { data, error } = await sb
           .from("rank_history_latest")
           .select("operator_id, snapshot_date, global_rank, percentile")
           .in("operator_id", ids);
         if (error) throw error;
         return (data ?? []) as unknown as DbRankHistory[];
-      }),
+      },
     );
     for (const r of pages.flat()) pctById.set(r.operator_id, num(r.percentile));
   }
@@ -482,9 +507,16 @@ export async function fetchLeaderboardOrThrow(
     if (params.mode) return [];
     return filterMockBoard(params);
   }
-  return dbSelectionEnabled() && canUseDbSelection(params)
-    ? leaderboardFromDb(sb, params)
-    : leaderboardLegacy(sb, params);
+  if (dbSelectionEnabled() && canUseDbSelection(params)) {
+    try {
+      return await leaderboardFromDb(sb, params);
+    } catch (error) {
+      // Missing function (migration 0059 not applied), schema-cache lag or a
+      // bad shape must not blank the board: warn and use the legacy path.
+      console.warn("getLeaderboard: DB selection failed, using legacy path:", error);
+    }
+  }
+  return leaderboardLegacy(sb, params);
 }
 
 /** Leaderboard rows plus whether the live read was unavailable. */

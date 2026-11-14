@@ -87,11 +87,17 @@ CREATE OR REPLACE FUNCTION public.board_pick_snapshots(
   p_operator_ids  uuid[] DEFAULT NULL
 )
 RETURNS SETOF public.metric_snapshots
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY INVOKER
 SET search_path = public, pg_temp
 AS $$
+BEGIN
+  IF p_level IS NULL OR p_level NOT IN ('operator', 'platform') THEN
+    RAISE EXCEPTION 'board_pick_snapshots: p_level must be ''operator'' or ''platform'', got %', p_level
+      USING ERRCODE = '22023';
+  END IF;
+  RETURN QUERY
   SELECT picked.*
   FROM (
     SELECT DISTINCT ON (
@@ -112,7 +118,8 @@ AS $$
       c.snapshot_date DESC,
       c.metric_snapshot_id DESC NULLS LAST
   ) picked
-  ORDER BY picked.snapshot_date DESC, picked.metric_snapshot_id DESC
+  ORDER BY picked.snapshot_date DESC, picked.metric_snapshot_id DESC;
+END
 $$;
 
 -- 3. Distinct submitted platforms per operator (operatorTotal UI badge) -------
@@ -143,6 +150,12 @@ AS $$
   ) p
   GROUP BY p.operator_id
 $$;
+
+-- Supporting index for the per-operator / per-platform DISTINCT ON above (the
+-- existing (operator_id, platform) index does not carry the date/id ordering).
+-- The table is small (~3k rows) so this is cheap insurance as it grows.
+CREATE INDEX IF NOT EXISTS ix_metric_snapshots_board_pick
+  ON public.metric_snapshots (operator_id, platform, snapshot_date DESC, metric_snapshot_id DESC);
 
 -- 4. Latest rank_history row per operator -----------------------------------
 --    getLeaderboard reads only the percentile of the newest row per operator.

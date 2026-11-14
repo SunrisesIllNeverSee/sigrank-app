@@ -54,7 +54,7 @@ import {
   getOperatorRecords as _getOperatorRecords,
 } from "@/lib/board/queries";
 
-import { memoize } from "./memo";
+import { memoize, memoSet } from "./memo";
 
 import type {
   LeaderboardRow,
@@ -106,15 +106,28 @@ export const LEADERBOARD_CACHE_MAX_BYTES = 1_800_000;
 
 type CachedLeaderboard = { rows: LeaderboardRow[] } | { oversize: true };
 
+/**
+ * Decide what goes into the shared cache. Size is measured in UTF-8 bytes of the
+ * JSON the Data Cache will store. Rows are returned through a JSON round-trip so
+ * a cache miss and a cache hit hand callers identical data (JSON drops
+ * `undefined` fields and turns NaN/Infinity into null).
+ */
+export function prepareCacheEntry(rows: LeaderboardRow[]): CachedLeaderboard {
+  const text = JSON.stringify(rows);
+  if (Buffer.byteLength(text, "utf8") > LEADERBOARD_CACHE_MAX_BYTES) return { oversize: true };
+  return { rows: JSON.parse(text) as LeaderboardRow[] };
+}
+
 const sharedLeaderboard = unstable_cache(
   async (params: BoardParams): Promise<CachedLeaderboard> => {
     const rows = await _fetchLeaderboardOrThrow(params);
-    if (JSON.stringify(rows).length > LEADERBOARD_CACHE_MAX_BYTES) {
-      // Seed the memo so this instance does not fetch again.
-      void memoize(memoKey(params), 3600, async () => rows);
-      return { oversize: true };
-    }
-    return { rows };
+    const entry = prepareCacheEntry(rows);
+    // Oversize: the fetch above is the one full fetch for this hour; hand its
+    // rows to this instance's memo (replacing any stale entry) so the caller
+    // below does not fetch again. Other instances read the marker and fill
+    // their own memo once, exactly as before this PR.
+    if ("oversize" in entry) memoSet(memoKey(params), 3600, rows);
+    return entry;
   },
   ["board-leaderboard-v1"],
   { revalidate: 3600, tags: ["board"] },

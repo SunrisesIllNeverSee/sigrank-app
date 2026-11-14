@@ -28,8 +28,10 @@ import {
   modelBoardOperatorPlatforms,
   modelBoardPickSnapshots,
   selectLegacy,
+  resolvedModeForSnapshot,
   selectSqlModel,
 } from "@/lib/board/selection";
+import { includesBoardMode } from "@/lib/board/workflow-mode";
 import { assembleLeaderboard } from "@/lib/board/assemble";
 import { sortValue } from "@/lib/board/fallback";
 
@@ -124,7 +126,7 @@ function buildCorpus(nOps: number, seed: number) {
           snapshot_date: DATES[Math.floor(r() * DATES.length)],
           input_tokens: eligible ? 500 + Math.floor(r() * 5000) : r() < 0.5 ? null : 0,
           output_tokens: eligible ? 500 + Math.floor(r() * 5000) : 1000,
-          cache_creation_tokens: Math.floor(r() * 9000),
+          cache_creation_tokens: r() < 0.1 ? null : Math.floor(r() * 9000), // null -> resolvedModeForSnapshot null
           cache_read_tokens: 10_000 + uniq++ * 37 + Math.floor(r() * 30),
         }),
       );
@@ -195,6 +197,41 @@ function runBoth(
   return { a, b, legacy, sql };
 }
 
+
+type Rows = ReturnType<typeof assembleLeaderboard>;
+
+/**
+ * Assert two boards are the same. With no tied sort values the full sequences
+ * must be EXACTLY equal. Where rows tie on the sort value, the legacy order is
+ * PostgREST's arbitrary same-date order (not reproducible), so within each tied
+ * group we require the same members with the same values and the group's start
+ * rank; only the order inside the group may differ.
+ */
+function expectSameBoard(b: Rows, a: Rows, params: BoardParams) {
+  const sort = (params.sort ?? "yield") as never;
+  const groupsOf = (rows: Rows) => {
+    const out: Rows[] = [];
+    for (const r of rows) {
+      const last = out[out.length - 1];
+      if (last && sortValue(last[0], sort) === sortValue(r, sort)) last.push(r);
+      else out.push([r]);
+    }
+    return out;
+  };
+  const ga = groupsOf(a), gb = groupsOf(b);
+  if (ga.every((g) => g.length === 1)) {
+    expect(b).toEqual(a);
+    return;
+  }
+  const norm = (groups: Rows[]) =>
+    groups.map((g) =>
+      [...g]
+        .sort((x, y) => (x.operator.operator_id < y.operator.operator_id ? -1 : 1))
+        .map((r) => ({ ...r, global_rank: g[0].global_rank, percentile: params.claimedOnly ? g[0].percentile : r.percentile })),
+    );
+  expect(norm(gb)).toEqual(norm(ga));
+}
+
 // ── 1. Selection parity ─────────────────────────────────────────────────
 
 describe("board selection parity: legacy JS vs SQL model", () => {
@@ -205,7 +242,7 @@ describe("board selection parity: legacy JS vs SQL model", () => {
     it(`${combo.name}: identical LeaderboardRows (same rows, order, values)`, () => {
       for (const { ops, snaps } of corpora) {
         const { a, b } = runBoth(ops, snaps, combo.params);
-        expect(b).toEqual(a);
+        expectSameBoard(b, a, combo.params);
       }
     });
   }
@@ -330,14 +367,39 @@ describe("board selection parity: legacy JS vs SQL model", () => {
     expect(sql.snapRows.map((r) => r.metric_snapshot_id)).toEqual([uuid(8003)]);
   });
 
-  it("sort-value ties: same members and same rank groups (order inside a tie is unspecified today)", () => {
-    const ops = [1, 2, 3, 4].map((i) => opRow(20 + i, true));
+  it("sort-value ties: same members in each tied rank group (order inside an exact tie is unspecified today)", () => {
+    const ops = [1, 2, 3, 4, 5].map((i) => opRow(20 + i, true));
     const snaps = ops.map((o, i) =>
-      snapRow({ operator_id: o.operator_id, metric_snapshot_id: uuid(9000 + i), snapshot_date: `2026-11-0${i + 1}`, cache_read_tokens: i < 2 ? 7_000 : 0 + i * 1000 }),
+      snapRow({ operator_id: o.operator_id, metric_snapshot_id: uuid(9000 + i), snapshot_date: `2026-11-0${i + 1}`, cache_read_tokens: i < 3 ? 7_000 : i * 1000 }),
     );
     const { a, b } = runBoth(ops, snaps, { window: "all_time", operatorTotal: true });
-    expect(b.map((r) => sortValue(r, "yield" as never))).toEqual(a.map((r) => sortValue(r, "yield" as never)));
-    expect(new Set(b.map((r) => r.operator.operator_id))).toEqual(new Set(a.map((r) => r.operator.operator_id)));
+    const groups = (rows: typeof a) => {
+      const out: { v: number; ids: string[] }[] = [];
+      for (const r of rows) {
+        const v = sortValue(r, "yield" as never);
+        const last = out[out.length - 1];
+        if (last && last.v === v) last.ids.push(r.operator.operator_id);
+        else out.push({ v, ids: [r.operator.operator_id] });
+      }
+      return out.map((g) => ({ v: g.v, ids: g.ids.sort() }));
+    };
+    expect(groups(b)).toEqual(groups(a));
+    expect(groups(a).some((g) => g.ids.length > 1)).toBe(true); // a real tie was exercised
+  });
+
+  it("mode 'all' with an unresolvable mode (null cache tokens): row stays, workflow_mode null, both paths agree", () => {
+    const op = opRow(30, true);
+    const rows = [
+      snapRow({ operator_id: op.operator_id, metric_snapshot_id: uuid(30001), cache_creation_tokens: null, cache_read_tokens: 12_345 }),
+    ];
+    const { a, b, legacy, sql } = runBoth([op], rows, { window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" });
+    expect(includesBoardMode("all", resolvedModeForSnapshot(rows[0]))).toBe(true);
+    expect(resolvedModeForSnapshot(rows[0])).toBeNull();
+    expect(legacy.snapRows).toHaveLength(1);
+    expect(sql.snapRows).toHaveLength(1);
+    expect(a).toHaveLength(1);
+    expect(a[0].workflow_mode).toBeNull();
+    expect(b).toEqual(a);
   });
 
   it("mode hitl / agentic / hybrid stay on the legacy path", () => {
@@ -370,7 +432,7 @@ describe("board selection parity: legacy JS vs SQL model", () => {
 
 // ── 2. End to end through getLeaderboard (flag off vs on) ───────────────
 
-const fixture = vi.hoisted(() => ({ ops: [] as unknown[], snaps: [] as unknown[], calls: [] as string[] }));
+const fixture = vi.hoisted(() => ({ ops: [] as unknown[], snaps: [] as unknown[], calls: [] as string[], rpcFail: false, viewFail: false }));
 
 vi.mock("@/lib/infra/supabase/server", async () => {
   const sel = await import("@/lib/board/selection");
@@ -394,7 +456,12 @@ vi.mock("@/lib/infra/supabase/server", async () => {
     b.in = (c: string, vs: unknown[]) => (st.filters.push((r) => vs.includes(r[c])), b);
     b.order = (c: string, o?: { ascending?: boolean }) => (st.orders.push([c, o?.ascending !== false]), b);
     b.range = (f: number, t: number) => ((st.range = [f, t]), b);
-    b.then = (res: (v: unknown) => unknown) => res(exec());
+    b.then = (res: (v: unknown) => unknown) =>
+      res(
+        (table.startsWith("board_") && fixture.rpcFail) || (table === "rank_history_latest" && fixture.viewFail)
+          ? { data: null, error: { message: `function ${table} does not exist`, code: "42883" } }
+          : exec(),
+      );
     return b;
   }
   const client = {
@@ -428,6 +495,8 @@ describe("getLeaderboard: BOARD_DB_SELECTION off vs on (fake Supabase)", () => {
     fixture.ops = ops;
     fixture.snaps = legacyInput(snaps);
     fixture.calls = [];
+    fixture.rpcFail = false;
+    fixture.viewFail = false;
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -439,7 +508,7 @@ describe("getLeaderboard: BOARD_DB_SELECTION off vs on (fake Supabase)", () => {
       const off = await getLeaderboard(combo.params);
       vi.stubEnv("BOARD_DB_SELECTION", "1");
       const on = await getLeaderboard(combo.params);
-      expect(on).toEqual(off);
+      expectSameBoard(on as Rows, off as Rows, combo.params);
     });
   }
 
@@ -458,5 +527,29 @@ describe("getLeaderboard: BOARD_DB_SELECTION off vs on (fake Supabase)", () => {
     await getLeaderboard({ window: "all_time", operatorTotal: true, mode: "hitl" });
     expect(fixture.calls).toContain("metric_snapshots");
     expect(fixture.calls).not.toContain("board_pick_snapshots");
+  });
+
+  it("flag on + RPC error (migration missing / schema cache lag): warns and returns the legacy rows", async () => {
+    const { getLeaderboard, getLeaderboardResult } = await import("@/lib/board/queries");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const params = { window: "all_time", operatorTotal: true, claimedOnly: true, mode: "all" as const };
+    vi.stubEnv("BOARD_DB_SELECTION", "");
+    const legacy = await getLeaderboard(params);
+    fixture.rpcFail = true;
+    vi.stubEnv("BOARD_DB_SELECTION", "1");
+    const res = await getLeaderboardResult(params);
+    expect(res.unavailable).toBe(false);
+    expect(res.rows).toEqual(legacy);
+    expect(res.rows.length).toBeGreaterThan(0);
+    expect(warn).toHaveBeenCalled();
+    // the unclaimed path hits the view too
+    fixture.rpcFail = false;
+    fixture.viewFail = true;
+    const unclaimed = { window: "all_time", operatorTotal: true };
+    vi.stubEnv("BOARD_DB_SELECTION", "");
+    const legacy2 = await getLeaderboard(unclaimed);
+    vi.stubEnv("BOARD_DB_SELECTION", "1");
+    expect((await getLeaderboardResult(unclaimed)).rows).toEqual(legacy2);
+    warn.mockRestore();
   });
 });

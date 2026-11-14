@@ -10,7 +10,8 @@
 import { describe, it, expect } from "vitest";
 import { assembleLeaderboard } from "@/lib/board/assemble";
 import type { DbMetricSnapshot, DbOperator } from "@/lib/board/mappers";
-import { LEADERBOARD_CACHE_MAX_BYTES } from "@/lib/board/cached";
+import { LEADERBOARD_CACHE_MAX_BYTES, prepareCacheEntry } from "@/lib/board/cached";
+import type { LeaderboardRow } from "@/lib/board/types";
 
 function field(n: number) {
   const ops = new Map<string, DbOperator>();
@@ -62,5 +63,28 @@ describe("getLeaderboard cache entry size (2 MB Data Cache cap)", () => {
     const rows = field(1693);
     console.log(`[size] 1,693 rows = ${bytes(rows)} bytes (cap ${LEADERBOARD_CACHE_MAX_BYTES})`);
     expect(bytes(rows)).toBeGreaterThan(LEADERBOARD_CACHE_MAX_BYTES);
+  });
+
+  it("prepareCacheEntry: hit and miss return identical data (NaN/undefined normalized as JSON would)", () => {
+    const rows = field(3) as unknown as Record<string, unknown>[];
+    rows[0].percentile = NaN;
+    rows[1].window_start = undefined;
+    rows[2].extra = Infinity;
+    const entry = prepareCacheEntry(rows as unknown as LeaderboardRow[]);
+    expect("rows" in entry).toBe(true);
+    const got = (entry as unknown as { rows: Record<string, unknown>[] }).rows;
+    expect(got[0].percentile).toBeNull();
+    expect("window_start" in got[1]).toBe(false);
+    expect(got[2].extra).toBeNull();
+    // what a cache hit would return is the JSON round-trip of the stored value
+    expect(JSON.parse(JSON.stringify(got))).toEqual(got);
+  });
+
+  it("prepareCacheEntry: measures UTF-8 bytes, not characters", () => {
+    const row = { ...(field(1)[0] as object), bio: "é".repeat(1_000_000) } as unknown as LeaderboardRow;
+    const text = JSON.stringify([row]);
+    expect(text.length).toBeLessThan(LEADERBOARD_CACHE_MAX_BYTES);
+    expect(Buffer.byteLength(text, "utf8")).toBeGreaterThan(LEADERBOARD_CACHE_MAX_BYTES);
+    expect(prepareCacheEntry([row])).toEqual({ oversize: true });
   });
 });

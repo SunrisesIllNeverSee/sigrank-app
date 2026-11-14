@@ -7,7 +7,9 @@
  * empty"). It is NOT a redirect: an ISR-cached redirect could stick after the
  * data recovers and hurt search. The page renders this only while
  * getLeaderboardResult() reports `unavailable`; once Supabase answers again,
- * the next revalidation renders the real board and this disappears by itself.
+ * the next revalidation (at most 1h, or a submission's on-demand revalidate)
+ * renders the real board and this disappears by itself. While shown, the page
+ * is noindex (generateMetadata).
  */
 
 import Link from "next/link";
@@ -37,7 +39,7 @@ export function BoardUnderConstruction({
         </p>
         <p className="mt-2 font-sans text-sm leading-relaxed text-text-secondary">
           The live data is temporarily unavailable. Nothing has been lost; the
-          board returns on its own as soon as the data is back.
+          board returns on its own once the data is back.
         </p>
         <Link
           href="/board/history"
