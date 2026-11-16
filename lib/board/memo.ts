@@ -68,6 +68,16 @@ export function memoize<T>(key: string, ttl: number, fn: () => Promise<T>): Prom
 }
 
 /**
+ * Store an already-fetched value under `key`, REPLACING any live entry (unlike
+ * memoize, which keeps an unexpired one). Used when a fresh fetch happened
+ * elsewhere (the shared-cache function's oversize path) so this instance's memo
+ * is refreshed instead of staying stale or fetching again.
+ */
+export function memoSet<T>(key: string, ttl: number, value: T): void {
+  cache.set(key, { promise: Promise.resolve(value), expires: Date.now() + ttl * 1000 });
+}
+
+/**
  * Invalidate a specific cache entry (e.g. on data change).
  * Call this when `revalidateTag("board")` would normally fire.
  */

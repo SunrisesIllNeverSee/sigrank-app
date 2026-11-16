@@ -26,18 +26,17 @@
  * `"use cache"` directives. The cache policy (tags, revalidate windows)
  * stays the same.
  *
- * ⚠ 2MB LIMIT WORKAROUND: `getLeaderboard` returns ~2.5MB (1,640 operators ×
- * full nested objects), which exceeds `unstable_cache`'s 2MB per-entry cap
- * on Vercel. The Data Cache silently fails to set, so every request re-queries
- * Supabase. We use an in-memory memo cache (`./memo.ts`) instead — no size
- * limit, deduplicates concurrent requests, persists across warm serverless
- * invocations. See `./memo.ts` for the full rationale.
+ * 2MB LIMIT: the full unfiltered `getLeaderboard` field (~2.5MB for 1,640
+ * operators) exceeds `unstable_cache`'s 2MB per-entry cap. getLeaderboard goes
+ * through the shared Data Cache and falls back to the in-memory memo
+ * (`./memo.ts`) only for results over the cap — see the comment on
+ * `sharedLeaderboard` below.
  */
 
 import { unstable_cache } from "next/cache";
 
 import {
-  getLeaderboard as _getLeaderboard,
+  fetchLeaderboardOrThrow as _fetchLeaderboardOrThrow,
   getIndexableOperatorRows as _getIndexableOperatorRows,
   getOperator as _getOperator,
   getOperatorSubmissions as _getOperatorSubmissions,
@@ -55,7 +54,7 @@ import {
   getOperatorRecords as _getOperatorRecords,
 } from "@/lib/board/queries";
 
-import { memoize } from "./memo";
+import { memoize, memoSet } from "./memo";
 
 import type {
   LeaderboardRow,
@@ -69,6 +68,7 @@ import type {
 } from "@/lib/board/types";
 import type { BoardParams, HistoryParams } from "@/lib/board/mappers";
 import type {
+  LeaderboardResult,
   OperatorSubmission,
   OperatorReport,
   OperatorStaticRecord,
@@ -82,15 +82,84 @@ import type {
 // means that if no submissions arrive for an hour, the cache refreshes once
 // instead of every 5 minutes (12x fewer DB hits during idle periods).
 
-// ⚠ getLeaderboard uses the in-memory memo cache instead of unstable_cache
-// because the serialized payload (~2.5MB for 1,640 operators) exceeds
-// Vercel's 2MB Data Cache limit. The memo cache has no size limit and
-// deduplicates concurrent requests (a 100-request burst = 1 DB hit).
-// Cache key includes JSON-serialized params so different filters cache
-// separately. TTL matches the original unstable_cache revalidate (3600s).
-export function getLeaderboard(params: BoardParams = {}): Promise<LeaderboardRow[]> {
-  const key = `board:leaderboard:${JSON.stringify(params)}`;
-  return memoize(key, 3600, () => _getLeaderboard(params));
+// getLeaderboard — shared cache (2026-11-14, Supabase egress block).
+// It used to live in a per-instance in-memory memo, so every cold serverless
+// instance / region / build worker refetched the whole board from Supabase.
+// It now goes through Next's Data Cache (unstable_cache, tag "board",
+// revalidate 3600), which is shared across instances and is busted by
+// revalidateTag("board") in revalidateTouchedWindows. Cache key = the params.
+//
+// The Data Cache caps an entry at 2 MB and silently refuses bigger ones. The
+// entry is the mapped rows exactly as returned (nothing is trimmed: the board
+// must show identical data). Measured sizes are in
+// __tests__/board/leaderboard-cache-size.test.ts: ~1.9 KB per row, so the
+// claimed-only boards (hundreds of operators) are well below the cap, and the
+// full unfiltered field (~1,700 operators) is over it. Over-cap results are
+// detected inside the cached function, stored as a tiny marker, and served
+// from the old in-memory memo instead (seeded by the same fetch, so there is no
+// second database read on that instance). Failures are never cached: the
+// cached function THROWS when the database is unreadable, and unstable_cache
+// does not store a thrown result.
+
+/** Stay under the 2 MB Data Cache cap with headroom for cache metadata. */
+export const LEADERBOARD_CACHE_MAX_BYTES = 1_800_000;
+
+type CachedLeaderboard = { rows: LeaderboardRow[] } | { oversize: true };
+
+/**
+ * Decide what goes into the shared cache. Size is measured in UTF-8 bytes of the
+ * JSON the Data Cache will store. Rows are returned through a JSON round-trip so
+ * a cache miss and a cache hit hand callers identical data (JSON drops
+ * `undefined` fields and turns NaN/Infinity into null).
+ */
+export function prepareCacheEntry(rows: LeaderboardRow[]): CachedLeaderboard {
+  const text = JSON.stringify(rows);
+  if (Buffer.byteLength(text, "utf8") > LEADERBOARD_CACHE_MAX_BYTES) return { oversize: true };
+  return { rows: JSON.parse(text) as LeaderboardRow[] };
+}
+
+const sharedLeaderboard = unstable_cache(
+  async (params: BoardParams): Promise<CachedLeaderboard> => {
+    const rows = await _fetchLeaderboardOrThrow(params);
+    const entry = prepareCacheEntry(rows);
+    // Oversize: the fetch above is the one full fetch for this hour; hand its
+    // rows to this instance's memo (replacing any stale entry) so the caller
+    // below does not fetch again. Other instances read the marker and fill
+    // their own memo once, exactly as before this PR.
+    if ("oversize" in entry) memoSet(memoKey(params), 3600, rows);
+    return entry;
+  },
+  ["board-leaderboard-v1"],
+  { revalidate: 3600, tags: ["board"] },
+);
+
+function memoKey(params: BoardParams): string {
+  return `board:leaderboard:${JSON.stringify(params)}`;
+}
+
+/**
+ * Cached leaderboard read that also says whether the live database was
+ * unavailable (see LeaderboardResult). strictLive callers keep their throw.
+ */
+export async function getLeaderboardResult(
+  params: BoardParams = {},
+): Promise<LeaderboardResult> {
+  try {
+    const hit = await sharedLeaderboard(params);
+    if ("rows" in hit) return { rows: hit.rows, unavailable: false };
+    return {
+      rows: await memoize(memoKey(params), 3600, () => _fetchLeaderboardOrThrow(params)),
+      unavailable: false,
+    };
+  } catch (error) {
+    if (params.strictLive) throw error;
+    console.warn("getLeaderboard failed:", error);
+    return { rows: [], unavailable: true };
+  }
+}
+
+export async function getLeaderboard(params: BoardParams = {}): Promise<LeaderboardRow[]> {
+  return (await getLeaderboardResult(params)).rows;
 }
 
 export const getHallOfSignal = unstable_cache(

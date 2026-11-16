@@ -47,10 +47,10 @@
  */
 
 import { notFound, redirect } from "next/navigation";
-import React, { Suspense } from "react";
+import React, { Suspense, cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getLeaderboard, getLiveBoardInitialState } from "@/lib/board";
+import { getLeaderboard, getLeaderboardResult, getLiveBoardInitialState } from "@/lib/board";
 import { scoreRadarField } from "@/lib/radar/points";
 import { toEntry } from "@/lib/board/to-entry";
 import { boardWindowBySlug, BOARD_WINDOWS } from "@/lib/board/windows";
@@ -63,6 +63,7 @@ import { FaqSection } from "@/components/seo/FaqSection";
 import { withOG } from "@/lib/seo";
 import { BoardTableClient } from "@/components/board/BoardTableClient";
 import { LiveBoardMount } from "./live-board-mount";
+import { BoardUnderConstruction } from "./board-under-construction";
 import { getAllPosts, getArticlePosts } from "@/lib/editorial/blog-index";
 
 // D19: cache leaderboard reads for 3600s (1 hour). Board data changes only on
@@ -83,6 +84,34 @@ const LEGACY_SSR_ROWS = 25;
 const HOME_HEADING = { a: "AI User ", b: "Leaderboard" };
 const ALL_TIME_HEADING = { a: "All-Time ", b: "Leaderboard" };
 
+/**
+ * The window's ranking scope, read once per render. React cache() shares it
+ * between generateMetadata and the page, so the noindex decision below costs
+ * no extra database read (the same call also hits the shared data cache).
+ * The param literal keeps its key order: it must match getLiveBoardInitialState.
+ */
+const readBoardResult = cache((windowEnum: string) =>
+  getLeaderboardResult({
+    window: windowEnum,
+    windowFilter: windowEnum !== "all_time",
+    operatorTotal: true,
+    claimedOnly: true,
+    mode: "all",
+  }),
+);
+
+/**
+ * True while the live data is unavailable for this window (2026-11-14, egress
+ * block). The page is ISR-cached, so an unavailable render stays up until the
+ * next revalidation (at most 1h) or a submission's on-demand revalidate; while
+ * it does, it must not be indexed. Next cannot shorten revalidate per render.
+ */
+export async function isBoardUnavailable(slug: string): Promise<boolean> {
+  const win = boardWindowBySlug(slug);
+  if (!win) return false;
+  return (await readBoardResult(win.enum)).unavailable;
+}
+
 /** Per-window OG metadata. */
 export async function generateMetadata({
   params,
@@ -95,7 +124,7 @@ export async function generateMetadata({
   const label = win.label;
   const isAllTime = win.slug === "all";
   const titleLabel = isAllTime ? "All-Time AI Operator Leaderboard" : `${label} Leaderboard`;
-  return withOG({
+  const meta = withOG({
     title: titleLabel,
     description: isAllTime
       ? `Every claimed AI operator ranked all-time by Υ Yield (token cascade efficiency) on the SigRank Index.`
@@ -108,6 +137,9 @@ export async function generateMetadata({
       alt: `SigRank ${titleLabel}`,
     },
   });
+  return (await isBoardUnavailable(slug))
+    ? { ...meta, robots: { index: false, follow: true } }
+    : meta;
 }
 
 export async function BoardWindowPage({
@@ -149,15 +181,9 @@ export async function renderBoardWindow(slug: string, { home = false }: { home?:
   // so this Promise.all shares a single cached read: the workspace gets the
   // typed LiveBoardInitialState (first page + full-scope aggregates); the
   // raw rows feed the legacy table's SSR page and the JsonLd item list.
-  const [initialState, liveRows, allTimeRows] = await Promise.all([
+  const [initialState, liveResult, allTimeRows] = await Promise.all([
     getLiveBoardInitialState(win.slug),
-    getLeaderboard({
-      window: win.enum,
-      windowFilter: win.enum !== "all_time",
-      operatorTotal: true,
-      claimedOnly: true,
-      mode: "all",
-    }),
+    readBoardResult(win.enum),
     // Radars score the all-time field on every window (owner 2026-10-22: no
     // window-filtered radars yet). Same param literal as /board/all, so it
     // shares that page's memoized read; skipped when this IS all-time.
@@ -171,6 +197,14 @@ export async function renderBoardWindow(slug: string, { home = false }: { home?:
           mode: "all",
         }).catch(() => null),
   ]);
+  const liveRows = liveResult.rows;
+  // 2026-11-14 (Supabase egress block): distinguish "the database could not be
+  // read" from "this window is genuinely empty". While unavailable the page shows
+  // an "Under construction" notice instead of "No operators on this board" (and
+  // noindex, see generateMetadata). It is automatic but not instant: the ISR page
+  // re-renders at the next revalidation (at most 1h) or on a submission's
+  // on-demand revalidate; once Supabase answers, this is false and the board returns.
+  const boardUnavailable = liveResult.unavailable;
   const radarRows = isAllTime ? liveRows : allTimeRows;
   const initial = radarRows?.length
     ? {
@@ -247,15 +281,20 @@ export async function renderBoardWindow(slug: string, { home = false }: { home?:
         data={[
           // Static DOI dataset (v3.1) — its real modification date, never render time.
           sigrankDataset({ updated: SIGRANK_DATASET_PUBLISHED }),
-          leaderboardItemList(
-            jsonLdEntries.map((e) => ({
-              codename: e.codename,
-              display_name: e.anonId !== e.codename ? e.anonId : null,
-              rank: e.rank,
-              classTier: e.signalClass,
-            })),
-            `/board/${slug}`,
-          ),
+          // No empty ItemList while the live data is unavailable.
+          ...(boardUnavailable
+            ? []
+            : [
+                leaderboardItemList(
+                  jsonLdEntries.map((e) => ({
+                    codename: e.codename,
+                    display_name: e.anonId !== e.codename ? e.anonId : null,
+                    rank: e.rank,
+                    classTier: e.signalClass,
+                  })),
+                  `/board/${slug}`,
+                ),
+              ]),
           // AEO: FAQPage schema targeting "who is the best AI user?" queries
           // on the leaderboard page itself — where the answer lives. Also
           // rendered visibly (collapsed) at the foot of the board stage.
@@ -267,6 +306,11 @@ export async function renderBoardWindow(slug: string, { home = false }: { home?:
           The flag is read client-side in LiveBoardMount so this page stays
           static — SSR always ships the workspace; flagged sessions swap
           post-hydration. */}
+      {boardUnavailable ? (
+        <BoardUnderConstruction
+          heading={home ? HOME_HEADING : win.slug === "all" ? ALL_TIME_HEADING : { a: `${boardLabel} `, b: "Leaderboard" }}
+        />
+      ) : (
       <LiveBoardMount
         key={win.slug}
         initial={initial}
@@ -387,6 +431,7 @@ export async function renderBoardWindow(slug: string, { home = false }: { home?:
           </>
         }
       />
+      )}
     </>
   );
 }
