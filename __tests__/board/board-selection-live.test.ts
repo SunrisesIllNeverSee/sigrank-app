@@ -51,8 +51,7 @@ describe.skipIf(!live)("board selection: legacy vs DB selection on a live databa
       //   - the order of the operatorTotal `platforms` badge for same-day
       //     submissions.
       // Everything else must match: the same sort-value sequence, and the same
-      // rows inside every tie group. (Live-checked against prod 2026-11-16:
-      // 22/22 combos equivalent.)
+      // rows inside every tie group.
       const sort = params.sort ?? SORT_DEFAULT;
       const va = legacy.map((r) => sortValue(r, sort));
       const vb = sql.map((r) => sortValue(r, sort));
@@ -62,16 +61,18 @@ describe.skipIf(!live)("board selection: legacy vs DB selection on a live databa
         return JSON.stringify({
           ...x,
           global_rank: 0,
-          percentile: 0,
+          // claimedOnly derives percentile from rank (tie order); otherwise it
+          // comes from rank_history_latest and must match exactly.
+          percentile: params.claimedOnly ? 0 : x.percentile,
           platforms: x.platforms ? [...x.platforms].sort() : undefined,
         });
       };
       for (let k = 0; k < va.length; ) {
         let j = k;
-        while (j < va.length && va[j] === va[k]) j++;
+        while (j < va.length && Object.is(va[j], va[k])) j++;
         expect(sql.slice(k, j).map(norm).sort()).toEqual(legacy.slice(k, j).map(norm).sort());
         k = j;
       }
-    });
+    }, 60_000);
   }
 });
