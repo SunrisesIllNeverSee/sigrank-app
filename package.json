@@ -44,7 +44,7 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.1.0",
     "@x402/core": "^2.30.0",
-    "@x402/evm": "^2.30.0",
+    "@x402/evm": "^2.31.0",
     "@x402/next": "^2.30.0",
     "@x402/paywall": "^2.30.0",
     "clackboard": "^1.1.2",
