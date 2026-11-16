@@ -9,7 +9,7 @@
  *                      (pickPerKey ladder in mappers.ts). Used by the
  *                      default (flag OFF) path and by mode=hitl|agentic|hybrid.
  *   selectSqlModel() — a faithful JS model of the SQL in
- *                      supabase/migrations/20261114180000_0059_board_selection.sql
+ *                      migration 0059 (branch feat/board-selection-migration)
  *                      (board_candidates / board_pick_snapshots /
  *                      board_operator_platforms). The flag-ON path asks the
  *                      database for exactly these rows instead of all of them.
