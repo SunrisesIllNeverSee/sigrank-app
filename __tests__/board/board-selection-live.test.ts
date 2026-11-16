@@ -7,10 +7,12 @@
  *
  * For every param combination the board callers use, it runs getLeaderboard
  * with BOARD_DB_SELECTION off (legacy: whole tables, JS pick) and on (SQL pick)
- * and asserts the LeaderboardRows are identical, then prints rows fetched.
+ * and asserts the LeaderboardRows are equivalent (see the tie note below).
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 import type { BoardParams } from "@/lib/board/mappers";
+import { sortValue } from "@/lib/analytics/sort-value";
+import { SORT_DEFAULT } from "@/lib/constants";
 
 const live = Boolean(process.env.BOARD_VERIFY_URL && process.env.BOARD_VERIFY_KEY);
 
@@ -41,15 +43,36 @@ describe.skipIf(!live)("board selection: legacy vs DB selection on a live databa
       const sql = await fetchLeaderboardOrThrow(params);
       console.log(`[live] ${name}: legacy ${legacy.length} rows, sql ${sql.length} rows`);
       expect(sql.length).toBe(legacy.length);
-      // Ties on the sort value are unordered in the legacy path; compare the
-      // rows keyed by operator so a tie reshuffle is not a false alarm, then
-      // require identical values for every operator.
-      const byOp = (rows: typeof legacy) =>
-        new Map(rows.map((r) => [r.operator.operator_id, { ...r, global_rank: 0 }]));
-      expect(byOp(sql)).toEqual(byOp(legacy));
-      expect(sql.map((r) => r.snapshot.cascade?.yield_ ?? null)).toEqual(
-        legacy.map((r) => r.snapshot.cascade?.yield_ ?? null),
-      );
-    });
+      // The legacy path orders same-date rows by whatever order Postgres pages
+      // them out, so two things are arbitrary there and deterministic in SQL:
+      //   - order inside a tie group (rows with an equal sort value, e.g. every
+      //     non-compounding operator sorts at -1), and the rank/percentile that
+      //     follow from it;
+      //   - the order of the operatorTotal `platforms` badge for same-day
+      //     submissions.
+      // Everything else must match: the same sort-value sequence, and the same
+      // rows inside every tie group.
+      const sort = params.sort ?? SORT_DEFAULT;
+      const va = legacy.map((r) => sortValue(r, sort));
+      const vb = sql.map((r) => sortValue(r, sort));
+      expect(vb).toEqual(va);
+      const norm = (r: (typeof legacy)[number]) => {
+        const x = r as typeof r & { platforms?: string[] };
+        return JSON.stringify({
+          ...x,
+          global_rank: 0,
+          // claimedOnly derives percentile from rank (tie order); otherwise it
+          // comes from rank_history_latest and must match exactly.
+          percentile: params.claimedOnly ? 0 : x.percentile,
+          platforms: x.platforms ? [...x.platforms].sort() : undefined,
+        });
+      };
+      for (let k = 0; k < va.length; ) {
+        let j = k;
+        while (j < va.length && Object.is(va[j], va[k])) j++;
+        expect(sql.slice(k, j).map(norm).sort()).toEqual(legacy.slice(k, j).map(norm).sort());
+        k = j;
+      }
+    }, 60_000);
   }
 });

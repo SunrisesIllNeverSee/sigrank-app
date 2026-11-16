@@ -13,7 +13,7 @@ test.describe("mobile shell chrome", () => {
       await expect(page.locator(".m-top").getByRole("button", { name: "Menu" })).toBeVisible();
       const nav = page.getByRole("navigation", { name: "Primary" });
       await expect(nav).toBeVisible();
-      await expect(nav.locator(".m-tab")).toHaveCount(4);
+      await expect(nav.locator(".m-tab")).toHaveCount(5); // Board, Compare, Rank me (#443), Profile, Search
       // desktop-only chrome is gone on phones
       await expect(page.locator(".srail")).toBeHidden();
       await expect(page.locator(".ftr")).toBeHidden();

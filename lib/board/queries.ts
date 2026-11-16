@@ -294,9 +294,9 @@ export const OPERATOR_COLUMNS =
 
 /**
  * BOARD_DB_SELECTION=1 turns on the database-side row selection (egress fix,
- * 2026-11-14). Default OFF: it needs migration 0059
- * (shipped separately on branch feat/board-selection-migration), which the
- * owner must approve and apply first. With the flag off nothing changes.
+ * 2026-11-14). Default OFF in code; needs migration 0059
+ * (supabase/migrations/20261116102523_0059_board_selection.sql) in the target
+ * database. Without the flag, or if an RPC fails, the legacy path runs.
  */
 function dbSelectionEnabled(): boolean {
   return process.env.BOARD_DB_SELECTION === "1";
