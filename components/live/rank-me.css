@@ -17,8 +17,8 @@
 .lbw-root tr.you-row .you-in{position:sticky;left:12px;display:inline-flex;align-items:center;gap:14px}
 .lbw-root .you-rank{font-family:var(--font-mono);color:var(--mut)}
 .lbw-root .you-name{font-family:var(--font-disp);font-weight:700;color:var(--tx)}
-.lbw-root .you-y{font-family:var(--font-mono);color:var(--mut)}
-.lbw-root .you-note{color:var(--mut)}
+.lbw-root .you-y{font-family:var(--font-mono);color:var(--tx2)}
+.lbw-root .you-note{color:var(--tx2)}
 .lbw-root .you-link{color:var(--ac);text-decoration:underline;text-underline-offset:2px}
 
 /* phone ghost card */
