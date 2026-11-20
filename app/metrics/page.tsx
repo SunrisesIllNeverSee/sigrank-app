@@ -76,6 +76,17 @@ const MOVED = [
       "Scale V measures order-of-magnitude token activity, not whether tokens are unique, meaningful, relevant, newly generated, or successfully retrieved. Cache-read tokens can be reused context; these still count as recorded activity, not distinct content.",
     limitations:
       "A large token total can reflect repeated context rather than new information. Scale V is not Yield, Leverage, efficiency, unique-content volume, a quality measure, or a validated \u201cneedle in a haystack\u201d detection metric. Unavailable or zero totals cannot produce a meaningful positive logarithmic scale.",
+    test:
+      "For a positive total, sum the four raw counters and take log₁₀ of their total; multiplying all counters by ten must increase Scale V by one. Compare against the raw Total Tokens column and CSV export.",
+    observable: "Scale V and raw Total Tokens in the leaderboard\u2019s selected time window.",
+    falsifiers:
+      "If Scale V differs from log₁₀ of the four recorded pillars (for a positive total) or is presented as a retrieval-success signal, the presentation is incorrect.",
+    evidence:
+      "Deterministic formula over token-only telemetry; leaderboard export retains exact recorded total. No assessment of underlying prompt or response content is performed.",
+    evidenceLevel: "Production evidence",
+    lineage: "Four-pillar token telemetry, derived measurement. The distinct efficiency and reuse metrics are explained separately.",
+    lastUpdated: "2026-10-12",
+    related: [{ label: "Yield (Υ)", href: "/metrics/yield-cascade" }, { label: "Leverage", href: "/metrics/leverage" }, { label: "Velocity", href: "/metrics/velocity" }, { label: "Leaderboard", href: "/board/all" }],
   },
   {
     id: "output-flow-share",
@@ -88,6 +99,17 @@ const MOVED = [
       "Output flow share measures how much of the total token throughput is actual output vs cache operations and input.",
     limitations:
       "Does not distinguish useful output from verbose output. Confounded by cache-heavy workflows.",
+    test:
+      "Verify the formula for known inputs. Check that it sums to 1 with other flow shares.",
+    observable: "The numeric output flow share value (0 to 1).",
+    falsifiers:
+      "If output flow share does not equal output / total_tokens, the implementation is wrong.",
+    evidence:
+      "Computed from field data. Used in composition analysis.",
+    evidenceLevel: "Repeated experiment",
+    lineage: "SigRank composition analysis, cascade ontology. Architecture: mos2es.com/architecture.",
+    lastUpdated: "2026-09-01",
+    related: [{ label: "Context Activity Ratio", href: "#context-activity-ratio" }, { label: "Active Output Share", href: "#active-output-share" }, { label: "Composition", href: "/wiki/measurement/composition" }],
   },
   {
     id: "context-activity-ratio",
@@ -100,6 +122,17 @@ const MOVED = [
       "Context activity ratio measures the operator\u2019s investment in building and reusing context relative to fresh input.",
     limitations:
       "High ratio may indicate efficient context reuse OR may indicate excessive caching overhead.",
+    test:
+      "Verify the formula for known inputs.",
+    observable: "The numeric context activity ratio value.",
+    falsifiers:
+      "If the ratio does not equal (cache_creation + cache_read) / max(input, 1), the implementation is wrong.",
+    evidence:
+      "Computed from field data. Used in workflow friction analysis.",
+    evidenceLevel: "Repeated experiment",
+    lineage: "Upsilon workflow friction analysis. Architecture: mos2es.com/architecture.",
+    lastUpdated: "2026-09-01",
+    related: [{ label: "Output Flow Share", href: "#output-flow-share" }, { label: "Active Output Share", href: "#active-output-share" }],
   },
   {
     id: "active-output-share",
@@ -112,6 +145,17 @@ const MOVED = [
       "Active output share measures the proportion of active generation that is output vs cache creation \u2014 distinguishing productive output from context investment.",
     limitations:
       "Does not account for cache_read (reuse). A high share may indicate insufficient context building.",
+    test:
+      "Verify the formula for known inputs.",
+    observable: "The numeric active output share value (0 to 1).",
+    falsifiers:
+      "If the share does not equal output / (output + cache_creation), the implementation is wrong.",
+    evidence:
+      "Computed from field data. Used in composition analysis.",
+    evidenceLevel: "Repeated experiment",
+    lineage: "SigRank composition analysis. Architecture: mos2es.com/architecture.",
+    lastUpdated: "2026-09-01",
+    related: [{ label: "Output Flow Share", href: "#output-flow-share" }, { label: "Context Activity Ratio", href: "#context-activity-ratio" }],
   },
 ] as const;
 
@@ -223,6 +267,38 @@ export default function MetricsIndex() {
             </p>
             <p className="text-sm leading-relaxed text-text-secondary">
               <strong className="text-text-primary">Limitations:</strong> {m.limitations}
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Test:</strong> {m.test}
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Observable:</strong> {m.observable}
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Falsifiers:</strong> {m.falsifiers}
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Evidence:</strong> {m.evidence}
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Evidence level:</strong> {m.evidenceLevel}.{" "}
+              <strong className="text-text-primary">Spec version:</strong> TTEOP (Token Telemetry
+              Evaluation Operator Protocol) v0.1-draft.{" "}
+              <strong className="text-text-primary">Last updated:</strong> {m.lastUpdated}.
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Lineage:</strong> {m.lineage}
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Related:</strong>{" "}
+              {m.related.map((r, i) => (
+                <span key={r.href}>
+                  {i > 0 && " · "}
+                  <Link href={r.href} className="text-gold underline underline-offset-2">
+                    {r.label}
+                  </Link>
+                </span>
+              ))}
             </p>
           </section>
         ))}

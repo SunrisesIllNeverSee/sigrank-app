@@ -292,16 +292,16 @@ export const ROUTE_CLASSES: Record<string, RouteClass> = {
   "/operator-performance": "REDIRECT", // 308 → /ai-operator-scoring
   "/ai-benchmarking": "REDIRECT", // 308 → /ai-operator-scoring
   "/cascade-analysis": "REDIRECT", // 308 → /token-cascade
-  "/metrics/compression-ratio": "REDIRECT", // 308 → /metrics (2026-11 metrics consolidation)
+  "/metrics/compression-ratio": "REDIRECT", // 308 → /metrics#compression-ratio (2026-11 metrics consolidation)
   "/wiki/metrics": "REDIRECT", // 308 → /metrics (no index page existed)
   "/wiki/metrics/yield": "REDIRECT", // 308 → /metrics/yield-cascade
   "/wiki/metrics/leverage": "REDIRECT", // 308 → /metrics/leverage
   "/wiki/metrics/velocity": "REDIRECT", // 308 → /metrics/velocity
   "/wiki/metrics/snr": "REDIRECT", // 308 → /metrics/signal-to-noise-ratio
-  "/wiki/metrics/output-flow-share": "REDIRECT", // 308 → /metrics
-  "/wiki/metrics/context-activity-ratio": "REDIRECT", // 308 → /metrics
-  "/wiki/metrics/active-output-share": "REDIRECT", // 308 → /metrics
-  "/wiki/metrics/scale-v": "REDIRECT", // 308 → /metrics
+  "/wiki/metrics/output-flow-share": "REDIRECT", // 308 → /metrics#output-flow-share
+  "/wiki/metrics/context-activity-ratio": "REDIRECT", // 308 → /metrics#context-activity-ratio
+  "/wiki/metrics/active-output-share": "REDIRECT", // 308 → /metrics#active-output-share
+  "/wiki/metrics/scale-v": "REDIRECT", // 308 → /metrics#scale-v
 };
 
 /** Classes that are candidates for sitemap promotion. */

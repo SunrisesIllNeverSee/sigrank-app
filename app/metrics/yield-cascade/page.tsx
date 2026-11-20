@@ -13,6 +13,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { ReferenceNotes } from "@/components/metrics/ReferenceNotes";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
@@ -388,6 +389,25 @@ export default function YieldCascadePage() {
           </div>
         </dl>
       </section>
+
+      {/* ── Reference notes (carried over from the retired /wiki/metrics entry) ── */}
+      <ReferenceNotes
+        intro="Carried over from the former wiki entry for this metric."
+        notes={[
+          { label: "Inputs", body: <>cache_read, output, input (three of the four token pillars).</> },
+          { label: "Formula as implemented", body: <>Υ = (cache_read × output) / max(input, 1)²</> },
+          { label: "Claim", body: <>Yield measures the combined efficiency of producing output and reusing cached signal relative to fresh input.</> },
+          { label: "Test", body: <>Canonical test — MO§ES seed values (1_251_211, 11_296_121, 128_196_310, 2_555_179_769) → Υ 18436.98. Must reproduce exactly.</> },
+          { label: "Observable", body: <>The numeric yield value for a given set of token counts.</> },
+          { label: "Falsifiers", body: <>If the formula does not reproduce the canonical seed value, the implementation is wrong.</> },
+          { label: "Evidence", body: <>Canonical test passes 11/11. Seed values verified. Published in TTEOP (Token Telemetry Evaluation Operator Protocol).</> },
+          { label: "Limitations", body: <>Sensitive to small input denominators. Does NOT establish correctness, novelty, quality, value, safety, talent, effort, or intelligence. Plausibility checks matter.</> },
+          { label: "Evidence level", body: <>Production evidence</> },
+          { label: "Spec version", body: <>TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft</> },
+          { label: "Lineage", body: <>TTEOP, Search Authority canon, MO§ES seed values. Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</> },
+          { label: "Last updated", body: <>2026-09-01</> },
+        ]}
+      />
 
       {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">

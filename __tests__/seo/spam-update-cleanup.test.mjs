@@ -400,7 +400,28 @@ test("the /metrics hub lists the 6 kept pages and holds the moved sections with 
   assert.ok(hub.includes("output_flow_share = output / (input + output + cache_creation + cache_read)"));
   assert.ok(hub.includes("context_activity_ratio = (cache_creation + cache_read) / max(input, 1)"));
   assert.ok(hub.includes("active_output_share = output / max(output + cache_creation, 1)"));
-  assert.equal(/sr-only|hidden/.test(hub), false, "no hidden text on the hub");
+  assert.equal(/\bsr-only\b|className="[^"]*\bhidden\b|display:\s*none/.test(hub), false, "no hidden text on the hub");
+});
+
+test("wiki evidence text is carried onto the redirect targets as visible reference notes", () => {
+  const targets = {
+    "app/metrics/yield-cascade/page.tsx": ["Υ = (cache_read × output) / max(input, 1)²", "Υ 18436.98", "Canonical test passes 11/11.", "Sensitive to small input denominators."],
+    "app/metrics/leverage/page.tsx": ["leverage = cache_read / max(input, 1)", "Cross-check with 10xDEV = log10(leverage).", "insufficient fresh input"],
+    "app/metrics/velocity/page.tsx": ["velocity = output / max(input, 1)", "Ignores cache creation cost.", "Transmission stage = output / input"],
+    "app/metrics/signal-to-noise-ratio/page.tsx": ["SNR = output / (input + output)", "Returns 0 when denominator is not positive.", "loses information about absolute scale"],
+  };
+  for (const [file, phrases] of Object.entries(targets)) {
+    const src = read(file);
+    assert.match(src, /<ReferenceNotes/, file);
+    for (const ph of phrases) assert.ok(src.includes(ph), `${file} missing "${ph}"`);
+  }
+  const hub = read("app/metrics/page.tsx");
+  for (const ph of [
+    "Verify the formula for known inputs. Check that it sums to 1 with other flow shares.",
+    "If the ratio does not equal (cache_creation + cache_read) / max(input, 1), the implementation is wrong.",
+    "If the share does not equal output / (output + cache_creation), the implementation is wrong.",
+    "multiplying all counters by ten must increase Scale V by one",
+  ]) assert.ok(hub.includes(ph), `hub missing "${ph}"`);
 });
 
 test("hard constraints: /user profiles, home title and crawl delay are untouched", () => {

@@ -139,7 +139,13 @@ export interface WikiCategoryDef {
   id: WikiCategory;
   label: string;
   description: string;
-  /** The URL prefix for entries in this category, e.g. /wiki/measurement/ */
+  /**
+   * The URL prefix for entries in this category, e.g. /wiki/measurement/.
+   * A descriptive label only: nothing matches page slugs against it. The
+   * metrics category links to /metrics/* pages and /metrics#anchor sections
+   * (the retired /wiki/metrics/* entries), so its entries are not all under
+   * this prefix.
+   */
   slugPrefix: string;
 }
 
