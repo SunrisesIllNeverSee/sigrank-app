@@ -38,7 +38,7 @@
     "@modelcontextprotocol/server": "^2.4.0",
     "@pluginsradar/analytics": "0.2.0",
     "@posthog/mcp": "0.25.0",
-    "@stripe/stripe-js": "^10.1.0",
+    "@stripe/stripe-js": "^10.3.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.0",
     "@upstash/redis": "^1.39.0",
