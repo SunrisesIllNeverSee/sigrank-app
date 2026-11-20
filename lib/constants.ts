@@ -171,4 +171,4 @@ export const MCP_VERSION = "1.0.49" as const;
  * marketing copy never drifts (it was hardcoded as "14+" while the registry had 15).
  * Bump when the MCP ships a new adapter.
  */
-export const PLATFORM_COUNT = 22 as const;
+export const PLATFORM_COUNT = 23 as const;
