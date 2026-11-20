@@ -7,7 +7,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { PHONE_SIZES, THEMES, gotoPhone } from "./_helpers";
 
-const PAGES = ["/hall", "/wiki", "/wiki/metrics/yield", "/wiki/four-degrees", "/blog", "/blog/a-tour-of-the-new-signalaf", "/field", "/fieldhub", "/sigrank"];
+const PAGES = ["/hall", "/wiki", "/metrics/yield-cascade", "/wiki/four-degrees", "/blog", "/blog/a-tour-of-the-new-signalaf", "/field", "/fieldhub", "/sigrank"];
 
 /** Visible elements whose right/left edge leaves the viewport, ignoring anything inside a horizontal scroller. */
 async function offscreen(page: Page) {

@@ -115,14 +115,6 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
   { path: "/wiki/measurement/cohort", priority: 0.6, changeFrequency: "monthly" },
   { path: "/wiki/measurement/reference-field", priority: 0.6, changeFrequency: "monthly" },
   // Metrics category
-  { path: "/wiki/metrics/yield", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/wiki/metrics/leverage", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/wiki/metrics/velocity", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/wiki/metrics/snr", priority: 0.6, changeFrequency: "monthly" },
-  { path: "/wiki/metrics/output-flow-share", priority: 0.5, changeFrequency: "monthly" },
-  { path: "/wiki/metrics/context-activity-ratio", priority: 0.5, changeFrequency: "monthly" },
-  { path: "/wiki/metrics/active-output-share", priority: 0.5, changeFrequency: "monthly" },
-  { path: "/wiki/metrics/scale-v", priority: 0.5, changeFrequency: "monthly" },
   // System Tests category
   { path: "/wiki/tests/lineage", priority: 0.5, changeFrequency: "monthly" },
   { path: "/wiki/tests/compression", priority: 0.5, changeFrequency: "monthly" },
@@ -370,11 +362,8 @@ export const STATIC_ROUTES: StaticRouteEntry[] = [
 
   // Metric definition pages — definitional intent
   { path: "/metrics/yield-cascade", priority: 0.6, changeFrequency: "monthly" },
-  {
-    path: "/metrics/compression-ratio",
-    priority: 0.6,
-    changeFrequency: "monthly",
-  },
+  // /metrics/compression-ratio and the 8 /wiki/metrics/* pages → 308 into /metrics
+  // or the matching /metrics/* page (2026-11 metrics consolidation). Never sitemap members.
   {
     path: "/metrics/signal-to-noise-ratio",
     priority: 0.6,

@@ -13,7 +13,7 @@ export const metadata: Metadata = withOG({
 
 const crossRefs: WikiCrossRef[] = [
   { label: "Operator", href: "/wiki/measurement/operator" },
-  { label: "Yield (Υ)", href: "/wiki/metrics/yield" },
+  { label: "Yield (Υ)", href: "/metrics/yield-cascade" },
   { label: "Architecture (mos2es.com)", href: "https://mos2es.com/architecture" },
   { label: "30-Day Pilot (mos2es.com)", href: "https://mos2es.com/products" },
 ];

@@ -190,7 +190,7 @@ test("googlebot noindex never applies to core pages, /user profiles or utility p
   const core = [
     "/", "/faq", "/methodology", "/science", "/research", "/wiki", "/score", "/hall",
     "/compare", "/field", "/fieldhub", "/token-cascade", "/ai-operator-scoring",
-    "/metrics/yield-cascade", "/wiki/metrics/yield", "/user/the-field", "/user/claimedop",
+    "/metrics/yield-cascade", "/metrics", "/user/the-field", "/user/claimedop",
     "/board/all", "/tools/yield-calculator", "/sigrank", "/about",
   ];
   for (const p of core) assert.equal(isGoogleOnlyNoindex(p), false, p);
@@ -280,6 +280,17 @@ const RETIRED = {
   "/ai-benchmarking": "/ai-operator-scoring",
   "/ai-coding-metrics": "/ai-operator-scoring",
   "/operator-performance": "/ai-operator-scoring",
+  // 2026-11 metrics consolidation (destinations are real pages or /metrics anchors).
+  "/metrics/compression-ratio": "/metrics#compression-ratio",
+  "/wiki/metrics": "/metrics",
+  "/wiki/metrics/yield": "/metrics/yield-cascade",
+  "/wiki/metrics/leverage": "/metrics/leverage",
+  "/wiki/metrics/velocity": "/metrics/velocity",
+  "/wiki/metrics/snr": "/metrics/signal-to-noise-ratio",
+  "/wiki/metrics/output-flow-share": "/metrics#output-flow-share",
+  "/wiki/metrics/context-activity-ratio": "/metrics#context-activity-ratio",
+  "/wiki/metrics/active-output-share": "/metrics#active-output-share",
+  "/wiki/metrics/scale-v": "/metrics#scale-v",
 };
 
 test("retired duplicate pages 308 to the winner", () => {
@@ -330,6 +341,87 @@ test("no internal link points at a retired URL", () => {
       assert.equal(re.test(s), false, `${f} links to retired ${from}`);
     }
   }
+});
+
+// ── 5. Metrics consolidation (16 pages → 7) ───────────────────────────────
+
+test("metrics routes: hub + 6 kept pages, no wiki metric stubs, no compression page", () => {
+  assert.deepEqual(childRoutes("metrics"), [
+    "/metrics/cache-hit-rate",
+    "/metrics/efficiency",
+    "/metrics/leverage",
+    "/metrics/signal-to-noise-ratio",
+    "/metrics/velocity",
+    "/metrics/yield-cascade",
+  ]);
+  assert.equal(existsSync(join(ROOT, "app/metrics/page.tsx")), true);
+  assert.equal(existsSync(join(ROOT, "app/wiki/metrics")), false);
+});
+
+test("metrics redirects 308 to a kept page or the hub, never through another redirect", () => {
+  const redirects = redirectsFromConfig();
+  const sources = new Set(Object.keys(redirects));
+  for (const [from, to] of Object.entries(RETIRED)) {
+    if (!from.startsWith("/wiki/metrics") && from !== "/metrics/compression-ratio") continue;
+    const target = to.split("#")[0];
+    assert.equal(sources.has(target), false, `${from} -> ${to} chains`);
+    assert.ok(target === "/metrics" || existsSync(join(ROOT, "app", target, "page.tsx")), `${to} must exist`);
+  }
+});
+
+test("retired metrics URLs are gone from route manifest, llms pages, footer/nav and review routes", () => {
+  const retired = Object.keys(RETIRED).filter((p) => p.startsWith("/wiki/metrics") || p === "/metrics/compression-ratio");
+  assert.equal(retired.length, 10);
+  const routes = JSON.parse(read("components/review/routes.json"));
+  const llmsPages = read("lib/seo/llms-pages.ts");
+  const llmsFull = read("app/llms-full.txt/route.ts");
+  const nav = read("components/metrics/MetricsWorkspaceFrame.tsx") + read("components/ui/Footer.tsx") + read("lib/editorial/section-pages.ts");
+  for (const p of retired) {
+    assert.equal(routes.includes(p), false, `routes.json lists ${p}`);
+    assert.equal(llmsPages.includes(`"${p}"`), false, `llms-pages lists ${p}`);
+    assert.equal(llmsFull.includes(`"${p}"`), false, `llms-full lists ${p}`);
+    assert.equal(nav.includes(`"${p}"`), false, `nav lists ${p}`);
+  }
+});
+
+test("the /metrics hub lists the 6 kept pages and holds the moved sections with id anchors", () => {
+  const hub = read("app/metrics/page.tsx");
+  for (const href of [
+    "/metrics/yield-cascade", "/metrics/cache-hit-rate", "/metrics/leverage",
+    "/metrics/velocity", "/metrics/signal-to-noise-ratio", "/metrics/efficiency",
+  ]) assert.ok(hub.includes(`href: "${href}"`), `hub lists ${href}`);
+  for (const id of ["scale-v", "output-flow-share", "context-activity-ratio", "active-output-share"]) {
+    assert.ok(hub.includes(`id: "${id}"`), `hub has section ${id}`);
+  }
+  assert.ok(hub.includes('id="compression-ratio"'));
+  assert.match(hub, /word-era \(historical\)/);
+  // canon formulas carried over verbatim
+  assert.ok(hub.includes("Scale V = log₁₀(I + O + W + R)"));
+  assert.ok(hub.includes("output_flow_share = output / (input + output + cache_creation + cache_read)"));
+  assert.ok(hub.includes("context_activity_ratio = (cache_creation + cache_read) / max(input, 1)"));
+  assert.ok(hub.includes("active_output_share = output / max(output + cache_creation, 1)"));
+  assert.equal(/\bsr-only\b|className="[^"]*\bhidden\b|display:\s*none/.test(hub), false, "no hidden text on the hub");
+});
+
+test("wiki evidence text is carried onto the redirect targets as visible reference notes", () => {
+  const targets = {
+    "app/metrics/yield-cascade/page.tsx": ["Υ = (cache_read × output) / max(input, 1)²", "Υ 18436.98", "Canonical test passes 11/11.", "Sensitive to small input denominators."],
+    "app/metrics/leverage/page.tsx": ["leverage = cache_read / max(input, 1)", "Cross-check with 10xDEV = log10(leverage).", "insufficient fresh input"],
+    "app/metrics/velocity/page.tsx": ["velocity = output / max(input, 1)", "Ignores cache creation cost.", "Transmission stage = output / input"],
+    "app/metrics/signal-to-noise-ratio/page.tsx": ["SNR = output / (input + output)", "Returns 0 when denominator is not positive.", "loses information about absolute scale"],
+  };
+  for (const [file, phrases] of Object.entries(targets)) {
+    const src = read(file);
+    assert.match(src, /<ReferenceNotes/, file);
+    for (const ph of phrases) assert.ok(src.includes(ph), `${file} missing "${ph}"`);
+  }
+  const hub = read("app/metrics/page.tsx");
+  for (const ph of [
+    "Verify the formula for known inputs. Check that it sums to 1 with other flow shares.",
+    "If the ratio does not equal (cache_creation + cache_read) / max(input, 1), the implementation is wrong.",
+    "If the share does not equal output / (output + cache_creation), the implementation is wrong.",
+    "multiplying all counters by ten must increase Scale V by one",
+  ]) assert.ok(hub.includes(ph), `hub missing "${ph}"`);
 });
 
 test("hard constraints: /user profiles, home title and crawl delay are untouched", () => {

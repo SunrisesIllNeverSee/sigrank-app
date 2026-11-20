@@ -14,6 +14,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { ReferenceNotes } from "@/components/metrics/ReferenceNotes";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
@@ -353,6 +354,25 @@ export default function VelocityPage() {
         </dl>
       </section>
 
+      {/* ── Reference notes (carried over from the retired /wiki/metrics entry) ── */}
+      <ReferenceNotes
+        intro="Carried over from the former wiki entry for this metric."
+        notes={[
+          { label: "Inputs", body: <>output, input.</> },
+          { label: "Formula as implemented", body: <>velocity = output / max(input, 1)</> },
+          { label: "Claim", body: <>Velocity measures the raw output efficiency — how much output an operator generates per unit of fresh input.</> },
+          { label: "Test", body: <>Verify velocity = output / max(input, 1) for known inputs.</> },
+          { label: "Observable", body: <>The numeric velocity value.</> },
+          { label: "Falsifiers", body: <>If velocity does not equal output / max(input, 1), the implementation is wrong.</> },
+          { label: "Evidence", body: <>Canonical test. Field data shows velocity distributions.</> },
+          { label: "Limitations", body: <>Ignores cache creation cost. High velocity may indicate efficient output OR may indicate insufficient context reuse.</> },
+          { label: "Evidence level", body: <>Production evidence</> },
+          { label: "Spec version", body: <>TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft</> },
+          { label: "Lineage", body: <>TTEOP (Token Telemetry Evaluation Operator Protocol), cascade ontology (Transmission stage = output / input). Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</> },
+          { label: "Last updated", body: <>2026-09-01</> },
+        ]}
+      />
+
       {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">
         <p className="font-sans text-sm text-text-muted">
@@ -365,7 +385,7 @@ export default function VelocityPage() {
           </Link>
           {" · "}
           <Link
-            href="/metrics/compression-ratio"
+            href="/metrics#compression-ratio"
             className="text-gold underline underline-offset-2"
           >
             Compression Ratio (word era)

@@ -17,14 +17,6 @@ export const WIKI_PAGES: { path: string; title: string }[] = [
   { path: "/wiki/local-agent", title: "The Local Agent (MCP)" },
   { path: "/wiki/signal-drift", title: "Signature Drift — the tune meter" },
   { path: "/wiki/measured-alongside", title: "Measured Alongside" },
-  { path: "/wiki/metrics/yield", title: "Yield (Υ)" },
-  { path: "/wiki/metrics/leverage", title: "Leverage" },
-  { path: "/wiki/metrics/velocity", title: "Velocity" },
-  { path: "/wiki/metrics/snr", title: "Signal-to-Noise Ratio (SNR)" },
-  { path: "/wiki/metrics/output-flow-share", title: "Output Flow Share" },
-  { path: "/wiki/metrics/context-activity-ratio", title: "Context Activity Ratio" },
-  { path: "/wiki/metrics/active-output-share", title: "Active Output Share" },
-  { path: "/wiki/metrics/scale-v", title: "Scale V — Recorded Token Activity" },
 ];
 
 /** Canon naming (owner-approved 2026-08-28): SignalAF presents SigRank;

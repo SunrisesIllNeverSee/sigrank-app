@@ -13,6 +13,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { ReferenceNotes } from "@/components/metrics/ReferenceNotes";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
@@ -307,6 +308,25 @@ export default function LeveragePage() {
           </div>
         </dl>
       </section>
+
+      {/* ── Reference notes (carried over from the retired /wiki/metrics entry) ── */}
+      <ReferenceNotes
+        intro="Carried over from the former wiki entry for this metric."
+        notes={[
+          { label: "Inputs", body: <>cache_read, input.</> },
+          { label: "Formula as implemented", body: <>leverage = cache_read / max(input, 1)</> },
+          { label: "Claim", body: <>Leverage measures how efficiently an operator reuses cached context relative to fresh input.</> },
+          { label: "Test", body: <>Verify leverage = cache_read / max(input, 1) for known inputs. Cross-check with 10xDEV = log10(leverage).</> },
+          { label: "Observable", body: <>The numeric leverage value.</> },
+          { label: "Falsifiers", body: <>If leverage does not equal cache_read / max(input, 1), the implementation is wrong.</> },
+          { label: "Evidence", body: <>Canonical test. Field data shows leverage distributions across operators.</> },
+          { label: "Limitations", body: <>Does NOT establish causal leverage or business value. High leverage may indicate efficient reuse OR may indicate insufficient fresh input.</> },
+          { label: "Evidence level", body: <>Production evidence</> },
+          { label: "Spec version", body: <>TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft</> },
+          { label: "Lineage", body: <>TTEOP (Token Telemetry Evaluation Operator Protocol), cascade ontology (Reuse stage = cache_read / cache_create). Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</> },
+          { label: "Last updated", body: <>2026-09-01</> },
+        ]}
+      />
 
       {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">

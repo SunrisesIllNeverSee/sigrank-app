@@ -16,7 +16,7 @@ describe("Scale V leaderboard", () => {
     const sort = vi.fn();
     const { container } = render(<table><thead><BoardHead mode="metrics" sortKey="Scale V" sortDir="desc" onSort={sort}/></thead></table>);
     expect(screen.getByRole("button", { name: /SCALE V/ })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Scale V definition in Wiki/ })).toHaveAttribute("href", "/wiki/metrics/scale-v");
+    expect(screen.getByRole("link", { name: /Scale V definition/ })).toHaveAttribute("href", "/metrics#scale-v");
     expect(container.querySelector('th[aria-sort="descending"]')).toHaveTextContent("SCALE V");
     expect(screen.getByText("TOTAL")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /SCALE V/ }));

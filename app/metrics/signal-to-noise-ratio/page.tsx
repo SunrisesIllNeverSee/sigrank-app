@@ -13,6 +13,7 @@ import Link from "next/link";
 import { withOG } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WaveHero } from "@/components/ui/WaveHero";
+import { ReferenceNotes } from "@/components/metrics/ReferenceNotes";
 import { MetricsWorkspaceFrame } from "@/components/metrics/MetricsWorkspaceFrame";
 import { breadcrumb, definedTerm, faqPage } from "@/lib/jsonld";
 
@@ -323,6 +324,25 @@ export default function SignalToNoiseRatioPage() {
           </div>
         </dl>
       </section>
+
+      {/* ── Reference notes (carried over from the retired /wiki/metrics entry) ── */}
+      <ReferenceNotes
+        intro="Carried over from the former wiki entry for this metric."
+        notes={[
+          { label: "Inputs", body: <>output, input.</> },
+          { label: "Formula as implemented", body: <>SNR = output / (input + output)</> },
+          { label: "Claim", body: <>SNR measures the output fraction of the fresh signal — how much of what the operator generates (plus what they take in) is actual output.</> },
+          { label: "Test", body: <>Verify SNR = output / (input + output). Returns 0 when denominator is not positive.</> },
+          { label: "Observable", body: <>The numeric SNR value (0 to 1).</> },
+          { label: "Falsifiers", body: <>If SNR does not equal output / (input + output), the implementation is wrong.</> },
+          { label: "Evidence", body: <>Canonical test. Field data shows SNR distributions.</> },
+          { label: "Limitations", body: <>Does NOT establish output quality. SNR is bounded [0, 1] and loses information about absolute scale.</> },
+          { label: "Evidence level", body: <>Production evidence</> },
+          { label: "Spec version", body: <>TTEOP (Token Telemetry Evaluation Operator Protocol) v0.1-draft</> },
+          { label: "Lineage", body: <>TTEOP (Token Telemetry Evaluation Operator Protocol). Architecture: <a href="https://mos2es.com/architecture" className="text-text-accent underline-offset-2 hover:underline">mos2es.com/architecture</a>.</> },
+          { label: "Last updated", body: <>2026-09-01</> },
+        ]}
+      />
 
       {/* ── Cross-links ── */}
       <section className="mt-4 border-t border-bg-border-subtle pt-6">

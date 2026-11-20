@@ -241,6 +241,19 @@ const nextConfig: NextConfig = {
         destination: "/token-cascade",
         permanent: true,
       },
+      // 2026-11 metrics consolidation: 16 metrics pages → 7. Wiki metric stubs
+      // and the word-era Compression page fold into /metrics or the matching
+      // /metrics/* reference page.
+      { source: "/metrics/compression-ratio", destination: "/metrics#compression-ratio", permanent: true },
+      { source: "/wiki/metrics", destination: "/metrics", permanent: true },
+      { source: "/wiki/metrics/yield", destination: "/metrics/yield-cascade", permanent: true },
+      { source: "/wiki/metrics/leverage", destination: "/metrics/leverage", permanent: true },
+      { source: "/wiki/metrics/velocity", destination: "/metrics/velocity", permanent: true },
+      { source: "/wiki/metrics/snr", destination: "/metrics/signal-to-noise-ratio", permanent: true },
+      { source: "/wiki/metrics/output-flow-share", destination: "/metrics#output-flow-share", permanent: true },
+      { source: "/wiki/metrics/context-activity-ratio", destination: "/metrics#context-activity-ratio", permanent: true },
+      { source: "/wiki/metrics/active-output-share", destination: "/metrics#active-output-share", permanent: true },
+      { source: "/wiki/metrics/scale-v", destination: "/metrics#scale-v", permanent: true },
     ];
   },
 };
