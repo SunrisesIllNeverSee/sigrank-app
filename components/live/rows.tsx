@@ -139,7 +139,7 @@ const HEAD_COLS: Record<ColMode, HeadCol[]> = {
     { icon: "↗", label: "TREND", cls: "hc-trend", l: true, tip: "Observed Yield history" },
     { icon: "∑", label: "TOTAL", cls: "hc-tot", k: "Total", tip: "I + O + W + R" },
     { icon: "∑", label: "∑/DAY", cls: "hc-day", k: "∑/Day", tip: "Exact-calendar processed tokens per day" },
-    { icon: "Ⅴ", label: "SCALE V", cls: "hc-scale", k: "Scale V", tip: "log10(Input + Output + Cache-write + Cache-read). Each +1 = 10× recorded token activity. Activity volume, not efficiency or unique content. See Wiki.", href: "/wiki/metrics/scale-v" },
+    { icon: "Ⅴ", label: "SCALE V", cls: "hc-scale", k: "Scale V", tip: "log10(Input + Output + Cache-write + Cache-read). Each +1 = 10× recorded token activity. Activity volume, not efficiency or unique content. See Metrics.", href: "/metrics#scale-v" },
     { icon: "Υ", label: "YIELD", cls: "hc-yield", k: "Yield" },
     { icon: "▲", label: "SNR", cls: "hc-snr", k: "SNR" },
     { icon: "⚡", label: "VELOCITY", cls: "hc-vel", k: "Velocity" },
@@ -222,7 +222,7 @@ export function BoardHead({ mode, sortKey, sortDir, onSort }: BoardHeadProps) {
               {onSort && c.k ? (
                 <button type="button" className="hsort" onClick={() => onSort(c.k!)}>{inner}</button>
               ) : inner}
-              {c.href && <a href={c.href} className="head-help" title="Scale V definition in the Wiki" aria-label="Scale V definition in Wiki">ⓘ</a>}
+              {c.href && <a href={c.href} className="head-help" title="Scale V definition" aria-label="Scale V definition">ⓘ</a>}
             </th>
           );
         })}

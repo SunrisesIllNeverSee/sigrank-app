@@ -13,7 +13,7 @@ const ops = [
   { codename: "signal-ccc", name: "Adam Smith", handle: "@smith", klass: "BUILDER" },
 ];
 const pages = [
-  { path: "/wiki/metrics/yield", title: "Yield (Υ)", section: "Wiki" },
+  { path: "/metrics/yield-cascade", title: "Yield (Υ)", section: "Wiki" },
   { path: "/blog/volume-isnt-yield", title: "Volume Isn't Yield", section: "Blog" },
   { path: "/about", title: "About", section: "Pages" },
 ];
@@ -32,7 +32,7 @@ test("every token must match; empty query returns nothing", () => {
 
 test("ties keep board order; title hits outrank path-only hits", () => {
   assert.deepEqual(matchOperators(ops, "ad").map((o) => o.codename), ["signal-aaa", "signal-ccc"]);
-  assert.equal(matchPages(pages, "yield")[0].path, "/wiki/metrics/yield");
+  assert.equal(matchPages(pages, "yield")[0].path, "/metrics/yield-cascade");
   assert.equal(matchPages(pages, "blog")[0].path, "/blog/volume-isnt-yield");
 });
 

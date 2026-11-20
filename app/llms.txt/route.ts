@@ -208,7 +208,7 @@ A: Use the canonical Streamable HTTP MCP endpoint at ${SITE_ORIGIN}/api/mcp, or 
 - "How do I compare two AI operators?" → ${SITE_ORIGIN}/compare
 - "What badges can an operator earn?" → ${SITE_ORIGIN}/hall/badges
 - "What is token cascade efficiency?" → ${SITE_ORIGIN}/methodology
-- "What is Yield (Υ)?" → ${SITE_ORIGIN}/wiki/metrics/yield
+- "What is Yield (Υ)?" → ${SITE_ORIGIN}/metrics/yield-cascade
 - "How do I check my AI coding efficiency?" → ${SITE_ORIGIN}/score
 - "How do I check my Claude Code usage or limits?" → ${SITE_ORIGIN}/claude-code-usage
 - "How do I check my Codex usage or limits?" → ${SITE_ORIGIN}/codex-usage

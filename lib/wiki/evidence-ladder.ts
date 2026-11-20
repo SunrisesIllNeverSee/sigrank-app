@@ -157,7 +157,7 @@ export const WIKI_CATEGORIES: WikiCategoryDef[] = [
     label: "Metrics",
     description:
       "The cascade metrics derived from the four pillars. Definitions, formulas, and evidence for each.",
-    slugPrefix: "/wiki/metrics/",
+    slugPrefix: "/metrics/",
   },
   {
     id: "system-tests",
@@ -228,13 +228,13 @@ export const WIKI_CATEGORY_PAGES: Record<WikiCategory, WikiCategoryEntry[]> = {
     { slug: "/wiki/measurement/reference-field", label: "Reference Field" },
   ],
   metrics: [
-    { slug: "/wiki/metrics/yield", label: "Yield (Υ)" },
-    { slug: "/wiki/metrics/leverage", label: "Leverage" },
-    { slug: "/wiki/metrics/velocity", label: "Velocity" },
-    { slug: "/wiki/metrics/snr", label: "Signal-to-Noise Ratio (SNR)" },
-    { slug: "/wiki/metrics/output-flow-share", label: "Output Flow Share" },
-    { slug: "/wiki/metrics/context-activity-ratio", label: "Context Activity Ratio" },
-    { slug: "/wiki/metrics/active-output-share", label: "Active Output Share" },
+    { slug: "/metrics/yield-cascade", label: "Yield (Υ)" },
+    { slug: "/metrics/leverage", label: "Leverage" },
+    { slug: "/metrics/velocity", label: "Velocity" },
+    { slug: "/metrics/signal-to-noise-ratio", label: "Signal-to-Noise Ratio (SNR)" },
+    { slug: "/metrics#output-flow-share", label: "Output Flow Share" },
+    { slug: "/metrics#context-activity-ratio", label: "Context Activity Ratio" },
+    { slug: "/metrics#active-output-share", label: "Active Output Share" },
   ],
   "system-tests": [
     { slug: "/wiki/tests/lineage", label: "Lineage Test" },

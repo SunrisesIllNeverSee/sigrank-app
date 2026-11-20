@@ -407,7 +407,7 @@ test("the Phase-1 recovery cohort stays promoted (CORE or SUPPORTED)", () => {
     "/", "/board/all", "/methodology", "/wiki", "/science", "/research",
     "/token-telemetry", "/score", "/hall", "/compare", "/ai-operator-scoring",
     "/metrics/yield-cascade", "/metrics/cache-hit-rate",
-    "/metrics/compression-ratio", "/tools/yield-calculator",
+    "/tools/yield-calculator",
     "/tools/token-waste-calculator",
     "/guides/how-to-measure-ai-coding-efficiency", "/blog/volume-isnt-yield",
     "/vs/ccusage", "/vs/cursor", "/vs/lmsys-arena",
@@ -449,7 +449,7 @@ test("operator sitemap entries pass the shared policy (no noindex rows emitted)"
 
 test("redesign-era permanent pages are promoted and emitted", () => {
   const emitted = new Set(emittedStaticPlusBoardUrls().map((u) => new URL(u).pathname));
-  for (const p of ["/fieldhub", "/blog/a-tour-of-the-new-signalaf", "/wiki/metrics/scale-v"]) {
+  for (const p of ["/fieldhub", "/blog/a-tour-of-the-new-signalaf"]) {
     assert.ok(isSitemapPromoted(p), `${p} must be promoted`);
     assert.ok(emitted.has(p), `${p} must be emitted in the sitemap`);
   }

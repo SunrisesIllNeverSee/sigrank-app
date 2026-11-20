@@ -26,7 +26,7 @@ const ASK_AI: [string, string][] = [
   ["How do I compare two AI operators?", "/compare"],
   ["Who holds the records?", "/hall"],
   ["What badges can an operator earn?", "/hall/badges"],
-  ["What is Scale V?", "/wiki/metrics/scale-v"],
+  ["What is Scale V?", "/metrics#scale-v"],
   ["What is token cascade efficiency?", "/methodology"],
   ["How do I check my AI coding efficiency?", "/score"],
   ["What is Yield in AI usage?", "/blog/volume-isnt-yield"],

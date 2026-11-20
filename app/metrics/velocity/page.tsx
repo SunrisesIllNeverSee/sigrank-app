@@ -365,7 +365,7 @@ export default function VelocityPage() {
           </Link>
           {" · "}
           <Link
-            href="/metrics/compression-ratio"
+            href="/metrics#compression-ratio"
             className="text-gold underline underline-offset-2"
           >
             Compression Ratio (word era)

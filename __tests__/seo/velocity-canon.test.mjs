@@ -66,8 +66,8 @@ test("velocity page defines Velocity as output per fresh input", async () => {
   }
 });
 
-test("compression-ratio page is word-era and points to Velocity and methodology", async () => {
-  const src = await source("app/metrics/compression-ratio/page.tsx");
+test("metrics hub carries the word-era Compression Ratio section and points to Velocity and methodology", async () => {
+  const src = await source("app/metrics/page.tsx");
   assert.match(src, /word-era/i);
   assert.ok(src.includes('href="/metrics/velocity"'));
   assert.ok(src.includes('href="/methodology"'));
@@ -154,6 +154,9 @@ const ALLOWED_PHRASES = [
   "for Compression Ratio.",
   "Compression Ratio\", path:",
   "Compression Ratio\"",
+  "Compression Ratio (a word-era metric)",
+  "Compression Ratio — word-era (historical)",
+  "Compression Ratio — Word-Era Metric",
 ];
 
 test("'compression ratio' in public app/ copy appears only in word-era phrases", async () => {

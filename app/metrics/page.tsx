@@ -1,7 +1,8 @@
 /**
  * app/metrics/page.tsx — Metrics index.
  *
- * Hub page listing the SigRank metric definition pages. Each child page carries
+ * Hub page listing the SigRank metric definition pages and carrying short
+ * definitions (anchored sections) for metrics without their own page. Each child page carries
  * DefinedTerm + FAQPage + BreadcrumbList schema. This index adds an ItemList
  * so AI engines see the full metric set as a structured collection.
  *
@@ -19,7 +20,7 @@ import { breadcrumb, alternativesItemList, faqPage } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Metrics — AI Operator Token Efficiency Definitions",
   description:
-    "The token-era SigRank metrics: Yield (Υ), Cache Hit Rate, Leverage, Velocity, and Signal-to-Noise Ratio. Definitions, formulas, and how to improve each one. Compression Ratio is a word-era metric, still shown as a legacy view.",
+    "The SigRank metrics: Yield (Υ), Cache Hit Rate, Leverage, Velocity, Signal-to-Noise Ratio and Efficiency, plus short definitions of Scale V, Output Flow Share, Context Activity Ratio, Active Output Share, and Compression Ratio (a word-era metric).",
   path: "/metrics",
 });
 
@@ -35,11 +36,6 @@ const METRICS = [
     href: "/metrics/cache-hit-rate",
     title: "Cache Hit Rate — Context Reuse Efficiency",
     desc: "cache_read / (cache_read + cache_write) — how well you reuse prompt-cached context. The highest-leverage AI coding metric.",
-  },
-  {
-    href: "/metrics/compression-ratio",
-    title: "Compression Ratio — Word-Era Metric",
-    desc: "A word-era SigRank metric (M.01), still shown as a legacy Compression view. The token-era output-per-fresh-input ratio is Velocity.",
   },
   {
     href: "/metrics/leverage",
@@ -63,6 +59,62 @@ const METRICS = [
   },
 ];
 
+/**
+ * Short definitions moved from the retired /wiki/metrics/* pages and
+ * /metrics/compression-ratio (2026-11 consolidation). Each section has an id
+ * anchor; the old URLs 308 to /metrics. Text is carried over, not rewritten.
+ */
+const MOVED = [
+  {
+    id: "scale-v",
+    title: "Scale V — Recorded Token Activity",
+    definition:
+      "The base-10 logarithm of the sum of recorded input, output, cache-write, and cache-read token counts over the selected measurement window. Every increase of 1 corresponds to ten times the recorded activity volume. The raw Total Tokens figure remains separately available.",
+    formula: "Scale V = log₁₀(I + O + W + R), for positive recorded totals. A total of one million tokens gives Scale V = 6; ten million gives 7.",
+    inputs: "Input (I), Output (O), Cache-write (W), Cache-read (R), as nonnegative recorded token counts from the same window.",
+    claim:
+      "Scale V measures order-of-magnitude token activity, not whether tokens are unique, meaningful, relevant, newly generated, or successfully retrieved. Cache-read tokens can be reused context; these still count as recorded activity, not distinct content.",
+    limitations:
+      "A large token total can reflect repeated context rather than new information. Scale V is not Yield, Leverage, efficiency, unique-content volume, a quality measure, or a validated \u201cneedle in a haystack\u201d detection metric. Unavailable or zero totals cannot produce a meaningful positive logarithmic scale.",
+  },
+  {
+    id: "output-flow-share",
+    title: "Output Flow Share",
+    definition:
+      "The fraction of total token flow that is output. Measures what proportion of all token movement is productive output.",
+    formula: "output_flow_share = output / (input + output + cache_creation + cache_read)",
+    inputs: "output, input, cache_creation, cache_read.",
+    claim:
+      "Output flow share measures how much of the total token throughput is actual output vs cache operations and input.",
+    limitations:
+      "Does not distinguish useful output from verbose output. Confounded by cache-heavy workflows.",
+  },
+  {
+    id: "context-activity-ratio",
+    title: "Context Activity Ratio",
+    definition:
+      "The ratio of cache activity (creation + read) to fresh input. Measures how much an operator invests in context vs fresh prompting.",
+    formula: "context_activity_ratio = (cache_creation + cache_read) / max(input, 1)",
+    inputs: "cache_creation, cache_read, input.",
+    claim:
+      "Context activity ratio measures the operator\u2019s investment in building and reusing context relative to fresh input.",
+    limitations:
+      "High ratio may indicate efficient context reuse OR may indicate excessive caching overhead.",
+  },
+  {
+    id: "active-output-share",
+    title: "Active Output Share",
+    definition:
+      "The fraction of output relative to all active token movement (output + cache_creation). Measures how much active generation is output vs cache building.",
+    formula: "active_output_share = output / max(output + cache_creation, 1)",
+    inputs: "output, cache_creation.",
+    claim:
+      "Active output share measures the proportion of active generation that is output vs cache creation \u2014 distinguishing productive output from context investment.",
+    limitations:
+      "Does not account for cache_read (reuse). A high share may indicate insufficient context building.",
+  },
+] as const;
+
 export default function MetricsIndex() {
   return (
     <MetricsWorkspaceFrame
@@ -80,7 +132,15 @@ export default function MetricsIndex() {
       <JsonLd
         data={[
           breadcrumb([{ name: "Metrics", path: "/metrics" }]),
-          alternativesItemList(METRICS.map((m) => ({ name: m.title, url: `${SITE_ORIGIN}${m.href}` })), "/metrics", "SigRank Metrics — All Definitions"),
+          alternativesItemList(
+            [
+              ...METRICS.map((m) => ({ name: m.title, url: `${SITE_ORIGIN}${m.href}` })),
+              ...MOVED.map((m) => ({ name: m.title, url: `${SITE_ORIGIN}/metrics#${m.id}` })),
+              { name: "Compression Ratio — Word-Era Metric", url: `${SITE_ORIGIN}/metrics#compression-ratio` },
+            ],
+            "/metrics",
+            "SigRank Metrics — All Definitions",
+          ),
         ]}
       />
       <JsonLd
@@ -133,6 +193,79 @@ export default function MetricsIndex() {
             </p>
           </Link>
         ))}
+      </div>
+
+      <section className="flex flex-col gap-2" aria-labelledby="more-definitions">
+        <h2 id="more-definitions" className="font-sans text-2xl font-bold text-text-primary">
+          More metric definitions
+        </h2>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          Shorter definitions for the remaining metrics. Each stays on this page
+          because it has no separate reference page.
+        </p>
+      </section>
+
+      <div className="flex flex-col gap-6">
+        {MOVED.map((m) => (
+          <section
+            key={m.id}
+            id={m.id}
+            className="flex scroll-mt-24 flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5"
+          >
+            <h3 className="font-sans text-xl font-bold text-text-primary">{m.title}</h3>
+            <p className="text-sm leading-relaxed text-text-secondary">{m.definition}</p>
+            <p className="font-mono text-sm text-text-primary">{m.formula}</p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Inputs:</strong> {m.inputs}
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">What it measures:</strong> {m.claim}
+            </p>
+            <p className="text-sm leading-relaxed text-text-secondary">
+              <strong className="text-text-primary">Limitations:</strong> {m.limitations}
+            </p>
+          </section>
+        ))}
+
+        <section
+          id="compression-ratio"
+          className="flex scroll-mt-24 flex-col gap-3 rounded-lg border border-bg-border bg-bg-surface p-5"
+        >
+          <h3 className="font-sans text-xl font-bold text-text-primary">
+            Compression Ratio — word-era (historical)
+          </h3>
+          <p className="text-sm leading-relaxed text-text-secondary">
+            Compression Ratio (ticker <strong className="text-text-primary">COMP</strong>,
+            canonical id M.01) is a <strong className="text-text-primary">word-era</strong> SigRank
+            metric. It is retained as background for the planned evolution to word-based ranking,
+            and the board still shows it as a legacy Compression view. It is not one of the
+            token-era metrics.
+          </p>
+          <p className="text-sm leading-relaxed text-text-secondary">
+            Compression Ratio was the first of SigRank&rsquo;s original Core 5 metrics, alongside
+            Prompt Complexity and the others. It was a bounded 0 to 1 score rather than a count:
+            the SigRank badge criteria for structural badges such as Compression Forge are written
+            as thresholds on that 0 to 1 scale (for example, a Compression score of 0.85 or
+            higher). This site does not publish a token formula for Compression Ratio.
+          </p>
+          <p className="text-sm leading-relaxed text-text-secondary">
+            The token-era output-per-fresh-input ratio is{" "}
+            <Link href="/metrics/velocity" className="text-gold underline underline-offset-2">
+              Velocity
+            </Link>
+            : <span className="font-mono text-text-primary">Velocity = output / input</span>, a
+            secondary metric and one of the two terms of{" "}
+            <Link href="/metrics/yield-cascade" className="text-gold underline underline-offset-2">
+              Yield (Υ)
+            </Link>
+            , the headline: Υ = (cache_read / input) × (output / input), which is leverage ×
+            velocity. For how the board is built, see the{" "}
+            <Link href="/methodology" className="text-gold underline underline-offset-2">
+              methodology
+            </Link>
+            .
+          </p>
+        </section>
       </div>
     </div>
     </MetricsWorkspaceFrame>
