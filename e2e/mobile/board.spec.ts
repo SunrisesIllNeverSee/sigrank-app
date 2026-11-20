@@ -6,7 +6,7 @@ import { PHONE_SIZES, THEMES, expectNoHorizontalClip, gotoPhone, trackConsole } 
 const BOARD = "/board/all";
 
 test.describe("mobile board", () => {
-  test("cards replace the table: one list, 44px rows, 8+ above the fold", async ({ page }) => {
+  test("cards replace the table: one list, 44px rows, 6+ above the fold", async ({ page }) => {
     const errors = trackConsole(page);
     await page.setViewportSize({ width: 390, height: 844 });
     await gotoPhone(page, BOARD);
@@ -24,7 +24,8 @@ test.describe("mobile board", () => {
       expect(b.height).toBeGreaterThanOrEqual(44);
       if (b.y + b.height <= Math.min(vh, tabsTop) + 1) above++;
     }
-    expect(above).toBeGreaterThanOrEqual(8);
+    // owner 2026-11-20: 6 above the fold is fine since the signed-out strip / RankMe tab (#443, #446)
+    expect(above).toBeGreaterThanOrEqual(6);
     expect(errors.filter((e) => /hydrat/i.test(e) && !/aria-label="Theme/.test(e))).toEqual([]);
     await expectNoHorizontalClip(page);
   });
