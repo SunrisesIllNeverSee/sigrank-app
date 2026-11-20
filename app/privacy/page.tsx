@@ -29,7 +29,7 @@ export default function PrivacyPage() {
           <div className="mod">
             <div className="mini-h"><span className="sq" />PRIVACY</div>
             <div className="ws-kv">
-              <div className="row"><span className="k">updated</span><span className="v">2026-10-10</span></div>
+              <div className="row"><span className="k">updated</span><span className="v">2026-11-20</span></div>
               <div className="row"><span className="k">collected</span><span className="v acc">token counts</span></div>
               <div className="row"><span className="k">never</span><span className="v">prompts · code</span></div>
             </div>
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="font-mono text-[11px] text-text-dim">
-          Last updated 2026-10-10
+          Last updated 2026-11-20
         </p>
       </header>
 
@@ -107,6 +107,16 @@ export default function PrivacyPage() {
             The plugin does not receive your full conversation or access your
             private local logs. Local measurement and telemetry submission use
             separate services covered by this policy.
+          </p>
+          <p>
+            When enabled, Plugins Radar receives Analyst connector usage events:
+            tool name, success or error category, response time and size, language,
+            protocol and server version, and pseudonymous user and conversation
+            identifiers supplied by your AI client. These help us measure usage
+            and reliability. We exclude tool argument values and fingerprints,
+            tool results, error text, IP addresses, raw user-agent strings and
+            location fields from these events. Pseudonymous identifiers can link
+            calls from the same client account; they are not an install count.
           </p>
           <p>
             Beta reports are optional. You can review, edit or decline a report
@@ -181,7 +191,8 @@ export default function PrivacyPage() {
           </h2>
           <p>
             We use Supabase (authentication, database, and avatar storage),
-            Vercel (hosting), Resend (support email delivery), your chosen
+            Vercel (hosting), Resend (support email delivery), Plugins Radar
+            (Analyst connector usage analytics, when enabled), your chosen
             sign-in provider (GitHub, X, or email), and — only if you choose
             to support the build — Stripe for payments. Stripe handles card
             data directly; we never see or store it.

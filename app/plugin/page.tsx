@@ -168,7 +168,11 @@ export default function PluginPage() {
           <strong className="text-text-primary">Data handling.</strong> The server receives only tool
           arguments: codenames, time windows, board views and filters, and, for a bug report, the
           report text and an optional reply email. It does not receive prompts, conversation content or
-          account identity. Lookups are not stored in a SignalAF database. A short diagnostic log line
+          account identity used to sign in to SignalAF. AI clients may also supply pseudonymous
+          user and conversation identifiers. When enabled, Plugins Radar receives these identifiers
+          with tool names, status, timing, response size and language to measure connector usage.
+          Argument values and fingerprints, results, error text, IP addresses, raw user-agent strings
+          and location fields are excluded from Radar events. Lookups are not stored in a SignalAF database. A short diagnostic log line
           (method, tool name, client name and user agent, but no arguments) is written only when a
           request stalls or times out, and our hosting provider keeps standard request logs under its
           own retention. Rate-limit counters keyed by IP address expire within about an hour. Bug

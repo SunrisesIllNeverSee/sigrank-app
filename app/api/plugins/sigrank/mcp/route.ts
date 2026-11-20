@@ -3,6 +3,7 @@ import { createMcpHandler } from "@modelcontextprotocol/server";
 import { allowedOrigin } from "@/lib/mcp/protocol";
 import { createPluginServer } from "@/lib/mcp/plugin/server";
 import { posthogMcp } from "@/lib/mcp/posthog";
+import { radarMcp } from "@/lib/mcp/plugin/radar";
 import { mcpRateLimitResponse } from "@/lib/mcp/route-limit";
 import { sanitizeUntrusted } from "@/lib/mcp/untrusted";
 import contracts from "@/lib/mcp/plugin/contracts.json";
@@ -21,6 +22,7 @@ const TIMED_OUT = Symbol("timed-out");
 // Send queued MCP analytics once the response (including a stream) has finished.
 function flushAnalytics(): void {
   if (posthogMcp) after(() => posthogMcp?.flush().catch(() => {}));
+  if (radarMcp) after(() => radarMcp?.flush());
 }
 
 function withTimeout<T>(work: Promise<T>, ms: number): Promise<T | typeof TIMED_OUT> {

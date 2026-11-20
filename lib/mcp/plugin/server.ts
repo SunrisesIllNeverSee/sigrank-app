@@ -4,6 +4,7 @@ import { callPluginTool } from "./service";
 import { UNTRUSTED_TEXT_NOTICE } from "../untrusted";
 import { posthogMcp } from "../posthog";
 import { instrumentMcp } from "@/lib/mcp/analytics";
+import { instrumentPluginRadar } from "./radar";
 
 export function createPluginServer(request: Request): McpServer {
   const server = new McpServer(
@@ -12,6 +13,7 @@ export function createPluginServer(request: Request): McpServer {
   );
   // PostHog MCP analytics ($mcp_tool_call), before tools are registered.
   instrumentMcp(server, posthogMcp);
+  instrumentPluginRadar(server);
   for (const tool of contracts.tools) {
     const inputSchema = fromJsonSchema(tool.inputSchema as Record<string, unknown>) as StandardSchemaWithJSON<Record<string, unknown>, Record<string, unknown>>;
     const outputSchema = fromJsonSchema(tool.outputSchema as Record<string, unknown>) as StandardSchemaWithJSON<Record<string, unknown>, Record<string, unknown>>;
