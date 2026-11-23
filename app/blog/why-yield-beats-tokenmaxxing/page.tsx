@@ -111,6 +111,15 @@ export default function WhyYieldBeatsTokenmaxxingPage() {
       </div>
 
       {/* ── Intro ── */}
+      <p className="font-sans text-sm leading-relaxed text-text-secondary">
+        This article was published in July 2026. Explore the later{" "}
+        <Link href="/board/history" prefetch={false} className="text-gold underline">
+          frozen July 31 leaderboard
+        </Link>{" "}
+        for historical context, or visit{" "}
+        <Link href="/board/all" className="text-gold underline">today&apos;s live board</Link>.
+        The archive is a separate snapshot, not a record of today&apos;s rankings.
+      </p>
       <section className="flex flex-col gap-4">
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           The short version, from the measured field: the operator with the

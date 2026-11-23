@@ -5,13 +5,15 @@ description: "Interactive analytics dashboards for the SigRank two-axis operator
 seo_description: "Interactive SigRank dashboards: 10 build archetypes, a 24-stage experience ladder, metric and operator scatterplots, and platform and model boards."
 tags: [article, sigrank, dashboards, analytics, archetypes, tier-ladder, scatter, platform-board, model-board, interactive]
 timestamp: 2026-08-11T14:00:00Z
-modified: 2026-08-11
+modified: 2026-11-23
 author: Deric J. McHenry
 ---
 
 > [1] The full analytical surface of the SigRank two-axis operator taxonomy, rendered as interactive Chart.js dashboards. All data is embedded, with no server calls and no API dependencies, so each dashboard is self-contained and can be viewed independently.
 
 ---
+
+> **Historical context:** These dashboards embed their own dated datasets. Explore the related [frozen July 31, 2026 leaderboard](/board/history), or open [today's live board](/board/all) for submitted operator data. The archive's 1,642 profiles are a separate snapshot, not a replacement for the datasets reported below.
 
 ## Build Archetype Analytics
 
