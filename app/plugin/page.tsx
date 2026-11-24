@@ -15,7 +15,9 @@ const ADMIN_TOOLS = [
   { name: "get_leaderboard", summary: "Reads the public board for 7d, 30d, 90d or all time.", access: "Read-only" },
   { name: "get_operator", summary: "Reads one public operator profile by codename.", access: "Read-only" },
   { name: "compare_operators", summary: "Compares two public operators over a common window.", access: "Read-only" },
-  { name: "get_field_stats", summary: "Reads distributions and field size for the public board.", access: "Read-only" },
+  { name: "get_field_stats", summary: "Reads full-field token means, medians, extrema, distributions and sample sizes.", access: "Read-only" },
+  { name: "get_platform_stats", summary: "Compares platform token distributions with sample sizes, overlap and period coverage.", access: "Read-only" },
+  { name: "get_historical_board", summary: "Explores the frozen July 31, 2026 reference board with sorting, statistics and paginated rows.", access: "Read-only" },
   {
     name: "report_beta_bug",
     summary: "Emails a bug report to hello@signalaf.com, only when the user explicitly asks to send it.",
@@ -40,6 +42,8 @@ export default function PluginPage() {
           Explore the live 7-day, 30-day, 90-day and all-time boards, read public operator profiles,
           compare operating structures, and understand field statistics. The plugin helps explain
           relationships among fresh input, generated output, context construction and reuse.
+          Sort by the metric you want to explore, read full-field token statistics, or compare platform groups.
+          The frozen July 2026 reference board is available through a separate historical tool.
           In Codex, an existing local SigRank identity can locate its public profile by codename.
           In Claude, look up any operator by its public codename.
         </p>

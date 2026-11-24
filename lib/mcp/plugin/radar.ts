@@ -21,7 +21,7 @@ export function redactRadarEvent(event: RadarEvent): RadarEvent | null {
 
 const key = process.env.RADAR_KEY;
 const options: RadarOptions | null = key && process.env.VERCEL_ENV !== "preview"
-  ? { key, captureArgs: false, captureLocation: false, redact: redactRadarEvent, version: "1.1.0" }
+  ? { key, captureArgs: false, captureLocation: false, redact: redactRadarEvent, version: contracts.contract_version }
   : null;
 
 export const radarMcp = options ? createRadar(options) : null;
