@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import Ajv from "ajv/dist/2020";
 import { NextRequest } from "next/server";
 import contracts from "@/lib/mcp/plugin/contracts.json";
+import published from "@/__tests__/fixtures/analyst/published-1.2.0.json";
 import type { LeaderboardRow } from "@/lib/board/types";
 
 const h = vi.hoisted(() => ({
@@ -39,6 +40,13 @@ async function call(name: string, args: Record<string, unknown> = {}) {
   const schema = contracts.tools.find(t => t.name === name)!.outputSchema;
   const validate = new Ajv({ strict: false, validateFormats: false }).compile(schema);
   expect(validate(result), JSON.stringify(validate.errors)).toBe(true);
+  // Validate execution against the independent published baseline too. Editing
+  // the implementation and current schema together must not hide client breakage.
+  const prior = published.tools.find(t => t.name === name)?.outputSchema;
+  if (prior) {
+    const acceptsPublished = new Ajv({ strict: false, validateFormats: false }).compile(prior);
+    expect(acceptsPublished(result), JSON.stringify(acceptsPublished.errors)).toBe(true);
+  }
   return result as { status: string; data: Record<string, any> | null; error: { code: string } | null };
 }
 beforeEach(() => { h.db = true; h.rows = [row("a"), row("b", 30, 40, 20, 300, "codex", 2)]; h.platformRows = h.rows;
