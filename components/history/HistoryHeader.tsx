@@ -27,6 +27,17 @@ export function HistoryHeader({ meta }: { meta: HistoricalBoard["meta"] }) {
         July 31, 2026. It is an archive and is never updated. Today&apos;s{" "}
         <Link href="/board/all">leaderboard</Link> is made of operators who submit their own data.
       </p>
+      <nav aria-label="Original articles" className="hist-explainer">
+        Original articles:{" "}
+        <Link href="/blog/volume-isnt-yield" prefetch={false}>Volume Isn&apos;t Yield</Link>
+        {" · "}
+        <Link href="/blog/the-tool-is-the-person" prefetch={false}>The Tool Is the Person</Link>
+        {" · "}
+        <Link href="/blog/why-yield-beats-tokenmaxxing" prefetch={false}>Tokenmaxxing, Measured</Link>
+        {" · "}
+        <Link href="/blog/sigrank-dashboards" prefetch={false}>Interactive Dashboards</Link>
+        . Each article retains its own analysis date and comparison population.
+      </nav>
       <p className="hist-fingerprint">
         Source:{" "}
         <a href={`${REPO}/commit/${meta.sourceCommit}`} rel="noopener noreferrer" target="_blank">

@@ -4,9 +4,9 @@ import { readFileSync } from "node:fs";
 
 const contracts = JSON.parse(readFileSync(new URL("../../lib/mcp/plugin/contracts.json", import.meta.url), "utf8"));
 
-test("public plugin exposes only the five V1 tools without OAuth", () => {
+test("public Analyst exposes seven explicitly scoped tools without OAuth", () => {
   assert.deepEqual(contracts.tools.map(tool => tool.name), [
-    "get_leaderboard", "get_operator", "compare_operators", "get_field_stats", "report_beta_bug",
+    "get_leaderboard", "get_operator", "compare_operators", "get_field_stats", "get_platform_stats", "get_historical_board", "report_beta_bug",
   ]);
   for (const tool of contracts.tools) {
     assert.deepEqual(tool.securitySchemes, [{ type: "noauth" }]);

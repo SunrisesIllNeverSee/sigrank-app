@@ -8,7 +8,7 @@ import { instrumentPluginRadar } from "./radar";
 
 export function createPluginServer(request: Request): McpServer {
   const server = new McpServer(
-    { name: "sigrank-signalaf", title: "SigRank | SignalAF Analyst", version: "1.1.0", websiteUrl: "https://signalaf.com" },
+    { name: "sigrank-signalaf", title: "SigRank | SignalAF Analyst", version: "1.2.0", websiteUrl: "https://signalaf.com" },
     { capabilities: { tools: { listChanged: false } }, instructions: "Tokenpull measures → SigRank evaluates → SignalAF publishes. Metrics describe observable AI operating structure, not intelligence, productivity, or work quality. Archetypes are operating patterns, not personality. Public exploration does not scan local logs." },
   );
   // PostHog MCP analytics ($mcp_tool_call), before tools are registered.

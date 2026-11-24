@@ -5,7 +5,7 @@ description: A historical analysis of 1,628 AI coding operator records by volume
 seo_description: "A historical analysis of 1,628 AI coding operator records by volume, Yield, and token-flow composition. Groups show operating signatures, not intervention."
 tags: [article, sigrank, benford, clustering, archetypes, human-center-of-mass, cascade, ai-operators, measurement]
 timestamp: 2026-07-14T09:00:00Z
-modified: 2026-10-05
+modified: 2026-11-23
 author: Deric J. McHenry
 hero: /article-charts/webp/03-volume-vs-yield.webp
 ---
@@ -17,6 +17,8 @@ hero: /article-charts/webp/03-volume-vs-yield.webp
 > [1] We ranked 1,628 AI coding operator records by token volume, then measured how their four token flows relate. This historical analysis separated seven composition clusters and a statistical outlier group. The median record had 19 cache-read tokens per fresh-input token, and the shape is not what you'd expect.
 
 ---
+
+> **Explore the original board:** The [frozen July 31, 2026 leaderboard](/board/history) preserves 1,642 profiles for historical exploration. This article analyzes the earlier July 13 field of 1,628 records; its counts and findings are not a description of that later snapshot or [today's live board](/board/all).
 
 ## Why SigRank Exists
 

@@ -138,6 +138,8 @@ describe("plugin route timeouts", () => {
       ["get_operator", "Get Operator Profile"],
       ["compare_operators", "Compare Two Operators"],
       ["get_field_stats", "Get Field Statistics"],
+      ["get_platform_stats", "Compare Platform Token Statistics"],
+      ["get_historical_board", "Explore the Frozen July 2026 Board"],
       ["report_beta_bug", "Report a Beta Bug"],
     ];
     expect(tools).toHaveLength(titles.length);
