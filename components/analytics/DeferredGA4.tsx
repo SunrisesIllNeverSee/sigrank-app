@@ -6,7 +6,7 @@ export const GA4_ID = "G-YQCKR06LBH";
 
 // Real-user signals only. Automated sweeps load the page and leave without ever
 // producing one of these, so GA4 never sees them. Events are passive and one-shot.
-export const GA4_INTERACTION_EVENTS = ["pointerdown", "keydown", "scroll", "touchstart"] as const;
+export const GA4_INTERACTION_EVENTS = ["pointerdown", "keydown", "touchstart"] as const;
 
 /**
  * Loads gtag.js and configures GA4 once, on the first real user interaction.
@@ -25,19 +25,25 @@ export function loadGA4OnFirstInteraction(doc: Document = document, id: string =
     for (const t of targets) for (const e of GA4_INTERACTION_EVENTS) t.removeEventListener(e, onInteract, opts);
   };
 
-  function onInteract() {
-    if (done) return;
+  // Queueing stub installed immediately: any early gtag() call is buffered in
+  // dataLayer and replayed by gtag.js once it loads. Only the script and the
+  // config are deferred.
+  win.dataLayer = win.dataLayer || [];
+  if (typeof win.gtag !== "function") {
+    win.gtag = function gtag() {
+      // gtag.js requires the Arguments object, not an array.
+      // eslint-disable-next-line prefer-rest-params
+      (win.dataLayer as unknown[]).push(arguments);
+    };
+  }
+
+  function onInteract(event: Event) {
+    if (done || !event.isTrusted) return; // synthetic events (scripts/bots) do not count
     done = true;
     detach();
     if (doc.getElementById("ga4-gtag-src")) return;
-    win!.dataLayer = win!.dataLayer || [];
-    win!.gtag = function gtag() {
-      // gtag.js requires the Arguments object, not an array.
-      // eslint-disable-next-line prefer-rest-params
-      (win!.dataLayer as unknown[]).push(arguments);
-    };
-    win!.gtag("js", new Date());
-    win!.gtag("config", id);
+    win!.gtag!("js", new Date());
+    win!.gtag!("config", id);
     const s = doc.createElement("script");
     s.id = "ga4-gtag-src";
     s.async = true;

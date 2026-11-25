@@ -20,10 +20,13 @@ export function requestHost(req: { headers: { get(name: string): string | null }
 }
 
 /**
- * `$host` + `host` properties for server-side PostHog events so funnels can be
- * scoped to a site. Empty when the host cannot be determined.
+ * Host properties for server-side PostHog events so funnels can be scoped to a
+ * site. `host` is always the bucket from requestHost (allow-listed hostname,
+ * "preview" or "other"). PostHog's reserved `$host` is set only to a real
+ * allow-listed hostname, never to a bucket.
  */
 export function hostProps(req: { headers: { get(name: string): string | null } }): { $host?: string; host?: string } {
   const host = requestHost(req);
-  return host ? { $host: host, host } : {};
+  if (!host) return {};
+  return SITE_HOSTS.has(host) ? { $host: host, host } : { host };
 }
