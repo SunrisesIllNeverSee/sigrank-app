@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Nav } from "@/components/ui/Nav";
@@ -11,7 +12,6 @@ import { SITE_ORIGIN, siteMetadata } from "@/lib/seo";
 import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
-import { DeferredGA4 } from "@/components/analytics/DeferredGA4";
 import { WebMcpRegistrar } from "@/components/webmcp/register-tools";
 
 // Roboto — the LOCKED theme typeface (matches _HEADER_LOCKED.html, the design
@@ -111,8 +111,19 @@ export default function RootLayout({
         <SpeedInsights />
         <Analytics />
         <WebMcpRegistrar />
-        {/* GA4 (measurement ID G-YQCKR06LBH) loads only after a first real user interaction, to keep automated sweeps out of GA4. */}
-        <DeferredGA4 />
+        {/* Google Analytics 4 (gtag.js) — measurement ID G-YQCKR06LBH */}
+        <Script
+          id="ga4-gtag-src"
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-YQCKR06LBH"
+        />
+        <Script
+          id="ga4-gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-YQCKR06LBH');`,
+          }}
+        />
       </body>
     </html>
   );
