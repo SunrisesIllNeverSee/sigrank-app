@@ -24,7 +24,17 @@ import { captureServer } from "@/lib/infra/posthog/server";
 
 export type McpServerId = "sigrank" | "contribution-exchange";
 export type McpTransport = "remote_mcp" | "webmcp" | "direct_http";
-export type McpOperation = "initialize" | "tools_list" | "tools_call";
+/**
+ * `tools_call` means a tools/call request that reached tool handling. Methods
+ * the server does not implement are `unsupported_method` (real method name in
+ * metadata.method); unparseable or malformed requests are `invalid_request`.
+ */
+export type McpOperation =
+  | "initialize"
+  | "tools_list"
+  | "tools_call"
+  | "unsupported_method"
+  | "invalid_request";
 export type McpResult = "success" | "error" | "denied" | "rate_limited" | "invalid_request";
 export type McpAuthTier = "anonymous" | "actor" | "agent" | "proposer" | "admin";
 
@@ -40,6 +50,8 @@ export interface McpCallRecord {
   scopes?: string[];
   client_name?: string;
   client_version?: string;
+  /** Site the request was served on (e.g. signalaf.com); lowercase hostname, no port. */
+  host?: string;
   result: McpResult;
   error_code?: string;
   duration_ms?: number;
@@ -201,6 +213,11 @@ export async function recordMcpCall(record: McpCallRecord): Promise<void> {
         duration_bucket: durationBucket,
         idempotent_replay: record.idempotent_replay ?? false,
         client_name: record.client_name ?? null,
+        host: record.host ?? null,
+        method:
+          record.operation === "unsupported_method" && typeof record.metadata?.method === "string"
+            ? record.metadata.method
+            : null,
       },
     ).catch(() => {
       // PostHog failure must never break the request

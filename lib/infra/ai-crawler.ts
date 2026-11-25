@@ -77,10 +77,22 @@ export function crawlerFamily(botName: string): CrawlerFamily | null {
   return FAMILY[botName] ?? null;
 }
 
+/**
+ * Result of a real identity check on the requester (reverse DNS, published IP
+ * ranges, or a platform-signed verified-bot signal). The proxy has none today:
+ * Vercel exposes no verified-bot signal to middleware (BotID's checkBotId runs
+ * in route handlers, not the proxy) and reverse DNS would add a network lookup
+ * to every crawler request. Without one, a hit is "ua_only".
+ */
+export interface CrawlerVerification {
+  verified: boolean;
+  method: string;
+}
+
 export interface CrawlerHit {
   distinctId: string;
   event: typeof AI_CRAWLER_EVENT;
-  properties: Record<string, string | boolean>;
+  properties: Record<string, string | boolean | null>;
 }
 
 /**
@@ -90,7 +102,12 @@ export interface CrawlerHit {
  * User-Agent only, so a client can claim to be one. The query string is
  * never recorded.
  */
-export function crawlerHit(bot: BotInfo, url: URL, method: string): CrawlerHit | null {
+export function crawlerHit(
+  bot: BotInfo,
+  url: URL,
+  method: string,
+  verification?: CrawlerVerification,
+): CrawlerHit | null {
   if (!bot.isBot) return null;
   if (method !== "GET" && method !== "HEAD") return null;
   const family = crawlerFamily(bot.botName);
@@ -101,7 +118,8 @@ export function crawlerHit(bot: BotInfo, url: URL, method: string): CrawlerHit |
   if (PRIVATE_PATH.test(path)) return null;
   return {
     // One PostHog id per bot, with no person profile: bots aren't people.
-    distinctId: `crawler:${bot.botName}`,
+    // Lowercase so the same bot has one id across sites and casings.
+    distinctId: `crawler:${bot.botName.toLowerCase()}`,
     event: AI_CRAWLER_EVENT,
     properties: {
       bot_name: bot.botName,
@@ -110,6 +128,10 @@ export function crawlerHit(bot: BotInfo, url: URL, method: string): CrawlerHit |
       host,
       path,
       method,
+      // true only when a real check passed; null when the bot is known by
+      // User-Agent alone (a client can claim to be any bot).
+      bot_verified: verification ? verification.verified : null,
+      bot_verification: verification ? verification.method : "ua_only",
       $host: host,
       $pathname: path,
       $current_url: `${url.protocol}//${host}${path}`,

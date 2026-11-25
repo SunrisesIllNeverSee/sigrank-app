@@ -18,6 +18,7 @@
  */
 
 import type { NextRequest } from "next/server";
+import { requestHost } from "@/lib/infra/request-host";
 import {
   PROTOCOL_VERSION,
   SUPPORTED_VERSIONS,
@@ -67,6 +68,7 @@ export async function POST(req: NextRequest) {
   const clientInfo = getClientInfo(req);
   const ipHash = hashIp(req.headers.get("x-forwarded-for")?.split(",")[0]?.trim());
   const transport: McpTransport = "remote_mcp";
+  const host = requestHost(req);
 
   let message: RpcRequest;
   try {
@@ -76,13 +78,14 @@ export async function POST(req: NextRequest) {
       request_id: requestId,
       server_id: "contribution-exchange",
       transport,
-      operation: "tools_call",
+      operation: "invalid_request",
       result: "invalid_request",
       error_code: "parse_error",
       duration_ms: Date.now() - startTime,
       ip_hash: ipHash,
       client_name: clientInfo.name,
       client_version: clientInfo.version,
+      host,
     });
     return rpcError(null, -32700, "Parse error", undefined, 400);
   }
@@ -92,13 +95,14 @@ export async function POST(req: NextRequest) {
       request_id: requestId,
       server_id: "contribution-exchange",
       transport,
-      operation: "tools_call",
+      operation: "invalid_request",
       result: "invalid_request",
       error_code: "invalid_request",
       duration_ms: Date.now() - startTime,
       ip_hash: ipHash,
       client_name: clientInfo.name,
       client_version: clientInfo.version,
+      host,
     });
     return rpcError(message.id ?? null, -32600, "Invalid Request", undefined, 400);
   }
@@ -118,6 +122,7 @@ export async function POST(req: NextRequest) {
       ip_hash: ipHash,
       client_name: clientInfo.name,
       client_version: clientInfo.version,
+      host,
     });
     return jsonRpc(id, {
       protocolVersion: negotiated,
@@ -140,13 +145,14 @@ export async function POST(req: NextRequest) {
       request_id: requestId,
       server_id: "contribution-exchange",
       transport,
-      operation: "tools_call",
+      operation: "invalid_request",
       result: "error",
       error_code: "unsupported_protocol",
       duration_ms: Date.now() - startTime,
       ip_hash: ipHash,
       client_name: clientInfo.name,
       client_version: clientInfo.version,
+      host,
     });
     return rpcError(id, -32602, "Unsupported protocol version", {
       supported: [...SUPPORTED_VERSIONS],
@@ -177,6 +183,7 @@ export async function POST(req: NextRequest) {
       ip_hash: ipHash,
       client_name: clientInfo.name,
       client_version: clientInfo.version,
+      host,
     });
     return jsonRpc(id, { tools: scopedTools });
   }
@@ -196,6 +203,7 @@ export async function POST(req: NextRequest) {
         ip_hash: ipHash,
         client_name: clientInfo.name,
         client_version: clientInfo.version,
+        host,
       });
       return rpcError(id, -32602, "Invalid params", { required: "params.name" });
     }
@@ -218,6 +226,7 @@ export async function POST(req: NextRequest) {
         ip_hash: ipHash,
         client_name: clientInfo.name,
         client_version: clientInfo.version,
+        host,
       });
       return jsonRpc(id, scopeError);
     }
@@ -258,6 +267,7 @@ export async function POST(req: NextRequest) {
       ip_hash: ipHash,
       client_name: clientInfo.name,
       client_version: clientInfo.version,
+      host,
     });
     return jsonRpc(id, result);
   }
@@ -266,13 +276,15 @@ export async function POST(req: NextRequest) {
     request_id: requestId,
     server_id: "contribution-exchange",
     transport,
-    operation: "tools_call",
+    operation: "unsupported_method",
     result: "error",
     error_code: "method_not_found",
+    metadata: { method: method.slice(0, 64) },
     duration_ms: Date.now() - startTime,
     ip_hash: ipHash,
     client_name: clientInfo.name,
     client_version: clientInfo.version,
+    host,
   });
   return rpcError(id, -32601, "Method not found", { method });
 }

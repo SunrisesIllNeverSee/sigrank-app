@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { withOG } from "@/lib/seo";
+import { REMOTE_TOOL_COUNT } from "@/lib/mcp/tools";
 
 export const metadata: Metadata = withOG({
   title: "Pricing — Free During Build Stage",
@@ -13,7 +14,7 @@ const freeFeatures = [
   ["Public leaderboard", "/board/all", "Full operator rankings, all time windows"],
   ["Score calculator", "/score", "Paste token counts, get your Yield — no account"],
   ["REST API", "/developers", "Public reads, OpenAPI spec, rate-limited"],
-  ["MCP server", "/mcp", "Streamable HTTP + CLI, 3 tools, no auth required"],
+  ["MCP server", "/mcp", `Streamable HTTP + CLI, ${REMOTE_TOOL_COUNT} remote tools, no auth required`],
   ["CLI tool", "/developers", "npx sigrank — local scanner and MCP server"],
   ["Field analysis", "/field", "Distribution of the July 2026 field: 1,498 operators after outliers are set aside"],
 ];
