@@ -3,6 +3,7 @@ import { createServerClient } from "@/lib/infra/supabase/auth-server";
 import { getSupabaseService } from "@/lib/infra/supabase/server";
 import { captureServer } from "@/lib/infra/posthog/server";
 import { safeNext } from "@/lib/infra/safe-next";
+import { hostProps } from "@/lib/infra/request-host";
 
 /**
  * GET /auth/callback — OAuth (GitHub) + magic-link return point.
@@ -131,6 +132,7 @@ export async function GET(req: NextRequest) {
             codename: mintedCodename,
             had_handle: !!providerHandle,
             claim_path: "auth_callback",
+            ...hostProps(req),
           });
         }
       }

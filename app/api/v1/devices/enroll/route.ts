@@ -4,6 +4,7 @@ import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
 import { normalizeConnectCode } from "@/lib/identity/connect-code";
 import { isValidAgentPublicKey } from "@/lib/ingest/signature";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { hostProps } from "@/lib/infra/request-host";
 
 /**
  * POST /api/v1/devices/enroll — redeem a connect code + bind a device (D7 §4.3).
@@ -128,6 +129,7 @@ export async function POST(req: NextRequest) {
         "operator_enrolled",
         {
           agent_version: agentVersion ?? undefined,
+          ...hostProps(req),
         },
       );
       return NextResponse.json(

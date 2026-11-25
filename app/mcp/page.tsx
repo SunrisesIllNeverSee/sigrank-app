@@ -187,10 +187,6 @@ const REGISTRIES = [
     url: "https://registry.modelcontextprotocol.io",
   },
   {
-    name: "Smithery",
-    url: "https://smithery.ai/server/@SunrisesIllNeverSee/sigrank-mcp",
-  },
-  {
     name: "Glama",
     url: "https://glama.ai/mcp/servers/@SunrisesIllNeverSee/sigrank-mcp",
   },

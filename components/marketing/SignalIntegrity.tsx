@@ -626,13 +626,6 @@ npx sigrank
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://img.shields.io/badge/MCP-Smithery-blue?style=flat-square"
-            alt="Smithery MCP server"
-            width={120}
-            height={20}
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
             src="https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp/badges/score.svg"
             alt="Glama score"
             width={120}
@@ -680,7 +673,7 @@ npx sigrank
             },
             {
               cat: "MCP directories",
-              items: "Smithery (98/100) · Glama (AAA) · npm",
+              items: "Glama (AAA) · npm",
             },
             {
               cat: "SIGNOMY surface",
@@ -710,26 +703,7 @@ npx sigrank
           <span className="font-mono text-[11px] uppercase tracking-wide text-text-muted">
             Where to find & install the MCP
           </span>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <a
-              href="https://smithery.ai/servers/burnmydays/sigrank-mcp"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col gap-1.5 rounded-lg border border-bg-border bg-bg-surface p-4 transition-colors hover:border-gold/40 hover:bg-bg-elevated"
-            >
-              <span className="flex items-baseline gap-2">
-                <span className="font-mono text-sm font-bold text-text-primary">
-                  Smithery
-                </span>
-                <span className="ml-auto font-mono text-[11px] text-text-accent">
-                  ↗
-                </span>
-              </span>
-              <span className="font-sans text-xs leading-relaxed text-text-muted">
-                One-click install for Claude Desktop, Cursor, and other MCP
-                clients. Quality score 98/100.
-              </span>
-            </a>
+          <div className="grid gap-3 sm:grid-cols-2">
             <a
               href="https://glama.ai/mcp/servers/SunrisesIllNeverSee/sigrank-mcp"
               target="_blank"

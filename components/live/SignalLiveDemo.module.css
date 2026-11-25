@@ -42,6 +42,7 @@
 }
 
 .brand {
+  margin: 0;
   gap: 10px;
   font-size: 14px;
   font-weight: 800;

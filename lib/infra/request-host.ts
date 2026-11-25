@@ -18,3 +18,12 @@ export function requestHost(req: { headers: { get(name: string): string | null }
   if (forwarded && forwarded !== "other") return forwarded;
   return classify(req.headers.get("host"));
 }
+
+/**
+ * `$host` + `host` properties for server-side PostHog events so funnels can be
+ * scoped to a site. Empty when the host cannot be determined.
+ */
+export function hostProps(req: { headers: { get(name: string): string | null } }): { $host?: string; host?: string } {
+  const host = requestHost(req);
+  return host ? { $host: host, host } : {};
+}
