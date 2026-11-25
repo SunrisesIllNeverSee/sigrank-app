@@ -1,0 +1,55 @@
+name: Publish remote MCP servers to the MCP Registry
+
+# Publishes mcp-registry/*.server.json (the com.signalaf/* remote servers)
+# to the official MCP Registry. Run by hand from the Actions tab.
+# Auth: HTTP domain proof for signalaf.com. The public key is served at
+# https://signalaf.com/.well-known/mcp-registry-auth; the private key is the
+# MCP_REGISTRY_PRIVATE_KEY repository secret.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Validate only, don't publish"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mcp-publisher (pinned v1.8.1 + checksum verified)
+        run: |
+          MCP_PUBLISHER_VERSION="v1.8.1"
+          MCP_PUBLISHER_SHA256="a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc"
+          MCP_PUBLISHER_URL="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}/mcp-publisher_linux_amd64.tar.gz"
+          curl -fL "$MCP_PUBLISHER_URL" -o /tmp/mcp-publisher.tar.gz
+          echo "$MCP_PUBLISHER_SHA256  /tmp/mcp-publisher.tar.gz" | sha256sum -c -
+          tar xzf /tmp/mcp-publisher.tar.gz -C . mcp-publisher
+          chmod +x mcp-publisher
+
+      - name: Validate server files
+        run: |
+          for f in mcp-registry/*.server.json; do
+            echo "Validating $f"
+            ./mcp-publisher validate "$f"
+          done
+
+      - name: Log in with the signalaf.com domain key
+        if: ${{ !inputs.dry_run }}
+        env:
+          MCP_REGISTRY_PRIVATE_KEY: ${{ secrets.MCP_REGISTRY_PRIVATE_KEY }}
+        run: ./mcp-publisher login http --domain signalaf.com --private-key "$MCP_REGISTRY_PRIVATE_KEY"
+
+      - name: Publish
+        if: ${{ !inputs.dry_run }}
+        run: |
+          for f in mcp-registry/*.server.json; do
+            echo "Publishing $f"
+            ./mcp-publisher publish "$f"
+          done
