@@ -1,0 +1,55 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.signalaf/contribution-exchange",
+  "description": "SigRank Contribution Exchange: domain discovery, policies, preflight checks and signals.",
+  "title": "Contribution Exchange",
+  "repository": {
+    "url": "https://github.com/SunrisesIllNeverSee/sigrank-app",
+    "source": "github"
+  },
+  "version": "1.0.1",
+  "websiteUrl": "https://signalaf.com/exchange",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://signalaf.com/api/exchange/mcp"
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "agent_guide": "https://signalaf.com/agents.md",
+      "authentication": {
+        "note": "Read-only tools (6) are always visible. Mutation tools (4) require scope headers.",
+        "required": false,
+        "scopes": {
+          "exchange:attempt": "Granted when x-exchange-actor-id header is present. Covers exchange_create_attempt and exchange_submit_attempt.",
+          "exchange:propose": "Granted when x-exchange-agent-key or x-exchange-proposer-key header is present. Covers exchange_propose and exchange_create_proposal_from_attempt.",
+          "exchange:read": "Always granted. Covers all read-only tools."
+        }
+      },
+      "commitment_schema": "https://signalaf.com/exchange.schema.json",
+      "exchange_profile": "https://signalaf.com/.well-known/exchange.json",
+      "invariants": [
+        "No MCP tool creates a Commitment",
+        "No MCP tool grants execution authorization",
+        "No MCP tool creates a payment obligation",
+        "Proposal is non-binding; Commitments require separate bilateral acceptance",
+        "Signals are before proposals and commitments; they do not bypass bilateral Commitment formation"
+      ],
+      "protocol_versions": [
+        "2025-06-18",
+        "2025-03-26"
+      ],
+      "server_card": "https://signalaf.com/.well-known/exchange-mcp.json",
+      "tool_count": 6,
+      "tools": [
+        "exchange_discover_domain",
+        "exchange_get_policy",
+        "exchange_preflight",
+        "exchange_list_signals",
+        "exchange_get_signal",
+        "exchange_get_attempt"
+      ]
+    }
+  }
+}
