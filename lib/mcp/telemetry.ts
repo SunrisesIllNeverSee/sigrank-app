@@ -16,6 +16,7 @@
 
 import type { NextRequest } from "next/server";
 import { recordMcpCall, hashIp } from "@/lib/exchange/mcp-observability";
+import { requestHost } from "@/lib/infra/request-host";
 
 /**
  * Record a SigRank MCP tool call with standard fields pre-filled.
@@ -43,6 +44,7 @@ export interface ToolCallObservability {
   ip_hash: string | undefined;
   client_name: string | undefined;
   client_version: string | undefined;
+  host: string | undefined;
   start_time: number;
 }
 
@@ -57,6 +59,7 @@ export function observabilityFromRequest(req: NextRequest): ToolCallObservabilit
     ip_hash: hashIp(req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()),
     client_name: req.headers.get("mcp-client-name") ?? undefined,
     client_version: req.headers.get("mcp-client-version") ?? undefined,
+    host: requestHost(req),
     start_time: startTimeHeader ? Number(startTimeHeader) : Date.now(),
   };
 }
@@ -85,5 +88,6 @@ export async function recordToolCallResult(
     ip_hash: obs.ip_hash,
     client_name: obs.client_name,
     client_version: obs.client_version,
+    host: obs.host,
   });
 }

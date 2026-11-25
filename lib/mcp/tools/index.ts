@@ -479,6 +479,9 @@ export const TOOLS = [
   },
 ] as const;
 
+/** Number of tools the remote SigRank MCP (/api/mcp) advertises; the site quotes this. */
+export const REMOTE_TOOL_COUNT = TOOLS.length;
+
 /** Tools that return user-supplied profile text; their advertised description carries an untrusted-data notice. */
 export const NAME_BEARING_TOOLS: ReadonlySet<string> = new Set(["get_leaderboard", "get_operator", "benchmark_me", "compare_to_field", "operator_gap", "field_anomaly", "who_operates_like_me", "operator_signature"]);
 

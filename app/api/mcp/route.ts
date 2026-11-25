@@ -51,6 +51,7 @@ import {
   hashIp,
   deriveAuthTier,
 } from "@/lib/exchange/mcp-observability";
+import { requestHost } from "@/lib/infra/request-host";
 import { captureServer } from "@/lib/infra/posthog/server";
 import { posthogMcp } from "@/lib/mcp/server";
 
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
   const clientName = req.headers.get("mcp-client-name") ?? undefined;
   const clientVersion = req.headers.get("mcp-client-version") ?? undefined;
   const ipHash = hashIp(req.headers.get("x-forwarded-for")?.split(",")[0]?.trim());
+  const host = requestHost(req);
 
   // 2. Parse the request body to check for Exchange tool calls and record telemetry
   let message: RpcRequest;
@@ -109,6 +111,7 @@ export async function POST(req: NextRequest) {
       ip_hash: ipHash,
       client_name: clientName,
       client_version: clientVersion,
+      host,
     });
   }
 
@@ -124,6 +127,7 @@ export async function POST(req: NextRequest) {
       ip_hash: ipHash,
       client_name: clientName,
       client_version: clientVersion,
+      host,
     });
   }
 
@@ -155,6 +159,7 @@ export async function POST(req: NextRequest) {
           ip_hash: ipHash,
           client_name: clientName,
           client_version: clientVersion,
+          host,
           metadata: { legacy_bridge: true },
         });
         return jsonRpc(id, scopeError);
@@ -178,6 +183,7 @@ export async function POST(req: NextRequest) {
           ip_hash: ipHash,
           client_name: clientName,
           client_version: clientVersion,
+          host,
           metadata: { legacy_bridge: true },
         });
         return rpcError(id, -32603, "Internal error", { tool: name });
@@ -217,6 +223,7 @@ export async function POST(req: NextRequest) {
         ip_hash: ipHash,
         client_name: clientName,
         client_version: clientVersion,
+        host,
         metadata: { legacy_bridge: true },
       });
 

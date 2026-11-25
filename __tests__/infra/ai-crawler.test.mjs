@@ -48,7 +48,7 @@ test("a crawler hit becomes one ai_bot_detected event with a per-bot id and no p
   const hit = crawlerHit(detectBot(UA["ChatGPT-User"]), url, "GET");
   assert.equal(hit.event, AI_CRAWLER_EVENT);
   assert.equal(hit.event, "ai_bot_detected");
-  assert.equal(hit.distinctId, "crawler:ChatGPT-User");
+  assert.equal(hit.distinctId, "crawler:chatgpt-user");
   assert.deepEqual(hit.properties, {
     bot_name: "ChatGPT-User",
     bot_operator: "OpenAI",
@@ -56,6 +56,8 @@ test("a crawler hit becomes one ai_bot_detected event with a per-bot id and no p
     host: "signalaf.com",
     path: "/alternatives/ai-benchmarking-tools",
     method: "GET",
+    bot_verified: null,
+    bot_verification: "ua_only",
     $host: "signalaf.com",
     $pathname: "/alternatives/ai-benchmarking-tools",
     $current_url: "https://signalaf.com/alternatives/ai-benchmarking-tools",
@@ -109,4 +111,22 @@ test("previews, local runs, signed-in paths and non-GET requests send nothing", 
   }
   assert.ok(crawlerHit(bot, new URL("https://www.signalaf.com/methodology"), "HEAD"));
   assert.ok(crawlerHit(bot, new URL("https://signalaf.com/membership"), "GET"), "only /me itself and below are private");
+});
+
+test("bot ids are lowercase so one bot has one id across casings", () => {
+  const hit = crawlerHit(detectBot(UA.AmazonBot), url, "GET");
+  assert.equal(hit.distinctId, "crawler:amazonbot");
+  assert.equal(hit.properties.bot_name, "AmazonBot");
+});
+
+test("bot_verified is null for a User-Agent-only match, and true only when a real check passed", () => {
+  const bot = detectBot(UA.Googlebot);
+  const uaOnly = crawlerHit(bot, url, "GET");
+  assert.equal(uaOnly.properties.bot_verified, null);
+  assert.equal(uaOnly.properties.bot_verification, "ua_only");
+  const passed = crawlerHit(bot, url, "GET", { verified: true, method: "reverse_dns" });
+  assert.equal(passed.properties.bot_verified, true);
+  assert.equal(passed.properties.bot_verification, "reverse_dns");
+  const failed = crawlerHit(bot, url, "GET", { verified: false, method: "reverse_dns" });
+  assert.equal(failed.properties.bot_verified, false);
 });

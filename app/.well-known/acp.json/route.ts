@@ -6,6 +6,7 @@
  * Spec: https://agenticcommerce.dev
  */
 
+import { REMOTE_TOOL_COUNT } from "@/lib/mcp/tools";
 import { NextResponse } from "next/server";
 import { SITE_ORIGIN } from "@/lib/seo";
 
@@ -69,7 +70,7 @@ export async function GET() {
           id: "mcp-tools",
           name: "MCP Tool Suite",
           description:
-            "15 MCP tools for measuring, ranking, and improving token efficiency",
+            `${REMOTE_TOOL_COUNT} MCP tools for measuring, ranking, and improving token efficiency`,
           endpoint: mcpEndpoint,
           methods: ["MCP"],
         },

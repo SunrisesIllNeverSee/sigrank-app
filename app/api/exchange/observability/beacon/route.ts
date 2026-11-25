@@ -20,6 +20,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { checkDistributedRateLimit } from "@/lib/infra/distributed-rate-limit";
 import { recordMcpCall, hashIp, type McpResult } from "@/lib/exchange/mcp-observability";
+import { requestHost } from "@/lib/infra/request-host";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
     duration_ms: durationMs,
     ip_hash: ipHash,
     client_name: req.headers.get("mcp-client-name") ?? undefined,
+    host: requestHost(req),
     client_version: req.headers.get("mcp-client-version") ?? undefined,
     metadata: { source: "webmcp_beacon" },
   });
