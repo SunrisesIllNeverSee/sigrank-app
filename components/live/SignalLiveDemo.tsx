@@ -511,7 +511,7 @@ export function SignalLiveDemo({ fieldYields }: { fieldYields: number[] }) {
     <div className={styles.shell} data-scene={scene}>
       <div className={styles.noise} aria-hidden />
       <header className={styles.header}>
-        <div className={styles.brand}><span>◈</span> SIGNALAF <b>LIVE</b></div>
+        <h1 className={styles.brand}><span>◈</span> SIGNALAF <b>LIVE</b></h1>
         <div className={styles.thesis}>HUMAN <i>×</i> CONTEXT <i>×</i> MODEL</div>
         <div className={styles.controls}>
           <button

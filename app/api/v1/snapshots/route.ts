@@ -40,6 +40,7 @@ import {
 import { captureServer } from "@/lib/infra/posthog/server";
 import { enforceRouteLimit } from "@/lib/infra/route-rate-limit";
 import { sanitizeNotifyCodename, safeText } from "@/lib/ingest/notify-sanitize";
+import { hostProps } from "@/lib/infra/request-host";
 
 const SCORING_ETA_SECONDS = 30;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
@@ -542,6 +543,7 @@ export async function POST(req: NextRequest) {
       payload.raw_telemetry.tokens_cache_creation > 0 &&
       payload.raw_telemetry.tokens_cache_read > 0,
     flag_codes: flagCodes,
+    ...hostProps(req),
   });
 
   // Notify the owner when a submission has flags (internal signals for review).

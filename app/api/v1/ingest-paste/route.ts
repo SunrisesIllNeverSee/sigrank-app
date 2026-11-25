@@ -31,6 +31,7 @@ import { pillarsToCore5 } from "@/lib/ingest/bridge";
 import { scoreSnapshot } from "@/lib/analytics/scoring-engine";
 import { publicScoringRules } from "@/lib/analytics/public-scoring";
 import { captureServer } from "@/lib/infra/posthog/server";
+import { hostProps } from "@/lib/infra/request-host";
 
 const SCORING_ETA_SECONDS = 10;
 
@@ -185,6 +186,7 @@ export async function POST(req: NextRequest) {
     window_type: windowType,
     platform: platformRaw,
     class_tier: scored.class_tier,
+    ...hostProps(req),
   });
 
   // 5. Respond

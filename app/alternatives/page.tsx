@@ -83,7 +83,7 @@ const ALTS = [
   {
     href: "/alternatives/mcp-ai-developer-tools",
     title: "Best MCP Tools for AI Developers (2026)",
-    desc: "The 6 best MCP tools for AI developers in 2026. SigRank MCP, Claude Code MCP, Continue MCP, Smithery, Glama MCP Registry, and MCP.so — which gives agents self-awareness of their own metrics.",
+    desc: "The 5 best MCP tools for AI developers in 2026. SigRank MCP, Claude Code MCP, Continue MCP, Glama MCP Registry, and MCP.so — which gives agents self-awareness of their own metrics.",
   },
 ];
 

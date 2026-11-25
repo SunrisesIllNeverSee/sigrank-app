@@ -42,6 +42,11 @@
 }
 
 .brand {
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+  color: inherit;
+  text-transform: none;
   gap: 10px;
   font-size: 14px;
   font-weight: 800;

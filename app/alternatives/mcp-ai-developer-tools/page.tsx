@@ -22,7 +22,7 @@ import { breadcrumb, faqPage, alternativesItemList } from "@/lib/jsonld";
 export const metadata: Metadata = withOG({
   title: "Best MCP Tools for AI Developers (2026)",
   description:
-    "The 6 best MCP tools for AI developers in 2026. SigRank MCP, Claude Code MCP, Continue MCP, Smithery, Glama MCP Registry, and MCP.so — which MCP server gives AI agents self-awareness of their own efficiency.",
+    "The 5 best MCP tools for AI developers in 2026. SigRank MCP, Claude Code MCP, Continue MCP, Glama MCP Registry, and MCP.so — which MCP server gives AI agents self-awareness of their own efficiency.",
   path: "/alternatives/mcp-ai-developer-tools",
 });
 
@@ -91,23 +91,6 @@ const TOOLS: Tool[] = [
     bestFor: "Continue editor users wanting codebase context exposed to AI agents via MCP",
   },
   {
-    name: "Smithery",
-    measures:
-      "MCP server registry and package manager — discover, install, and manage MCP servers for AI workflows. Infrastructure for MCP, not an efficiency-specific server itself.",
-    pros: [
-      "Registry model — discover and install MCP servers in one place",
-      "Package manager workflow — familiar to developers",
-      "Growing catalog of MCP servers across categories",
-    ],
-    cons: [
-      "Registry, not a server — does not expose any token or efficiency metrics itself",
-      "Quality varies across listed servers — no efficiency-specific curation",
-      "No agent self-awareness — agents cannot read their own metrics via Smithery",
-    ],
-    pricing: "Free (open-source registry)",
-    bestFor: "Discovering and installing MCP servers for AI developer workflows",
-  },
-  {
     name: "Glama MCP Registry",
     measures:
       "Curated MCP server registry — browse and deploy MCP servers for AI applications. Discovery and deployment infrastructure, not an efficiency-specific server.",
@@ -147,7 +130,7 @@ const FAQS = [
   {
     question: "What are MCP tools for AI developers?",
     answer:
-      "MCP (Model Context Protocol) tools expose servers that let AI agents read context, run tools, and interact with external systems during coding workflows. They range from general-purpose servers (Claude Code MCP, Continue MCP) to registries and directories (Smithery, Glama, MCP.so). SigRank MCP is the only server that lets AI agents read their own token-cascade efficiency (Υ Yield: cache_read × output / input²) — giving agents self-awareness of whether their usage is compounding or burning.",
+      "MCP (Model Context Protocol) tools expose servers that let AI agents read context, run tools, and interact with external systems during coding workflows. They range from general-purpose servers (Claude Code MCP, Continue MCP) to registries and directories (Glama, MCP.so). SigRank MCP is the only server that lets AI agents read their own token-cascade efficiency (Υ Yield: cache_read × output / input²) — giving agents self-awareness of whether their usage is compounding or burning.",
   },
   {
     question: "How does SigRank's MCP server work?",
@@ -157,7 +140,7 @@ const FAQS = [
   {
     question: "Which MCP tools are best for AI coding workflows?",
     answer:
-      "For general agentic context (file access, shell commands), Claude Code MCP is the standard for Claude Code users. For editor-integrated context, Continue MCP. For discovering MCP servers, Smithery, Glama, and MCP.so are the main registries. But for agent self-awareness of coding efficiency, SigRank MCP is the only server that exposes token-cascade metrics — letting agents read and react to their own Υ Yield.",
+      "For general agentic context (file access, shell commands), Claude Code MCP is the standard for Claude Code users. For editor-integrated context, Continue MCP. For discovering MCP servers, Glama and MCP.so are registries. But for agent self-awareness of coding efficiency, SigRank MCP is the only server that exposes token-cascade metrics — letting agents read and react to their own Υ Yield.",
   },
   {
     question: "Can AI agents read their own metrics via MCP?",
@@ -167,7 +150,7 @@ const FAQS = [
   {
     question: "Are MCP developer tools free?",
     answer:
-      "Yes. SigRank MCP, Claude Code MCP, Continue MCP, Smithery, Glama MCP Registry, and MCP.so are all free. SigRank MCP is open-source (MIT-licensed). The difference is that only SigRank MCP exposes efficiency metrics to agents — the rest provide general context or discovery infrastructure without giving agents self-awareness of their own cascade.",
+      "Yes. SigRank MCP, Claude Code MCP, Continue MCP, Glama MCP Registry, and MCP.so are all free. SigRank MCP is open-source (MIT-licensed). The difference is that only SigRank MCP exposes efficiency metrics to agents — the rest provide general context or discovery infrastructure without giving agents self-awareness of their own cascade.",
   },
 ];
 
@@ -197,7 +180,7 @@ export default function MCPAIDeveloperToolsPage() {
         title="Best MCP Tools for AI Developers (2026)"
         subtitle={
           <>
-            Six MCP tools for AI dev workflows. Only one gives agents{" "}
+            Five MCP tools for AI dev workflows. Only one gives agents{" "}
             <span className="text-gold">self-awareness</span> of their own
             efficiency.
           </>
@@ -212,7 +195,7 @@ export default function MCPAIDeveloperToolsPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           Most MCP tools for AI developers expose <em>external context</em> to
           agents. Claude Code MCP gives agents file and shell access. Continue
-          MCP gives agents codebase context. Smithery, Glama, and MCP.so help
+          MCP gives agents codebase context. Glama and MCP.so help
           you discover and install MCP servers. None of these let an agent read
           its own <strong className="text-text-primary">efficiency</strong> —
           whether its token cascade is compounding or burning.
@@ -287,7 +270,7 @@ export default function MCPAIDeveloperToolsPage() {
       {/* Detailed cards */}
       <section className="flex flex-col gap-4">
         <h2 className="font-mono text-base font-bold text-text-primary">
-          The 6 tools, in detail
+          The 5 tools, in detail
         </h2>
         <div className="flex flex-col gap-5">
           {TOOLS.map((t, i) => (
@@ -392,7 +375,7 @@ export default function MCPAIDeveloperToolsPage() {
         <p className="font-sans text-sm leading-relaxed text-text-secondary">
           If you want agents to read and write files, Claude Code MCP will let
           them. If you want codebase context, Continue MCP will provide it. If
-          you want to discover MCP servers, Smithery, Glama, and MCP.so will
+          you want to discover MCP servers, Glama and MCP.so will
           help you find them. But if you want your AI agents to{" "}
           <strong className="text-text-primary">read their own efficiency</strong>{" "}
           — to see their Υ Yield, cache hit rate, and class tier, and adjust

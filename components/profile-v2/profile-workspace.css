@@ -241,7 +241,7 @@
   .lbw-root .ws-pm-id{display:flex;align-items:center;gap:12px;min-width:0}
   .lbw-root .ws-pm-av{flex:none;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 18px var(--pv2-display,var(--font-d),monospace);color:var(--tx);background:radial-gradient(circle at 30% 30%,#4c1d95,#1a1128 75%);border:2px solid rgba(168,85,247,.6)}
   .lbw-root .ws-pm-names{min-width:0;display:flex;flex-direction:column;gap:2px}
-  .lbw-root .ws-pm-names h1{margin:0;font:700 20px/1.2 var(--font-sg,system-ui,sans-serif);color:var(--tx);overflow-wrap:anywhere}
+  .lbw-root .ws-pm-names h2{margin:0;font:700 20px/1.2 var(--font-sg,system-ui,sans-serif);color:var(--tx);overflow-wrap:anywhere}
   .lbw-root .ws-pm-handle{font:12px var(--font-mono);color:var(--mut);overflow-wrap:anywhere}
   .lbw-root .ws-pm-pills{display:flex;flex-wrap:wrap;gap:6px}
   .lbw-root .ws-pm-pills span{font:600 12px var(--font-mono);letter-spacing:.04em;padding:5px 10px;border:1px solid var(--line2);border-radius:999px;color:var(--tx2);background:var(--bg2);text-transform:uppercase}

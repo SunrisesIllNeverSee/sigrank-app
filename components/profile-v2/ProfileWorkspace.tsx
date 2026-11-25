@@ -41,7 +41,7 @@ function PhoneHeader({ name, codename, rank, tier, platform }: { name: string; c
     <div className="ws-pm-id">
       <span className="ws-pm-av" aria-hidden="true">{initials}</span>
       <div className="ws-pm-names">
-        <h1>{name}</h1>
+        <h2>{name}</h2>
         <span className="ws-pm-handle">@{codename}</span>
       </div>
     </div>
