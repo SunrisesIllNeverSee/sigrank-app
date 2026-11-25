@@ -44,17 +44,28 @@ export function ttlMemo<A extends unknown[], R>(
   ttlMs: number,
   keyOf: (...args: A) => string,
   load: (...args: A) => Promise<R>,
+  /** Optional: results failing this check (e.g. empty) are cached only for `negativeTtlMs`. */
+  keep: (value: R) => boolean = () => true,
+  negativeTtlMs = 10_000,
 ): ((...args: A) => Promise<R>) & { clear(): void } {
-  const cache = new Map<string, { at: number; value: Promise<R> }>();
+  const cache = new Map<string, { at: number; ttl: number; value: Promise<R> }>();
   const fn = (...args: A): Promise<R> => {
     const key = keyOf(...args);
     const now = Date.now();
     const hit = cache.get(key);
-    if (hit && now - hit.at < ttlMs) return hit.value;
+    if (hit && now - hit.at < hit.ttl) return hit.value;
     const value = load(...args);
-    cache.set(key, { at: now, value });
-    value.catch(() => { if (cache.get(key)?.value === value) cache.delete(key); });
-    if (cache.size > 32) for (const [k, v] of cache) if (now - v.at >= ttlMs) cache.delete(k);
+    const entry = { at: now, ttl: ttlMs, value };
+    cache.set(key, entry);
+    value.then(
+      (v) => {
+        let ok: boolean;
+        try { ok = keep(v); } catch { ok = false; }
+        if (!ok) entry.ttl = Math.min(ttlMs, negativeTtlMs);
+      },
+      () => { if (cache.get(key) === entry) cache.delete(key); },
+    );
+    if (cache.size > 32) for (const [k, v] of cache) if (now - v.at >= v.ttl) cache.delete(k);
     return value;
   };
   fn.clear = () => cache.clear();

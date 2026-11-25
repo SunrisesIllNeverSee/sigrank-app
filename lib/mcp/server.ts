@@ -23,8 +23,10 @@ import {
   type PromptCallback,
 } from "@modelcontextprotocol/server";
 import { instrumentMcp } from "@/lib/mcp/analytics";
+import { lenientInputSchema, IGNORED_ARGUMENTS_KEY } from "@/lib/mcp/lenient-schema";
 import { posthogMcp } from "@/lib/mcp/posthog";
 import { TOOLS, NAME_BEARING_TOOLS, callTool } from "@/lib/mcp/tools";
+import { isExchangeTool } from "@/lib/exchange/mcp-server";
 import { UNTRUSTED_TEXT_NOTICE } from "@/lib/mcp/untrusted";
 import { RESOURCES, readResource } from "@/lib/mcp/resources";
 import { PROMPTS, getPrompt } from "@/lib/mcp/prompts";
@@ -71,7 +73,10 @@ export function createSigrankServer(req?: NextRequest): McpServer {
   // PostHog MCP analytics with the shared SigRank options (lib/mcp/analytics):
   // no exception autocapture for expected isError results, no parameters
   // injected into tool schemas, and surface/traffic labels on every event.
-  instrumentMcp(server, posthogMcp);
+  // Every tool name this endpoint serves (its own 16 plus the legacy Exchange
+// bridge) counts as known; anything else is tagged is_probe.
+  const ownTools = new Set<string>(TOOLS.map((t) => t.name));
+  instrumentMcp(server, posthogMcp, (name) => ownTools.has(name) || isExchangeTool(name));
 
   // ── Register all 16 SigRank tools ──────────────────────────────────────
   // Each tool's handler delegates to the existing callTool dispatcher,
@@ -79,9 +84,9 @@ export function createSigrankServer(req?: NextRequest): McpServer {
   // fromJsonSchema wraps raw JSON Schema into StandardSchema for the SDK.
   for (const tool of TOOLS) {
     const toolName = tool.name;
-    const inputSchema = fromJsonSchema(
-      tool.inputSchema as Record<string, unknown>,
-    ) as StandardSchemaWithJSON<Record<string, unknown>, Record<string, unknown>>;
+    // Unknown extra properties are ignored (not rejected); validation errors
+    // list the required fields and an example call.
+    const inputSchema = lenientInputSchema(toolName, tool.inputSchema as Record<string, unknown>);
     const outputSchema =
       "outputSchema" in tool && tool.outputSchema
         ? (fromJsonSchema(
@@ -100,15 +105,19 @@ export function createSigrankServer(req?: NextRequest): McpServer {
     const toolHandler = async (
       args: Record<string, unknown>,
     ): Promise<CallToolResult> => {
-      const toolArgs =
+      const { [IGNORED_ARGUMENTS_KEY]: ignoredArguments, ...toolArgs } =
         args && typeof args === "object" && !Array.isArray(args)
           ? (args as Record<string, unknown>)
-          : {};
-      const result = (await callTool(
+          : ({} as Record<string, unknown>);
+      const rawResult = (await callTool(
         toolName,
         toolArgs,
         req!,
       )) as CallToolResult;
+      // Unknown extra properties are ignored, and reported back here.
+      const result: CallToolResult = Array.isArray(ignoredArguments) && ignoredArguments.length
+        ? { ...rawResult, _meta: { ...rawResult._meta, ignored_arguments: ignoredArguments } }
+        : rawResult;
 
       // Record observability with the ACTUAL result and ACTUAL duration
       // (measured from request start through tool execution). This restores

@@ -24,17 +24,36 @@ class ToolError extends Error {
   constructor(public code: string, message: string, public retryable = false) { super(message); }
 }
 
+const SUPPORTED_PLATFORMS = ["claude", "codex", "chatgpt", "gemini", "pi", "multi"] as const;
+// Unambiguous client/product names agents send for a supported platform. Vendor
+// names (anthropic, google, openai, gpt) are deliberately not mapped: they do not
+// name one platform.
+const PLATFORM_ALIASES: Record<string, string> = {
+  "claude-code": "claude", "claude-desktop": "claude", "claude-ai": "claude", "claude-cowork": "claude",
+  "codex-cli": "codex", "openai-codex": "codex", "codex-mcp-client": "codex",
+  "chatgpt-desktop": "chatgpt", "chatgpt-app": "chatgpt",
+  "gemini-cli": "gemini",
+};
+/** Lowercase, trim, underscores to hyphens, then map unambiguous client names. Non-strings pass through. */
+export function normalizePlatform<T>(platform: T): T | string {
+  if (typeof platform !== "string") return platform;
+  const key = platform.trim().toLowerCase().replace(/_/g, "-");
+  return PLATFORM_ALIASES[key] ?? key;
+}
+const FIND_CODENAMES = "Find valid codenames with get_leaderboard (entries[].codename).";
+
 function scopeOf(args: Args, defaultView: Scope["view"] = "total"): Scope {
   const window = args.window ?? "all";
   if (args.dataset !== undefined && args.dataset !== "live") throw new ToolError("UNSUPPORTED_SCOPE", "Use get_historical_board for the frozen July archive.");
-  const platform = args.platform ?? "all";
+  const rawPlatform = args.platform ?? "all";
+  const platform = normalizePlatform(rawPlatform);
   const cohort = args.cohort ?? "public";
   const view = args.view ?? defaultView;
   if (typeof window !== "string" || !WINDOWS.has(window)) throw new ToolError("INVALID_ARGUMENT", "Unsupported window.");
   if (typeof platform !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(platform)) throw new ToolError("INVALID_ARGUMENT", "Invalid platform.");
-  if (platform !== "all" && !["claude", "codex", "chatgpt", "gemini", "pi", "multi"].includes(platform)) throw new ToolError("UNSUPPORTED_SCOPE", "Platform is not supported.");
+  if (platform !== "all" && !(SUPPORTED_PLATFORMS as readonly string[]).includes(platform)) throw new ToolError("UNSUPPORTED_SCOPE", `Platform is not supported. Use one of: all, ${SUPPORTED_PLATFORMS.join(", ")}.`);
   if (view !== "total" && view !== "platforms") throw new ToolError("INVALID_ARGUMENT", "view must be total or platforms.");
-  if (cohort !== "public") throw new ToolError("UNSUPPORTED_SCOPE", "Evidence-class cohorts require stored provenance; existing board rows cannot support them yet.");
+  if (cohort !== "public") throw new ToolError("UNSUPPORTED_SCOPE", "Evidence-class cohorts (exact4, reconstructed4) require stored provenance; existing board rows cannot support them yet. Use cohort \"public\" (the default) or omit the argument.");
   return { dataset: "live", window: window as Scope["window"], platform, cohort: "public", view, category: "all", population: view === "total" ? "claimed_operators" : "public_operators" };
 }
 
@@ -152,7 +171,7 @@ function historicalResult(args: Args) {
     throw new ToolError("INVALID_ARGUMENT", "The historical tool reads only the frozen July 31 snapshot, with its original classification.");
   const board = getHistoricalBoard(), { metric, order, limit } = readOrder(args);
   if (args.dataset !== undefined && args.dataset !== "july_2026") throw new ToolError("INVALID_ARGUMENT", "Unsupported archive dataset.");
-  const platform = args.platform ?? "all";
+  const platform = normalizePlatform(args.platform ?? "all");
   if (typeof platform !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(platform)) throw new ToolError("INVALID_ARGUMENT", "Invalid platform.");
   const names = args.codenames;
   if (names !== undefined && (!Array.isArray(names) || names.length < 1 || names.length > 10 || names.some(n => typeof n !== "string" || !/^[a-zA-Z0-9_-]{1,128}$/.test(n))))
@@ -160,7 +179,7 @@ function historicalResult(args: Args) {
   const selected = board.entries.filter(e => (platform === "all" || (e.platform ?? e.primaryDomain)?.toLowerCase() === platform)
     && (!names || (names as string[]).some(n => n.toLowerCase() === e.codename.toLowerCase())));
   if (names && (names as string[]).some(n => !selected.some(e => e.codename.toLowerCase() === n.toLowerCase())))
-    throw new ToolError("NOT_FOUND", "An archive codename is unavailable in this platform scope.");
+    throw new ToolError("NOT_FOUND", "An archive codename is unavailable in this platform scope. List archive entries with get_historical_board (no codenames filter) to see valid codenames.");
   const entries = selected.map(e => ({ codename: e.codename, display_name: safeName(e.subLabel, e.codename), rank: e.rank,
     platform: e.platform ?? e.primaryDomain ?? "unknown", source_label: e.isSeed === true ? "seeded" : e.isSeed === false ? "recorded_real" : "unknown",
     class_tier: e.signalClass, operating_ratio: e.opRatio ?? null,
@@ -245,7 +264,7 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       let op: LeaderboardRow | null;
       try { op = await getOperator(codename, true); }
       catch { throw new ToolError("UPSTREAM_UNAVAILABLE", "Live operator read failed.", true); }
-      if (!op || op.operator.isPlaceholder || op.operator.status === "retired") throw new ToolError("NOT_FOUND", "Operator not found.");
+      if (!op || op.operator.isPlaceholder || op.operator.status === "retired") throw new ToolError("NOT_FOUND", `Operator not found. ${FIND_CODENAMES}`);
       const rows = await liveBoard(scope);
       const selected = rows.find(r => r.operator.codename.toLowerCase() === codename.toLowerCase());
       const row = selected ?? { ...op, pending: true };
@@ -257,7 +276,7 @@ export async function callPluginTool(name: string, args: Args, request: Request)
       const rows = await liveBoard(scope);
       const ar = rows.find(r => r.operator.codename.toLowerCase() === a.toLowerCase());
       const br = rows.find(r => r.operator.codename.toLowerCase() === b.toLowerCase());
-      if (!ar || !br) throw new ToolError("NOT_FOUND", "One or both operators are unavailable in this scope.");
+      if (!ar || !br) throw new ToolError("NOT_FOUND", `One or both operators are unavailable in this scope. ${FIND_CODENAMES}`);
       const operatorA = operatorDto(ar, scope), operatorB = operatorDto(br, scope);
       const delta = Object.fromEntries(METRICS.map(metric => {
         const av = operatorA.metrics[metric], bv = operatorB.metrics[metric];

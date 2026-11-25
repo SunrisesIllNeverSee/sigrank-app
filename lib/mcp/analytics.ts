@@ -14,7 +14,8 @@
  * 2026-11-11: real apps were `claude-ai` / `Claude-User/1.0 (Anthropic MCP
  * client)`, `claude-code` and `codex-mcp-client`; ~90% of connections were bots.
  */
-import { instrument, type MCPAnalyticsOptions } from "@posthog/mcp";
+import { createHash } from "node:crypto";
+import { instrument, getRequestHeaders, type MCPAnalyticsOptions } from "@posthog/mcp";
 import type { PostHog } from "posthog-node";
 
 type Surface = "chatgpt" | "claude" | "codex" | "other" | "unknown";
@@ -43,7 +44,42 @@ export function mcpTraffic(clientName: string, userAgent: string): "probe" | "cl
   return PROBE.test(`${clientName} ${userAgent}`) ? "probe" : "client";
 }
 
-export function mcpAnalyticsOptions(): MCPAnalyticsOptions {
+/** Tool names that only scanners and registry monitors call on purpose. */
+const PROBE_TOOL = /__.*nonexistent.*__|nonexistent|probe|authprobe/i;
+
+/**
+ * True for traffic that is not real use: monitor/registry/scanner clients, tool
+ * names that are probes by their own name, and calls to tools this server does
+ * not have. `$mcp_tool_call` events carry this as `is_probe` so error rates can
+ * exclude them. `knownTools` is the server's own tool list (undefined = skip
+ * the unknown-tool test).
+ */
+export function isProbeCall(
+  clientName: string,
+  userAgent: string,
+  toolName: string,
+  isKnownTool?: (name: string) => boolean,
+): boolean {
+  if (mcpTraffic(clientName, userAgent) === "probe") return true;
+  if (!toolName) return false;
+  if (PROBE_TOOL.test(toolName)) return true;
+  return isKnownTool ? !isKnownTool(toolName) : false;
+}
+
+/**
+ * Stable, non-identifying distinct id for one MCP session: a SHA-256 of the
+ * Mcp-Session-Id header (or the transport session id). Never IP, email or any
+ * user identifier. Null when the client sent no session id (stays anonymous).
+ */
+export function sessionDistinctId(sessionId: unknown): string | null {
+  if (typeof sessionId !== "string" || !sessionId.trim()) return null;
+  return `mcp-session:${createHash("sha256").update(sessionId.trim()).digest("hex").slice(0, 32)}`;
+}
+
+export type KnownTools = readonly string[] | ((name: string) => boolean);
+
+export function mcpAnalyticsOptions(known?: KnownTools): MCPAnalyticsOptions {
+  const isKnownTool = Array.isArray(known) ? ((n: string) => (known as readonly string[]).includes(n)) : (known as ((name: string) => boolean) | undefined);
   return {
     // Keep the published tool schemas exactly as written: in @posthog/mcp 0.25
     // these features inject extra tool parameters (conversation_id, llm_model,
@@ -55,18 +91,32 @@ export function mcpAnalyticsOptions(): MCPAnalyticsOptions {
     // arguments), not bugs; they stay on $mcp_tool_call, out of error tracking.
     enableExceptionAutocapture: false,
     ...(process.env.VERCEL_GIT_COMMIT_SHA ? { serverBuild: process.env.VERCEL_GIT_COMMIT_SHA } : {}),
+    // Per-session id from the Mcp-Session-Id header; anonymous when absent.
+    // Intent capture is deliberately off: it needs an injected `context`
+    // argument on every tool (changing published schemas and collecting
+    // agent-written text); see the comment on `context` above.
+    identify: async (_request, extra) => {
+      const headerId = getRequestHeaders(extra)?.["mcp-session-id"];
+      const id = sessionDistinctId(Array.isArray(headerId) ? headerId[0] : headerId ?? extra?.sessionId);
+      return id ? { distinctId: id } : null;
+    },
     beforeSend: event => {
       const props = event.properties;
       const clientName = text(props.$mcp_client_name);
       const userAgent = text(props.$mcp_client_user_agent);
       props.sigrank_mcp_surface = mcpSurface(clientName, userAgent);
       props.sigrank_traffic = mcpTraffic(clientName, userAgent);
+      // Sessions stay anonymous events: no PostHog person profile per session id.
+      props.$process_person_profile = false;
+      if (event.event === "$mcp_tool_call") {
+        props.is_probe = isProbeCall(clientName, userAgent, text(props.$mcp_tool_name), isKnownTool);
+      }
       return event;
     },
   };
 }
 
-export function instrumentMcp(server: unknown, posthog: PostHog | null): void {
+export function instrumentMcp(server: unknown, posthog: PostHog | null, known?: KnownTools): void {
   if (!posthog) return;
-  instrument(server, posthog, mcpAnalyticsOptions());
+  instrument(server, posthog, mcpAnalyticsOptions(known));
 }

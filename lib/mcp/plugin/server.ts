@@ -12,7 +12,7 @@ export function createPluginServer(request: Request): McpServer {
     { capabilities: { tools: { listChanged: false } }, instructions: "Tokenpull measures → SigRank evaluates → SignalAF publishes. Metrics describe observable AI operating structure, not intelligence, productivity, or work quality. Archetypes are operating patterns, not personality. Public exploration does not scan local logs." },
   );
   // PostHog MCP analytics ($mcp_tool_call), before tools are registered.
-  instrumentMcp(server, posthogMcp);
+  instrumentMcp(server, posthogMcp, contracts.tools.map((t) => t.name));
   instrumentPluginRadar(server);
   for (const tool of contracts.tools) {
     const inputSchema = fromJsonSchema(tool.inputSchema as Record<string, unknown>) as StandardSchemaWithJSON<Record<string, unknown>, Record<string, unknown>>;
