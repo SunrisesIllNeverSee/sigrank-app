@@ -22,6 +22,10 @@ describe("Analyst error guidance", () => {
     expect(normalizePlatform("gemini-cli")).toBe("gemini");
     expect(normalizePlatform("claude")).toBe("claude");
     expect(normalizePlatform("cursor")).toBe("cursor");
+    expect(normalizePlatform("Claude_Code")).toBe("claude");
+    expect(normalizePlatform("chatgpt-desktop")).toBe("chatgpt");
+    // Vendor names are not one platform: not mapped.
+    for (const v of ["google", "gpt", "anthropic", "openai"]) expect(normalizePlatform(v)).toBe(v);
   });
 
   it("accepts an alias instead of UNSUPPORTED_SCOPE", async () => {
@@ -52,14 +56,35 @@ describe("Analyst error guidance", () => {
 });
 
 import { ttlMemo } from "@/lib/mcp/untrusted";
-describe("ttlMemo keep", () => {
-  it("does not keep results the caller rejects", async () => {
+describe("ttlMemo negative caching", () => {
+  it("caches rejected results only for the short negative TTL", async () => {
+    vi.useFakeTimers();
+    try {
+      let n = 0;
+      const f = ttlMemo(60_000, (k: string) => k, async (_k: string) => (n++ < 1 ? [] : [1]), (r) => r.length > 0, 10_000);
+      expect(await f("a")).toEqual([]);
+      await Promise.resolve();
+      expect(await f("a")).toEqual([]);
+      expect(n).toBe(1);
+      vi.advanceTimersByTime(11_000);
+      expect(await f("a")).toEqual([1]);
+      vi.advanceTimersByTime(30_000);
+      await f("a");
+      expect(n).toBe(2);
+    } finally { vi.useRealTimers(); }
+  });
+  it("treats a throwing keep as a rejected result", async () => {
     let n = 0;
-    const f = ttlMemo(60_000, (k: string) => k, async (_k: string) => (n++ === 0 ? [] : [1]), (r) => r.length > 0);
-    expect(await f("a")).toEqual([]);
+    const f = ttlMemo(60_000, (k: string) => k, async () => ++n, () => { throw new Error("x"); }, 10_000);
+    expect(await f("a")).toBe(1);
     await Promise.resolve();
-    expect(await f("a")).toEqual([1]);
-    expect(await f("a")).toEqual([1]);
-    expect(n).toBe(2);
+    expect(await f("a")).toBe(1);
+  });
+});
+
+describe("get_historical_board platform aliases", () => {
+  it("normalizes the platform filter", async () => {
+    const out = await call("get_historical_board", { platform: "Claude_Code" });
+    expect(out.error?.code).not.toBe("INVALID_ARGUMENT");
   });
 });

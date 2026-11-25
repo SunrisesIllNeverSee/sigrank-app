@@ -25,15 +25,20 @@ class ToolError extends Error {
 }
 
 const SUPPORTED_PLATFORMS = ["claude", "codex", "chatgpt", "gemini", "pi", "multi"] as const;
-// Names agents commonly send for the same platforms (client names, product names).
+// Unambiguous client/product names agents send for a supported platform. Vendor
+// names (anthropic, google, openai, gpt) are deliberately not mapped: they do not
+// name one platform.
 const PLATFORM_ALIASES: Record<string, string> = {
-  "claude-code": "claude", "claude-desktop": "claude", "claude-ai": "claude", "claude-cowork": "claude", anthropic: "claude",
+  "claude-code": "claude", "claude-desktop": "claude", "claude-ai": "claude", "claude-cowork": "claude",
   "codex-cli": "codex", "openai-codex": "codex", "codex-mcp-client": "codex",
-  gpt: "chatgpt", "openai-chatgpt": "chatgpt", "chatgpt-app": "chatgpt",
-  "gemini-cli": "gemini", google: "gemini",
+  "chatgpt-desktop": "chatgpt", "chatgpt-app": "chatgpt",
+  "gemini-cli": "gemini",
 };
-export function normalizePlatform(platform: string): string {
-  return PLATFORM_ALIASES[platform] ?? platform;
+/** Lowercase, trim, underscores to hyphens, then map unambiguous client names. Non-strings pass through. */
+export function normalizePlatform<T>(platform: T): T | string {
+  if (typeof platform !== "string") return platform;
+  const key = platform.trim().toLowerCase().replace(/_/g, "-");
+  return PLATFORM_ALIASES[key] ?? key;
 }
 const FIND_CODENAMES = "Find valid codenames with get_leaderboard (entries[].codename).";
 
@@ -41,7 +46,7 @@ function scopeOf(args: Args, defaultView: Scope["view"] = "total"): Scope {
   const window = args.window ?? "all";
   if (args.dataset !== undefined && args.dataset !== "live") throw new ToolError("UNSUPPORTED_SCOPE", "Use get_historical_board for the frozen July archive.");
   const rawPlatform = args.platform ?? "all";
-  const platform = typeof rawPlatform === "string" ? normalizePlatform(rawPlatform) : rawPlatform;
+  const platform = normalizePlatform(rawPlatform);
   const cohort = args.cohort ?? "public";
   const view = args.view ?? defaultView;
   if (typeof window !== "string" || !WINDOWS.has(window)) throw new ToolError("INVALID_ARGUMENT", "Unsupported window.");
@@ -166,7 +171,7 @@ function historicalResult(args: Args) {
     throw new ToolError("INVALID_ARGUMENT", "The historical tool reads only the frozen July 31 snapshot, with its original classification.");
   const board = getHistoricalBoard(), { metric, order, limit } = readOrder(args);
   if (args.dataset !== undefined && args.dataset !== "july_2026") throw new ToolError("INVALID_ARGUMENT", "Unsupported archive dataset.");
-  const platform = args.platform ?? "all";
+  const platform = normalizePlatform(args.platform ?? "all");
   if (typeof platform !== "string" || !/^[a-z0-9][a-z0-9-]{0,63}$/.test(platform)) throw new ToolError("INVALID_ARGUMENT", "Invalid platform.");
   const names = args.codenames;
   if (names !== undefined && (!Array.isArray(names) || names.length < 1 || names.length > 10 || names.some(n => typeof n !== "string" || !/^[a-zA-Z0-9_-]{1,128}$/.test(n))))

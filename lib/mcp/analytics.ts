@@ -58,12 +58,12 @@ export function isProbeCall(
   clientName: string,
   userAgent: string,
   toolName: string,
-  knownTools?: ReadonlySet<string>,
+  isKnownTool?: (name: string) => boolean,
 ): boolean {
   if (mcpTraffic(clientName, userAgent) === "probe") return true;
   if (!toolName) return false;
   if (PROBE_TOOL.test(toolName)) return true;
-  return knownTools ? !knownTools.has(toolName) : false;
+  return isKnownTool ? !isKnownTool(toolName) : false;
 }
 
 /**
@@ -76,8 +76,10 @@ export function sessionDistinctId(sessionId: unknown): string | null {
   return `mcp-session:${createHash("sha256").update(sessionId.trim()).digest("hex").slice(0, 32)}`;
 }
 
-export function mcpAnalyticsOptions(knownToolNames?: readonly string[]): MCPAnalyticsOptions {
-  const knownTools = knownToolNames ? new Set(knownToolNames) : undefined;
+export type KnownTools = readonly string[] | ((name: string) => boolean);
+
+export function mcpAnalyticsOptions(known?: KnownTools): MCPAnalyticsOptions {
+  const isKnownTool = Array.isArray(known) ? ((n: string) => (known as readonly string[]).includes(n)) : (known as ((name: string) => boolean) | undefined);
   return {
     // Keep the published tool schemas exactly as written: in @posthog/mcp 0.25
     // these features inject extra tool parameters (conversation_id, llm_model,
@@ -104,15 +106,17 @@ export function mcpAnalyticsOptions(knownToolNames?: readonly string[]): MCPAnal
       const userAgent = text(props.$mcp_client_user_agent);
       props.sigrank_mcp_surface = mcpSurface(clientName, userAgent);
       props.sigrank_traffic = mcpTraffic(clientName, userAgent);
+      // Sessions stay anonymous events: no PostHog person profile per session id.
+      props.$process_person_profile = false;
       if (event.event === "$mcp_tool_call") {
-        props.is_probe = isProbeCall(clientName, userAgent, text(props.$mcp_tool_name), knownTools);
+        props.is_probe = isProbeCall(clientName, userAgent, text(props.$mcp_tool_name), isKnownTool);
       }
       return event;
     },
   };
 }
 
-export function instrumentMcp(server: unknown, posthog: PostHog | null, knownToolNames?: readonly string[]): void {
+export function instrumentMcp(server: unknown, posthog: PostHog | null, known?: KnownTools): void {
   if (!posthog) return;
-  instrument(server, posthog, mcpAnalyticsOptions(knownToolNames));
+  instrument(server, posthog, mcpAnalyticsOptions(known));
 }

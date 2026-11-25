@@ -485,30 +485,58 @@ export const REMOTE_TOOL_COUNT = TOOLS.length;
 /** Tools that return user-supplied profile text; their advertised description carries an untrusted-data notice. */
 export const NAME_BEARING_TOOLS: ReadonlySet<string> = new Set(["get_leaderboard", "get_operator", "benchmark_me", "compare_to_field", "operator_gap", "field_anomaly", "who_operates_like_me", "operator_signature"]);
 
+/** Empty results that came from a failed read (as opposed to a genuinely empty board). */
+const FAILED_READS = new WeakSet<object>();
+
 /**
- * Same code and message as before, plus retry guidance and the public board URL.
- * The cause is upstream (the board read returned no rows, e.g. during the
- * 2026-11-12..15 Supabase egress block), never the caller's arguments.
+ * board_unavailable. Only a read that actually failed is called temporary and
+ * retryable (e.g. the 2026-11-12..15 Supabase egress block). A successful read
+ * that returned no operators means the window has no data: not retryable.
  */
-function boardUnavailable() {
+function boardUnavailable(board: object) {
+  if (FAILED_READS.has(board)) {
+    return textResult({
+      code: "board_unavailable",
+      retryable: true,
+      message: "Live leaderboard data is unavailable (temporary, not caused by your arguments). Retry in a minute; the public board is at https://signalaf.com/board.",
+    }, true);
+  }
   return textResult({
     code: "board_unavailable",
-    retryable: true,
-    message: "Live leaderboard data is unavailable (temporary, not caused by your arguments). Retry in a minute; the public board is at https://signalaf.com/board.",
+    retryable: false,
+    message: "The live leaderboard has no operators for this window. Try a wider window (all or 90d); the public board is at https://signalaf.com/board.",
   }, true);
 }
 
 /**
  * 1000-row board read shared by field-wide tools; memoized for 60s per window.
- * An empty result (upstream failure or fixture-less outage) is never kept, so
- * one bad read does not turn into a minute of board_unavailable.
+ * Empty results are cached only for a short negative TTL (see ttlMemo), so an
+ * outage does not turn into a full-board read per call.
  */
-const getFullBoard = ttlMemo(
+const loadFullBoard = ttlMemo(
   60_000,
   (window: string) => window,
   (window: string) => getLeaderboard({ window, windowFilter: true, limit: 1000 }),
   (rows) => rows.length > 0,
 );
+
+const FAILED_READ_TTL_MS = 10_000;
+const failedReadAt = new Map<string, number>();
+
+async function getFullBoard(window: string): Promise<Awaited<ReturnType<typeof loadFullBoard>>> {
+  const failedAt = failedReadAt.get(window);
+  try {
+    if (failedAt !== undefined && Date.now() - failedAt < FAILED_READ_TTL_MS) throw new Error("recent board read failure");
+    const rows = await loadFullBoard(window);
+    failedReadAt.delete(window);
+    return rows;
+  } catch {
+    if (failedAt === undefined || Date.now() - failedAt >= FAILED_READ_TTL_MS) failedReadAt.set(window, Date.now());
+    const failed: Awaited<ReturnType<typeof loadFullBoard>> = [];
+    FAILED_READS.add(failed);
+    return failed;
+  }
+}
 
 export function validNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
@@ -1204,7 +1232,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const board = await getFullBoard(window);
 
     if (board.length === 0) {
-      return boardUnavailable();
+      return boardUnavailable(board);
     }
 
     // Extract cascade metrics from board rows, filtering to compounding operators
@@ -1346,7 +1374,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     // Fetch the live board to find the target yield threshold
     const board = await getFullBoard(window);
     if (board.length === 0) {
-      return boardUnavailable();
+      return boardUnavailable(board);
     }
 
     const fieldYields: number[] = [];
@@ -1647,7 +1675,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const window = typeof args.window === "string" ? args.window : "30d";
     const board = await getFullBoard(window);
     if (board.length === 0) {
-      return boardUnavailable();
+      return boardUnavailable(board);
     }
 
     // Collect compounding operators
@@ -1781,7 +1809,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
 
     const board = await getFullBoard(window);
     if (board.length === 0) {
-      return boardUnavailable();
+      return boardUnavailable(board);
     }
 
     // Compute signature distance to each board operator
@@ -1868,7 +1896,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const myC = cascade(pillars.input, pillars.output, pillars.cacheCreate, pillars.cacheRead);
     const board = await getFullBoard(window);
     if (board.length === 0) {
-      return boardUnavailable();
+      return boardUnavailable(board);
     }
 
     const yields: number[] = [], leverages: number[] = [], velocities: number[] = [], snrs: number[] = [];

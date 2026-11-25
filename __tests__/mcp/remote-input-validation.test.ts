@@ -50,19 +50,40 @@ describe("remote sigrank input validation", () => {
     expect(text).toMatch(/Example call/);
   });
 
+  it("reports ignored extras back in _meta", async () => {
+    const out = await callTool("rank_paste", { input: 1000, output: 100, cache_read: 5000, cache_write: 100, note: "extra", foo: 1 });
+    expect(out.result._meta?.ignored_arguments).toEqual(["note", "foo"]);
+    expect(JSON.stringify(out.result.content)).not.toContain("__sigrank_ignored_arguments");
+  });
+
+  it("rejects a property that looks like a typo, with did-you-mean", async () => {
+    const text = JSON.stringify(await callTool("rank_paste", { input: 1, output: 1, cache_read: 1, cache_write: 1, cache_wrte: 3 }));
+    expect(text).toMatch(/did you mean \\"cache_write\\"/);
+  });
+
   it("builds example arguments from required fields", () => {
     expect(exampleArguments({ required: ["a", "b"], properties: { a: { type: "number" }, b: { type: "string", enum: ["x"] } } })).toEqual({ a: 1000, b: "x" });
+    expect(exampleArguments({
+      required: ["c", "d", "e", "f", "g", "h"],
+      properties: {
+        c: { const: "fixed" }, d: { type: "integer", minimum: 5000, maximum: 6000 }, e: { type: "integer", maximum: 10 },
+        f: { anyOf: [{ type: "null" }, { type: "string", minLength: 8 }] }, g: { type: "string", examples: ["hello"] }, h: { type: "string", maxLength: 3 },
+      },
+    })).toEqual({ c: "fixed", d: 5000, e: 10, f: "examplex", g: "hello", h: "exa" });
   });
 });
 
 describe("remote sigrank probe flag and session id", () => {
   it("flags nonexistent tools and probe names, not real tools", () => {
-    const known = new Set(["rank_paste"]);
+    const known = (n: string) => n === "rank_paste";
     expect(isProbeCall("", "", "__mcp_index_nonexistent__", known)).toBe(true);
     expect(isProbeCall("", "", "__orank_nonexistent_tool_probe__", known)).toBe(true);
     expect(isProbeCall("", "", "calculate", known)).toBe(true);
     expect(isProbeCall("mcp-registry-call-probe", "x", "rank_paste", known)).toBe(true);
     expect(isProbeCall("claude-code", "x", "rank_paste", known)).toBe(false);
+    // Exchange tools served through /api/mcp are known, not probes.
+    const withExchange = (n: string) => known(n) || n.startsWith("exchange_");
+    expect(isProbeCall("claude-code", "x", "exchange_get_policy", withExchange)).toBe(false);
   });
 
   it("stamps is_probe on tool-call events", async () => {
@@ -92,6 +113,7 @@ describe("session distinct id on the wire", () => {
     const calls = h.captured.filter(e => e.event === "$mcp_tool_call");
     const withId = calls.find(c => String(c.distinctId ?? c.properties.distinct_id).startsWith("mcp-session:"));
     expect(withId).toBeTruthy();
+    expect(calls.every(c => c.properties.$process_person_profile === false)).toBe(true);
     expect(JSON.stringify(calls)).not.toContain("sess-secret-1");
   });
 });
