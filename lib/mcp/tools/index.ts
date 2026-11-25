@@ -485,11 +485,29 @@ export const REMOTE_TOOL_COUNT = TOOLS.length;
 /** Tools that return user-supplied profile text; their advertised description carries an untrusted-data notice. */
 export const NAME_BEARING_TOOLS: ReadonlySet<string> = new Set(["get_leaderboard", "get_operator", "benchmark_me", "compare_to_field", "operator_gap", "field_anomaly", "who_operates_like_me", "operator_signature"]);
 
-/** 1000-row board read shared by field-wide tools; memoized for 60s per window. */
+/**
+ * Same code and message as before, plus retry guidance and the public board URL.
+ * The cause is upstream (the board read returned no rows, e.g. during the
+ * 2026-11-12..15 Supabase egress block), never the caller's arguments.
+ */
+function boardUnavailable() {
+  return textResult({
+    code: "board_unavailable",
+    retryable: true,
+    message: "Live leaderboard data is unavailable (temporary, not caused by your arguments). Retry in a minute; the public board is at https://signalaf.com/board.",
+  }, true);
+}
+
+/**
+ * 1000-row board read shared by field-wide tools; memoized for 60s per window.
+ * An empty result (upstream failure or fixture-less outage) is never kept, so
+ * one bad read does not turn into a minute of board_unavailable.
+ */
 const getFullBoard = ttlMemo(
   60_000,
   (window: string) => window,
   (window: string) => getLeaderboard({ window, windowFilter: true, limit: 1000 }),
+  (rows) => rows.length > 0,
 );
 
 export function validNumber(value: unknown): value is number {
@@ -1186,7 +1204,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const board = await getFullBoard(window);
 
     if (board.length === 0) {
-      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable. Try again later." }, true);
+      return boardUnavailable();
     }
 
     // Extract cascade metrics from board rows, filtering to compounding operators
@@ -1328,7 +1346,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     // Fetch the live board to find the target yield threshold
     const board = await getFullBoard(window);
     if (board.length === 0) {
-      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable. Try again later." }, true);
+      return boardUnavailable();
     }
 
     const fieldYields: number[] = [];
@@ -1629,7 +1647,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const window = typeof args.window === "string" ? args.window : "30d";
     const board = await getFullBoard(window);
     if (board.length === 0) {
-      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
+      return boardUnavailable();
     }
 
     // Collect compounding operators
@@ -1763,7 +1781,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
 
     const board = await getFullBoard(window);
     if (board.length === 0) {
-      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
+      return boardUnavailable();
     }
 
     // Compute signature distance to each board operator
@@ -1850,7 +1868,7 @@ export async function callTool(name: string, args: Record<string, unknown>, req:
     const myC = cascade(pillars.input, pillars.output, pillars.cacheCreate, pillars.cacheRead);
     const board = await getFullBoard(window);
     if (board.length === 0) {
-      return textResult({ code: "board_unavailable", message: "Live leaderboard data is unavailable." }, true);
+      return boardUnavailable();
     }
 
     const yields: number[] = [], leverages: number[] = [], velocities: number[] = [], snrs: number[] = [];

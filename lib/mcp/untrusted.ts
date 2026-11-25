@@ -44,6 +44,8 @@ export function ttlMemo<A extends unknown[], R>(
   ttlMs: number,
   keyOf: (...args: A) => string,
   load: (...args: A) => Promise<R>,
+  /** Optional: results failing this check are returned but not kept in the cache. */
+  keep: (value: R) => boolean = () => true,
 ): ((...args: A) => Promise<R>) & { clear(): void } {
   const cache = new Map<string, { at: number; value: Promise<R> }>();
   const fn = (...args: A): Promise<R> => {
@@ -53,7 +55,10 @@ export function ttlMemo<A extends unknown[], R>(
     if (hit && now - hit.at < ttlMs) return hit.value;
     const value = load(...args);
     cache.set(key, { at: now, value });
-    value.catch(() => { if (cache.get(key)?.value === value) cache.delete(key); });
+    value.then(
+      (v) => { if (!keep(v) && cache.get(key)?.value === value) cache.delete(key); },
+      () => { if (cache.get(key)?.value === value) cache.delete(key); },
+    );
     if (cache.size > 32) for (const [k, v] of cache) if (now - v.at >= ttlMs) cache.delete(k);
     return value;
   };
